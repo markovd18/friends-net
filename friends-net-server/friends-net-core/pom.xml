@@ -12,7 +12,7 @@
 
     <artifactId>friends-net-core</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>friends-net-core</name>
+    <name>Core</name>
     <description>Core module of the Friends Net application.</description>
 
     <dependencies>
@@ -46,4 +46,22 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

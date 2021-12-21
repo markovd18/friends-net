@@ -5,14 +5,22 @@
 
     <parent>
         <groupId>cz.markovda</groupId>
-        <artifactId>friends-net</artifactId>
+        <artifactId>friends-net-server</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../friends-net</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>friends-net-war</artifactId>
+    <artifactId>friends-net-docker</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>friends-net-war</name>
+    <name>Docker</name>
+    <packaging>war</packaging>
     <description>Deployment module of the Friends Net application.</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>cz.markovda</groupId>
+            <artifactId>friends-net-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>
