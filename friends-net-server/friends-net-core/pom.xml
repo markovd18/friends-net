@@ -17,6 +17,14 @@
     <description>Core module of the Friends Net application.</description>
 
     <dependencies>
+        <!--    API dependency  -->
+        <dependency>
+            <groupId>cz.markovda</groupId>
+            <artifactId>friends-net-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!--    Other dependencies      -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

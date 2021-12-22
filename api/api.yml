@@ -1,0 +1,375 @@
+openapi: 3.0.3
+info:
+  title: Friends Net API
+  description: |
+    Frineds Net server API.
+  version: 1.0.0
+
+# Using basic HTTP authentication, can be switched to OAuth2, OpenId, ...
+# security:
+#   - BasicAuth: []
+
+# Tags are used to group endpoints. There can be multiple tags per endpoint,
+# the first tag determines the interface (in case of Java) defining this endpoint
+# in the generated code.
+tags:
+  - name: TestController
+    description: Test controller API for validation of API generation
+
+# Paths are the URIs within your REST Application.
+paths:
+  '/api/hello':
+    get:
+      summary: Prints simple hello
+      operationId: hello
+      tags:
+        - TestController
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+#   # It is a good practice to prefix your API with some common prefix to
+#   # allow for better serviceability - security rules, loadbalancer configuration...
+#   # We are using /api/v1 here, /admin part is here to differentiate the 
+#   # administrative API from the potential public or other endpoints.
+#   # This is usually the URI of a list (GET) and a create (POST) operations.
+#   '/api/v1/admin/users':
+#     # The HTTP method being used.
+#     get:
+#       # Short human readable description, use the 'description' property to
+#       # add a longer one.
+#       summary: List users
+#       # This is the computer readable identification of this endpoint.
+#       # It usually translates directly to a method name in the generated code.
+#       operationId: listUsers
+#       # See tags above for explanation. Combination of this tag and the operationId
+#       # defined above means this operation will be represented by the UserApi.listUser
+#       # method in the generated code.
+#       tags:
+#         - user
+#       # Example of query parameters (passed as GET/POST parameters). These are here
+#       # to allow for paging of the listed results. Another common use is to 
+#       # add filtering possibility (in the case of list operations).
+#       # This is the first occurence of $ref. Take a look at the referenced 
+#       # object. You can replace this reference with the contents of the object.
+#       # It's up to you whether to use inline or referenced definition.
+#       parameters:
+#         - $ref: '#/components/parameters/OffsetQueryParam'
+#         - $ref: '#/components/parameters/LimitQueryParam'
+#       # This part should cover all possible server responses and their respective
+#       # data structures.
+#       responses:
+#         '200':
+#           $ref: '#/components/responses/ListUsersResponse'
+#         '400':
+#           $ref: '#/components/responses/400'
+#         '401':
+#           $ref: '#/components/responses/401'
+#         '403':
+#           $ref: '#/components/responses/403'
+
+#   # This URI usually serves reads (GET), updates (PUT) and deletes (DELETE).
+#   # Note the part in curly braces which marks the presence of a path parameter.
+#   # In the real URI it is replaced by the parameter's value in the form
+#   # defined by the referenced type. Take a look at it.
+#   '/api/v1/admin/users/{userId}':
+#     parameters:
+#       - $ref: '#/components/parameters/UserIdPathParam'
+#     get:
+#       summary: Get user detail
+#       operationId: getUser
+#       tags:
+#         - user
+#       responses:
+#         '200':
+#           $ref: '#/components/responses/GetUserResponse'
+#         '400':
+#           $ref: '#/components/responses/400'
+#         '401':
+#           $ref: '#/components/responses/401'
+#         '403':
+#           $ref: '#/components/responses/403'
+#         '404':
+#           $ref: '#/components/responses/404'
+#     put:
+#       summary: Update user detail
+#       operationId: updateUser
+#       tags:
+#         - user
+#       requestBody:
+#         $ref: '#/components/requestBodies/UpdateUserRequest'
+#       responses:
+#         '204':
+#           description: User was successfully updated.
+#         '400':
+#           $ref: '#/components/responses/400'
+#         '401':
+#           $ref: '#/components/responses/401'
+#         '403':
+#           $ref: '#/components/responses/403'
+#         '404':
+#           $ref: '#/components/responses/404'
+
+# # Components referenced from the endpoints. There are several groups
+# # of components, we are using parameters, requestBodies, responses, schemas and
+# # securitySchemes here, but there are also others (headers, links, ...) 
+# components:
+
+#   # The actual definitions of query and path parameters referenced above.
+#   # Note that we are describing their features here, but the actual
+#   # data type is being referenced further. This time we do it to reuse
+#   # the data types in other places. It is also good practice to have
+#   # them all defined in the schemas part of the components definition. 
+#   parameters:
+#     OffsetQueryParam:
+#       in: query
+#       name: offset
+#       required: false
+#       schema:
+#         $ref: '#/components/schemas/PageNumber'
+#     LimitQueryParam:
+#       in: query
+#       name: limit
+#       required: false
+#       schema:
+#         $ref: '#/components/schemas/PageSize'
+#     UserIdPathParam:
+#       in: path
+#       name: userId
+#       required: true
+#       schema:
+#         $ref: '#/components/schemas/UUID'
+
+#   # Request bodies for requests that can contain a body (usually POST and PUT).
+#   requestBodies:
+#     UpdateUserRequest:
+#       description: Request body to update a user.
+#       content:
+#         # Multiple mime types can be defined here with different
+#         # referenced schemas, but we are using only application/json
+#         application/json:
+#           schema:
+#             $ref: '#/components/schemas/UpdatableUserInfo'
+
+#   # Response definitions
+#   responses:
+#     # First we define the common responses shared among multiple endpoints.
+#     '400':
+#       description: Problem with input data
+#       content:
+#         application/json:
+#           schema:
+#             $ref: '#/components/schemas/ApiError'
+
+#     '401':
+#       description: User is not authenticated.
+
+#     '403':
+#       description: User is not authorized to perform requested action.
+
+#     '404':
+#       description: Object not found.
+#       content:
+#         application/json:
+#           schema:
+#             $ref: '#/components/schemas/ApiError'
+
+#     # And then the individial responses (usually linked with the 200 OK status code)
+#     GetUserResponse:
+#       description: Response to the getUser operation.
+#       content:
+#         application/json:
+#           schema:
+#             $ref: '#/components/schemas/UserDetail'
+
+#     ListUsersResponse:
+#       description: Response to the listUsers operation.
+#       content:
+#         application/json:
+#           schema:
+#             $ref: '#/components/schemas/UsersList'
+
+
+#   # Finally, the actual objects being referenced in all the parts above, are
+#   # defined in this section. 
+#   schemas:
+  
+#     # This is a simple object showing that you can combine the in-line
+#     # definition of properties with references.
+#     ApiError:
+#       type: object
+#       properties:
+#         code:
+#           $ref: '#/components/schemas/ErrorCode'
+#         message:
+#           type: string
+#           maxLength: 1024
+#       example:
+#         code: APP123
+#         message: Cannot find user 'hlinik'!
+
+#     # Example of a pattern defined string.
+#     ErrorCode:
+#       type: string
+#       pattern: '^[A-Z]{3}\d{3}$'
+#       example: APP123
+
+#     # Another pattern defined string, this time a login name.
+#     Login:
+#       type: string
+#       pattern: '^[a-zA-Z][a-zA-Z0-9]*([\._][a-zA-Z0-9]+)*$'
+#       minLength: 3
+#       example:
+#         - karel.havlicek
+#         - lucy_liu
+  
+#     # Paging properties.
+#     PageNumber:
+#       description: Number of the current page.
+#       type: integer
+#       format: int64
+#       minimum: 0
+#       example: 42
+
+#     PageSize:
+#       description: Number of items on one page.
+#       type: integer
+#       format: int32
+#       minimum: 10
+#       maximum: 100
+#       example: 25
+
+#     Paging:
+#       description: Paging object covering all necessary fields (page number, page size, total count of objects).
+#       type: object
+#       properties:
+#         pageNumber:
+#           $ref: '#/components/schemas/PageNumber'
+#         pageSize:
+#           $ref: '#/components/schemas/PageSize'
+#         totalCount:
+#           $ref: '#/components/schemas/TotalCount'
+#       required:
+#         - pageNumber
+#         - pageSize
+#         - totalCount
+#       example:
+#         pageNumber: 42
+#         pageSize: 25
+#         totalCount: 1984
+
+#     TotalCount:
+#       description: Total count of elements.
+#       type: integer
+#       format: int64
+#       minimum: 0
+#       example: 1984
+
+#     # Request data used to update an existing user.
+#     UpdatableUserInfo:
+#       type: object
+#       properties:
+#         firstName:
+#           type: string
+#           example: Karel
+#         lastName:
+#           type: string
+#           example: Havlíček
+#         email:
+#           type: string
+#           format: email
+#           example: karel.havlicek@gmail.com
+#         password:
+#           type: string
+#           format: password
+#           minLength: 5
+#       example:
+#         firstName: Karel
+#         lastName: Havlíček
+#         email: karel.havlicek@gmail.com
+#         password: L33tHax0r
+
+#     # Detailed user information, note the inheritance represented
+#     # by the allOf property. This adds new properties to the
+#     # UserSummary object.
+#     UserDetail:
+#       type: object
+#       allOf:
+#         - $ref: '#/components/schemas/UserSummary'
+#       properties:
+#         roles:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/UserRole'
+#         description:
+#           type: string
+#           maxLength: 1024
+#           example: He's the boss.
+#       example:
+#         id: af1e78a2-43b4-11eb-9176-54e1ad105857
+#         firstName: Karel
+#         lastName: Havlíček
+#         email: karel.havlicek@gmail.com
+#         description: He's the boss.
+#         roles: [ADMIN, USER]
+
+#     # In this case we include the paging information in the response
+#     # adding the list of users as another property.
+#     UsersList:
+#       type: object
+#       allOf:
+#         - $ref: '#/components/schemas/Paging'
+#       properties:
+#         users:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/UserSummary'
+
+#     UserRole:
+#       type: string
+#       pattern: '^[A-Z]+$'
+#       minLength: 3
+#       maxLength: 64
+#       example: ADMIN
+
+#     UserSummary:
+#       type: object
+#       properties:
+#         id:
+#           $ref: '#/components/schemas/UUID'
+#         login:
+#           $ref: '#/components/schemas/Login'
+#         firstName:
+#           type: string
+#           example: Karel
+#         lastName:
+#           type: string
+#           example: Havlíček
+#         email:
+#           type: string
+#           format: email
+#           example: karel.havlicek@gmail.com
+#       required:
+#         - id
+#         - email
+#       example:
+#         id: af1e78a2-43b4-11eb-9176-54e1ad105857
+#         firstName: Karel
+#         lastName: Havlíček
+#         email: karel.havlicek@gmail.com
+
+#     UUID:
+#       description: Using UUIDs for object IDs instead of plain integers.
+#       type: string
+#       format: uuid
+#       example: af1e78a2-43b4-11eb-9176-54e1ad105857
+
+#   # Security schemes, you can read more about them in the OpenAPI documentation.
+#   # We are using basic HTTP authentication.
+#   securitySchemes:
+#     BasicAuth:
+#       type: http
+#       scheme: basic

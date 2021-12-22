@@ -1,6 +1,7 @@
 package cz.markovda.friendsnet;
 
-import org.springframework.web.bind.annotation.GetMapping;
+import cz.markovda.api.TestControllerApi;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -8,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 21.12.21
  */
 @RestController
-public class TestController {
+public class TestController implements TestControllerApi {
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "hello, docker container!";
+    @Override
+    public ResponseEntity<String> hello() {
+        return ResponseEntity.ok("Hello, Open API world of docker!");
     }
 }
