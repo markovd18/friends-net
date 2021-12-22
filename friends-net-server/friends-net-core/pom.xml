@@ -13,6 +13,7 @@
     <artifactId>friends-net-core</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Core</name>
+    <packaging>jar</packaging>
     <description>Core module of the Friends Net application.</description>
 
     <dependencies>

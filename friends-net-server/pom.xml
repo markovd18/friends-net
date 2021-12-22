@@ -26,7 +26,7 @@
 	<!--	MODULES	-->
 	<modules>
 		<module>friends-net-core</module>
-		<module>friends-net-docker</module>
+<!--		<module>friends-net-docker</module>-->
 	</modules>
 
 	<!--	DEPENDENCIES	-->
