@@ -1,0 +1,12 @@
+wwwroot/*.js
+node_modules
+typings
+dist
+git_push.sh
+*
+!index.ts
+!errors.tsx
+!standardErrorInterceptor.tsx
+!.openapi-generator-ignore
+!.gitignore
+!.npmignore

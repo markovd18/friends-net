@@ -1,7 +1,9 @@
 package cz.markovda.friendsnet;
 
 import cz.markovda.api.TestControllerApi;
+import cz.markovda.vo.HelloResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController implements TestControllerApi {
 
     @Override
-    public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("Hello, Open API world of docker!");
+    public ResponseEntity<HelloResponse> hello() {
+        return ResponseEntity.ok(new HelloResponse().text("Hello, OpenAPI world!"));
     }
 }

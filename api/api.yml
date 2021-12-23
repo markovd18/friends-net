@@ -30,7 +30,15 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/HelloResponse'
+
+components:
+  schemas:
+    HelloResponse:
+      type: object
+      properties:
+        text:
+          type: string
 #   # It is a good practice to prefix your API with some common prefix to
 #   # allow for better serviceability - security rules, loadbalancer configuration...
 #   # We are using /api/v1 here, /admin part is here to differentiate the 
