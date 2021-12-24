@@ -22,6 +22,6 @@
     "typeRoots": ["../node_modules/@types"]
   },
   "references": [{"@markovda/fn": ["packages/friends-net/src"]}, {"@markovda/fn-api": ["packages/friends-net-api/src"]}],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["packages/friends-net/next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", "dist"]
 }
