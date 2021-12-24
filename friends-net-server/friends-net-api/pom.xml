@@ -59,7 +59,7 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <inputSpec>
-                                ../../api/api.yml
+                                ${project.basedir}/../../api/api.yml
                             </inputSpec>
                             <generatorName>spring</generatorName>
                             <modelPackage>cz.markovda.vo</modelPackage>
