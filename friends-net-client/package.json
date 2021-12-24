@@ -9,10 +9,10 @@
     ]
   },
   "scripts": {
-    "dev": "next packages/friends-net dev",
-    "build": "next packages/firends-net build",
-    "start": "next packages/firends-net start",
-    "lint": "next packages/firends-net lint",
+    "dev": "yarn workspace @markovda/friends-net next dev",
+    "build": "yarn workspace @markovda/friends-net next build",
+    "start": "yarn workspace @markovda/friends-net next start",
+    "lint": "yarn workspace @markovda/friends-net next lint",
     "generate-api": "openapi-generator-cli generate -i ../api/api.yml -g typescript-axios -o packages/friends-net-api/src -p withSeparateModelsAndApi=true,apiPackage=api,modelPackage=model,withInterfaces=true,enumPropertyNaming=UPPERCASE --global-property skipFormModel=false",
     "postinstall": "yarn generate-api",
     "deduplicate": "yarn-deduplicate yarn.lock"

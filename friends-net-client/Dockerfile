@@ -40,10 +40,12 @@ RUN adduser -S nextjs -u 1001
 # COPY --from=builder /app/node_modules ./node_modules
 # COPY --from=builder /app/package.json ./package.json
 
-COPY public ./public
-COPY --chown=nextjs:nodejs .next ./.next
+COPY packages/friends-net/public ./packages/friends-net/public
+COPY --chown=nextjs:nodejs packages/friends-net/.next ./packages/friends-net/.next
 COPY node_modules ./node_modules
+COPY packages/friends-net/node_modules ./packages/friends-net/node_modules
 COPY package.json ./package.json
+COPY packages/friends-net/package.json ./packages/friends-net/package.json
 
 USER nextjs
 
@@ -56,4 +58,5 @@ ENV PORT 3000
 # Uncomment the following line in case you want to disable telemetry.
 ENV NEXT_TELEMETRY_DISABLED 1
 
+WORKDIR /app/packages/friends-net
 CMD ["node_modules/.bin/next", "start"]
