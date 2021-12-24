@@ -1,0 +1,1 @@
+CREATE TABLE auth_user(id SERIAL, login varchar(50), password varchar(70))
