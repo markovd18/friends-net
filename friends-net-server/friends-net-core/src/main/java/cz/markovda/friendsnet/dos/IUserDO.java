@@ -7,4 +7,11 @@ public interface IUserDO {
     String getLogin();
 
     String getPassword();
+
+    EnumUserRole getRole();
+
+    enum EnumUserRole {
+        ADMIN,
+        USER
+    }
 }

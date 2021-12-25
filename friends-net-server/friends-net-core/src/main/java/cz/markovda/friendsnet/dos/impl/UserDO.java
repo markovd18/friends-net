@@ -15,18 +15,24 @@ public class UserDO implements IUserDO {
     private int id;
     private String login;
     private String password;
+    private EnumUserRole role;
 
     protected UserDO() {
-    }
-
-    protected UserDO(final int id, final String login, final String password) {
-        this.id = id;
-        this.login = login;
-        this.password = password;
+        this(null, null);
     }
 
     protected UserDO(final String login, final String password) {
+        this(0, login, password);
+    }
+
+    protected UserDO(final int id, final String login, final String password) {
+        this(id, login, password, EnumUserRole.USER);
+    }
+
+    protected UserDO(final int id, final String login, final String password, final EnumUserRole role) {
+        this.id = id;
         this.login = login;
         this.password = password;
+        this.role = role;
     }
 }

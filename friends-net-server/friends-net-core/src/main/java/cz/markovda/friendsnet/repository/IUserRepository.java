@@ -14,5 +14,5 @@ public interface IUserRepository {
 
     int saveUser(IUserDO user);
 
-    Optional<IUserDO> findUserByLogin(String login);
+    Optional<IUserDO> findUserWithRoleByLogin(String login);
 }

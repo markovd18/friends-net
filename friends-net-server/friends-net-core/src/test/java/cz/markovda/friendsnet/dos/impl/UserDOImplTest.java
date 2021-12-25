@@ -1,8 +1,10 @@
 package cz.markovda.friendsnet.dos.impl;
 
+import cz.markovda.friendsnet.dos.IUserDO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -56,9 +58,62 @@ public class UserDOImplTest {
     }
 
     @Test
+    public void userCreated_withIdLoginPasswordConstructor_hasAllAttributesSet() {
+        final var id = 45;
+        final var login = "extra good login";
+        final var password = "hi mom";
+
+        UserDO userDO = new UserDO(id, login, password);
+        assertAll(() -> assertEquals(id, userDO.getId(), "Created user does not retain id set through constructor!"),
+                () -> assertEquals(login, userDO.getLogin(), "Created user does not retain login set through constructor!"),
+                () -> assertEquals(password, userDO.getPassword(), "Created user does not retain password set through constructor!"),
+                () -> assertEquals(IUserDO.EnumUserRole.USER, userDO.getRole(), "Created user does not have default role USER!"));
+    }
+
+    @Test
+    public void userCreated_withIdLoginPasswordRoleConstructor_hasAllAttributesSet() {
+        final var id = 1268;
+        final var login = "";
+        final var password = "encrypt me pls";
+        final var role = IUserDO.EnumUserRole.ADMIN;
+
+        UserDO userDO = new UserDO(id, login, password, role);
+        assertAll(() -> assertEquals(id, userDO.getId(), "Created user does not retain id set through constructor!"),
+                () -> assertEquals(login, userDO.getLogin(), "Created user does not retain login set through constructor!"),
+                () -> assertEquals(password, userDO.getPassword(), "Created user does not retain password set through constructor!"),
+                () -> assertEquals(role, userDO.getRole(), "Created user does not retain role set through constructor!"));
+    }
+
+    @Test
     public void emptyUserRetainsSetLogin() {
-        emptyUser.setLogin("amazing login");
-        assertNotNull(emptyUser.getLogin(), "User with login explicitly set should retain this value!");
+        final var login = "amazing login";
+
+        emptyUser.setLogin(login);
+        assertEquals(login, emptyUser.getLogin(), "User with login explicitly set should retain this value!");
+    }
+
+    @Test
+    public void userRetainsSetPassword() {
+        final var password = "123456789";
+
+        emptyUser.setPassword(password);
+        assertEquals(password, emptyUser.getPassword(), "User DO does not retain set password!");
+    }
+
+    @Test
+    public void userRetainsSetId() {
+        final var id = 5;
+
+        emptyUser.setId(id);
+        assertEquals(id, emptyUser.getId(), "User DO does not retain set ID!");
+    }
+
+    @Test
+    public void userRetainsSetRole() {
+        final var role = IUserDO.EnumUserRole.USER;
+
+        emptyUser.setRole(role);
+        assertEquals(role, emptyUser.getRole(), "User DO does not retain set role!");
     }
 
 }

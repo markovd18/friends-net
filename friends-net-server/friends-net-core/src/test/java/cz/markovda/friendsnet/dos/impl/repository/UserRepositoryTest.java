@@ -61,7 +61,7 @@ public class UserRepositoryTest {
         when(factory.createUser((int) queryResult.get("id"), (String) queryResult.get("login"), (String) queryResult.get("password")))
                 .thenReturn(prepareEmptyUserDO());
 
-        final Optional<IUserDO> result = userRepository.findUserByLogin((String) queryResult.get("login"));
+        final Optional<IUserDO> result = userRepository.findUserWithRoleByLogin((String) queryResult.get("login"));
 
         assertNotNull(result, "Query result may not be null!");
         assertTrue(result.isPresent(), "User repository should find an existing user!");
@@ -82,7 +82,7 @@ public class UserRepositoryTest {
                 .thenReturn(queryResult);
         when(factory.createUser(id, login, password)).thenReturn(prepareUserDO(id, login, password));
 
-        final Optional<IUserDO> result = userRepository.findUserByLogin(login);
+        final Optional<IUserDO> result = userRepository.findUserWithRoleByLogin(login);
         assertNotNull(result, "Query result may not be null!");
         assertTrue(result.isPresent(), "User repository should find an existing user!");
 
@@ -108,6 +108,11 @@ public class UserRepositoryTest {
             public String getPassword() {
                 return null;
             }
+
+            @Override
+            public EnumUserRole getRole() {
+                return null;
+            }
         };
     }
 
@@ -126,6 +131,11 @@ public class UserRepositoryTest {
             @Override
             public String getPassword() {
                 return password;
+            }
+
+            @Override
+            public EnumUserRole getRole() {
+                return EnumUserRole.USER;
             }
         };
     }

@@ -10,4 +10,5 @@ public interface IDOFactory {
     IUserDO createUser();
     IUserDO createUser(String login, String password);
     IUserDO createUser(int id, String login, String password);
+    IUserDO createUser(int id, String login, String password, IUserDO.EnumUserRole role);
 }

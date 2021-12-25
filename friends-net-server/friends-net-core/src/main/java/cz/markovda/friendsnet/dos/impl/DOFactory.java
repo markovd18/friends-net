@@ -23,4 +23,9 @@ public class DOFactory implements IDOFactory {
     public IUserDO createUser(final int id, final String login, final String password) {
         return new UserDO(id, login, password);
     }
+
+    @Override
+    public IUserDO createUser(int id, String login, String password, IUserDO.EnumUserRole role) {
+        return new UserDO(id, login, password, role);
+    }
 }
