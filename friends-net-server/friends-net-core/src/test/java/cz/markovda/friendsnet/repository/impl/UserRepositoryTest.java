@@ -1,9 +1,8 @@
-package cz.markovda.friendsnet.dos.impl.repository;
+package cz.markovda.friendsnet.repository.impl;
 
 import cz.markovda.friendsnet.dos.IDOFactory;
 import cz.markovda.friendsnet.dos.IUserDO;
 import cz.markovda.friendsnet.dos.impl.DOFactory;
-import cz.markovda.friendsnet.repository.impl.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -56,7 +55,7 @@ public class UserRepositoryTest {
         queryResult.put("login", "login");
         queryResult.put("password", "password");
 
-        when(jdbcTemplate.queryForMap("SELECT * FROM auth_user WHERE login = ?", queryResult.get("login")))
+        when(jdbcTemplate.queryForMap(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
                 .thenReturn(queryResult);
         when(factory.createUser((int) queryResult.get("id"), (String) queryResult.get("login"), (String) queryResult.get("password")))
                 .thenReturn(prepareEmptyUserDO());
@@ -78,7 +77,7 @@ public class UserRepositoryTest {
         queryResult.put("login", login);
         queryResult.put("password", password);
 
-        when(jdbcTemplate.queryForMap("SELECT * FROM auth_user WHERE login = ?", queryResult.get("login")))
+        when(jdbcTemplate.queryForMap(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
                 .thenReturn(queryResult);
         when(factory.createUser(id, login, password)).thenReturn(prepareUserDO(id, login, password));
 
@@ -89,7 +88,8 @@ public class UserRepositoryTest {
         final IUserDO userDO = result.get();
         assertAll(() -> assertEquals(id, userDO.getId(), "ID of found user has to be equal to the DB record!"),
                 () -> assertEquals(login, userDO.getLogin(), "Login of found user has to be equal to the DB record!"),
-                () -> assertEquals(password, userDO.getPassword(), "Password of found user has to be equal to the DB record!"));
+                () -> assertEquals(password, userDO.getPassword(), "Password of found user has to be equal to the DB record!"),
+                () -> assertEquals(IUserDO.EnumUserRole.USER, userDO.getRole(), "Role of found user has to be equal to the DB record!"));
     }
 
     private IUserDO prepareEmptyUserDO() {

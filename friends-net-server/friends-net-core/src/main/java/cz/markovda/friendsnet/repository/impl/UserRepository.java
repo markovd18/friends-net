@@ -5,6 +5,7 @@ import cz.markovda.friendsnet.dos.IUserDO;
 import cz.markovda.friendsnet.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.Optional;
@@ -14,12 +15,13 @@ import java.util.Optional;
  * @since 24.12.21
  */
 @RequiredArgsConstructor
+@Repository
 public class UserRepository implements IUserRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final IDOFactory factory;
 
-    private static final String USER_WITH_ROLE_BY_LOGIN_QUERY = "SELECT u.id, u.login, u.password, ar.name " +
+    protected static final String USER_WITH_ROLE_BY_LOGIN_QUERY = "SELECT u.id, u.login, u.password, ar.name " +
             "FROM auth_user u " +
             "INNER JOIN auth_user_role aur ON u.id = aur.id_user " +
             "INNER JOIN auth_role ar ON ar.id = aur.id_role " +

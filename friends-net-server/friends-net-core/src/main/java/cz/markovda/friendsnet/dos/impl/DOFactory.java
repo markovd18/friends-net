@@ -2,11 +2,13 @@ package cz.markovda.friendsnet.dos.impl;
 
 import cz.markovda.friendsnet.dos.IDOFactory;
 import cz.markovda.friendsnet.dos.IUserDO;
+import org.springframework.stereotype.Component;
 
 /**
  * @author <a href="mailto:">David Markov</a>
  * @since 24.12.21
  */
+@Component
 public class DOFactory implements IDOFactory {
 
     @Override
