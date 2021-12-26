@@ -6,40 +6,113 @@ info:
   version: 1.0.0
 
 # Using basic HTTP authentication, can be switched to OAuth2, OpenId, ...
-# security:
-#   - BasicAuth: []
-
+#security:
+#   - JsonWebToken: []
 # Tags are used to group endpoints. There can be multiple tags per endpoint,
 # the first tag determines the interface (in case of Java) defining this endpoint
 # in the generated code.
 tags:
-  - name: TestController
-    description: Test controller API for validation of API generation
+  - name: AuthenticationController
+    description: Controller for authentication, signing in and out and signing up.
 
 # Paths are the URIs within your REST Application.
 paths:
-  '/api/hello':
-    get:
-      summary: Prints simple hello
-      operationId: hello
+  '/login':
+    post:
+      summary: Signs user in
+      description: Allows user to sign in and authenticate to get access for all other operations.
+      security: []
       tags:
-        - TestController
+        - AuthenticationController
+      requestBody:
+        $ref: '#/components/requestBodies/LoginRequest'
+      operationId: login
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HelloResponse'
+          $ref: '#/components/responses/LoginResponse'
+        '400':
+          description: User credentials are incorrect
 
 components:
+
+  securitySchemes:
+    JsonWebToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestVO'
+    '401':
+      description: Access token is missing or invalid
+    LoginResponse:
+      description: Response on successfull login request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/JwtVO'
+
+  requestBodies:
+    LoginRequest:
+      required: true
+      description: Request to sign in with login and password.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoginVO'
+
   schemas:
-    HelloResponse:
+    LoginVO:
+      description: Object with user authentication request data.
       type: object
       properties:
-        text:
+        login:
           type: string
-#   # It is a good practice to prefix your API with some common prefix to
+          description: User's username
+          pattern: '[a-zA-Z0-9-_]*'
+          maxLength: 50
+          minLength: 4
+          example: great-login123
+        password:
+          type: string
+          format: password
+          description: User's password
+          example: my-secret_Password
+      required:
+        - login
+        - password
+      example:
+        login: great-login123
+        password: my-secret_Password
+    JwtVO:
+      description: Object carrying generated JSON Web Token used for user authentication.
+      type: object
+      properties:
+        token:
+          type: string
+          description: Generated JSON Web Token.
+          example: 0$[wfwnfuowburmgjo2126+
+      example:
+        token: 0$[wfwnfuowburmgjo2126+
+    BadRequestVO:
+      description: Object describing a Bad Request (400) HTTP error.
+      type: object
+      properties:
+        cause:
+          type: string
+          description: Reason why was request not successfully fulfiled.
+          example: User with given username not found.
+      required:
+        - cause
+      example:
+        cause: User with given username not found.
+
+  #   # It is a good practice to prefix your API with some common prefix to
 #   # allow for better serviceability - security rules, loadbalancer configuration...
 #   # We are using /api/v1 here, /admin part is here to differentiate the 
 #   # administrative API from the potential public or other endpoints.

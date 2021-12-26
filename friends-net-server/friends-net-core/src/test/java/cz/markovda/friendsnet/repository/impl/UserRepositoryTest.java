@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -43,7 +44,7 @@ public class UserRepositoryTest {
         DOFactory factory = new DOFactory();
         IUserDO user = factory.createUser("john", "doe's password");
         when(jdbcTemplate.update(
-                "INSERT INTO auth_user(login, \"password\") VALUES(?, ?)", user.getLogin(), user.getPassword())
+                "INSERT INTO auth_user(login, password) VALUES(?, ?)", user.getLogin(), user.getPassword())
         ).thenReturn(1);
 
         assertEquals(1, userRepository.saveUser(user), "Repository did not save user! (Affected line count was not 1)");
@@ -57,8 +58,8 @@ public class UserRepositoryTest {
         queryResult.put("login", "login");
         queryResult.put("password", "password");
 
-        when(jdbcTemplate.queryForMap(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
-                .thenReturn(queryResult);
+        when(jdbcTemplate.queryForList(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
+                .thenReturn(List.of(queryResult));
         when(factory.createUser((int) queryResult.get("id"), (String) queryResult.get("login"), (String) queryResult.get("password")))
                 .thenReturn(UserDOTestUtils.prepareEmptyUser());
 
@@ -79,8 +80,8 @@ public class UserRepositoryTest {
         queryResult.put("login", login);
         queryResult.put("password", password);
 
-        when(jdbcTemplate.queryForMap(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
-                .thenReturn(queryResult);
+        when(jdbcTemplate.queryForList(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
+                .thenReturn(List.of(queryResult));
         when(factory.createUser(id, login, password)).thenReturn(UserDOTestUtils.prepareUser(id, login, password, IUserDO.EnumUserRole.USER));
 
         final Optional<IUserDO> result = userRepository.findUserWithRoleByLogin(login);
