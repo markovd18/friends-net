@@ -6,7 +6,9 @@ import cz.markovda.friendsnet.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,12 +30,14 @@ public class UserRepository implements IUserRepository {
             "WHERE login = ?";
 
     @Override
-    public int saveUser(final IUserDO user) {
+    public int saveUser(@NotNull final IUserDO user) {
+        Assert.notNull(user, "Saved user may not be null!");
         return jdbcTemplate.update("INSERT INTO auth_user(login, \"password\") VALUES(?, ?)",  user.getLogin(), user.getPassword());
     }
 
     @Override
-    public Optional<IUserDO> findUserWithRoleByLogin(final String login) {
+    public Optional<IUserDO> findUserWithRoleByLogin(@NotNull final String login) {
+        Assert.notNull(login, "Login must not be null!");
         Map<String, Object> queryResult = jdbcTemplate.queryForMap(USER_WITH_ROLE_BY_LOGIN_QUERY, login);
         return Optional.of(factory.createUser((Integer) queryResult.get("id"),
                 (String) queryResult.get("login"), (String) queryResult.get("password")));

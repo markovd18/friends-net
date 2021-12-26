@@ -1,7 +1,7 @@
 package cz.markovda.friendsnet.service.impl;
 
-import cz.markovda.friendsnet.dos.IUserDO;
 import cz.markovda.friendsnet.repository.IUserRepository;
+import cz.markovda.friendsnet.utils.UserDOTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,7 +32,7 @@ public class UserAuthServiceTest {
     public void loadsExistingUserByUsername() {
         final var username = "username";
 
-        when(userRepository.findUserWithRoleByLogin(username)).thenReturn(prepareExistingUserResult());
+        when(userRepository.findUserWithRoleByLogin(username)).thenReturn(Optional.of(UserDOTestUtils.prepareUser()));
         assertNotNull(userAuthService.loadUserByUsername("username"),
                 "User loaded by user authentication service should not be null");
     }
@@ -46,28 +46,10 @@ public class UserAuthServiceTest {
                 "Searching for non-existing user should throw an exception!");
     }
 
-    private Optional<IUserDO> prepareExistingUserResult() {
-        return Optional.of(new IUserDO() {
-            @Override
-            public int getId() {
-                return 0;
-            }
+    @Test
+    public void loadsExistingUserByUsername_withCorrectVAttributes() {
+        final var username = "little kid lover";
 
-            @Override
-            public String getLogin() {
-                return "username";
-            }
-
-            @Override
-            public String getPassword() {
-                return "password";
-            }
-
-            @Override
-            public EnumUserRole getRole() {
-                return EnumUserRole.USER;
-            }
-        });
+        when(userRepository.findUserWithRoleByLogin(username)).thenReturn(Optional.of(UserDOTestUtils.prepareUser(username)));
     }
-
 }

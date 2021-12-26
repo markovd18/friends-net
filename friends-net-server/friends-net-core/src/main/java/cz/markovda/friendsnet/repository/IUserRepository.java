@@ -2,6 +2,7 @@ package cz.markovda.friendsnet.repository;
 
 import cz.markovda.friendsnet.dos.IUserDO;
 
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 /**
@@ -10,7 +11,6 @@ import java.util.Optional;
  */
 public interface IUserRepository {
 
-    int saveUser(IUserDO user);
-
-    Optional<IUserDO> findUserWithRoleByLogin(String login);
+    int saveUser(@NotNull IUserDO user);
+    Optional<IUserDO> findUserWithRoleByLogin(@NotNull String login);
 }

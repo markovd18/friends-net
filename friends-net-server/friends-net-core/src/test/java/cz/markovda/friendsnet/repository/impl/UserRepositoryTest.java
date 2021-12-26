@@ -3,6 +3,7 @@ package cz.markovda.friendsnet.repository.impl;
 import cz.markovda.friendsnet.dos.IDOFactory;
 import cz.markovda.friendsnet.dos.IUserDO;
 import cz.markovda.friendsnet.dos.impl.DOFactory;
+import cz.markovda.friendsnet.utils.UserDOTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -58,7 +60,7 @@ public class UserRepositoryTest {
         when(jdbcTemplate.queryForMap(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
                 .thenReturn(queryResult);
         when(factory.createUser((int) queryResult.get("id"), (String) queryResult.get("login"), (String) queryResult.get("password")))
-                .thenReturn(prepareEmptyUserDO());
+                .thenReturn(UserDOTestUtils.prepareEmptyUser());
 
         final Optional<IUserDO> result = userRepository.findUserWithRoleByLogin((String) queryResult.get("login"));
 
@@ -79,7 +81,7 @@ public class UserRepositoryTest {
 
         when(jdbcTemplate.queryForMap(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
                 .thenReturn(queryResult);
-        when(factory.createUser(id, login, password)).thenReturn(prepareUserDO(id, login, password));
+        when(factory.createUser(id, login, password)).thenReturn(UserDOTestUtils.prepareUser(id, login, password, IUserDO.EnumUserRole.USER));
 
         final Optional<IUserDO> result = userRepository.findUserWithRoleByLogin(login);
         assertNotNull(result, "Query result may not be null!");
@@ -92,51 +94,15 @@ public class UserRepositoryTest {
                 () -> assertEquals(IUserDO.EnumUserRole.USER, userDO.getRole(), "Role of found user has to be equal to the DB record!"));
     }
 
-    private IUserDO prepareEmptyUserDO() {
-        return new IUserDO() {
-            @Override
-            public int getId() {
-                return 0;
-            }
-
-            @Override
-            public String getLogin() {
-                return null;
-            }
-
-            @Override
-            public String getPassword() {
-                return null;
-            }
-
-            @Override
-            public EnumUserRole getRole() {
-                return null;
-            }
-        };
+    @Test
+    public void throwsWhenSoughtLoginIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> userRepository.findUserWithRoleByLogin(null),
+                "Searching for NULL login has to throw an exception!");
     }
 
-    private IUserDO prepareUserDO(final int id, final String login, final String password) {
-        return new IUserDO() {
-            @Override
-            public int getId() {
-                return id;
-            }
-
-            @Override
-            public String getLogin() {
-                return login;
-            }
-
-            @Override
-            public String getPassword() {
-                return password;
-            }
-
-            @Override
-            public EnumUserRole getRole() {
-                return EnumUserRole.USER;
-            }
-        };
+    @Test
+    public void throwsWhenSavedUserIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> userRepository.saveUser(null),
+                "Saving NULL user has to throw an exception!");
     }
 }
