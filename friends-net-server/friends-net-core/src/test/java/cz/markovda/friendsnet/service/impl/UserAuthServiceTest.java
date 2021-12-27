@@ -102,4 +102,13 @@ public class UserAuthServiceTest {
                 "Creating existing user should throw an exception!");
     }
 
+    @Test
+    public void throwsWhenCreatedUserHasIdZero() {
+        final IUserDO userDO = UserDOTestUtils.prepareUser();
+        final IUserVO userVO = new UserVO("another", "stuff", IUserVO.EnumUserRole.ADMIN);
+
+        when(userRepository.saveUser(userDO)).thenReturn(0);
+        assertThrows(RuntimeException.class, () -> userAuthService.createNewUser(userVO));
+    }
+
 }

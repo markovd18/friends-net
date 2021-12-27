@@ -1,6 +1,7 @@
 package cz.markovda.friendsnet.repository;
 
 import cz.markovda.friendsnet.dos.IUserDO;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -12,6 +13,7 @@ import java.util.Optional;
  */
 public interface IUserRepository {
 
+    @Transactional
     int saveUser(@NotNull @Valid IUserDO user);
 
     Optional<IUserDO> findUserWithRoleByLogin(@NotNull String login);

@@ -7,9 +7,11 @@ import cz.markovda.friendsnet.utils.UserDOTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsertOperations;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -40,14 +42,24 @@ public class UserRepositoryTest {
 
     @Test
     public void savesUser() {
-
+        SimpleJdbcInsertOperations mock = mock(SimpleJdbcInsertOperations.class);
+        userRepository.setUserInsertOperations(mock);
         DOFactory factory = new DOFactory();
         IUserDO user = factory.createUser("john", "doe's password");
+        prepareInsertOperationsMock(mock, user);
+
         when(jdbcTemplate.update(
-                "INSERT INTO auth_user(login, password) VALUES(?, ?)", user.getLogin(), user.getPassword())
+                "INSERT INTO auth_user_role(id_user, id_role) VALUES (?, ?)", user.getLogin(), user.getRole().name())
         ).thenReturn(1);
 
         assertEquals(1, userRepository.saveUser(user), "Repository did not save user! (Affected line count was not 1)");
+    }
+
+    private void prepareInsertOperationsMock(SimpleJdbcInsertOperations mock, IUserDO user) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("login", user.getLogin());
+        parameters.put("password", user.getPassword());
+        when(mock.executeAndReturnKey(parameters)).thenReturn(1);
     }
 
     @Test

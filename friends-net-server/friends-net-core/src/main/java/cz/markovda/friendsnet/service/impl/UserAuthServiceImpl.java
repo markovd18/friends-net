@@ -67,8 +67,8 @@ public class UserAuthServiceImpl implements IUserAuthService {
         final String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         final IUserDO userDO = doFactory.createUser(newUser.getLogin(), encodedPassword);
 
-        final boolean isNotSingleRowAffected = userRepository.saveUser(userDO) != 1;
-        if (isNotSingleRowAffected) {
+        final int createdUserId = userRepository.saveUser(userDO);
+        if (createdUserId == 0) {
             throw new RuntimeException("Error while saving new user!");
         }
 

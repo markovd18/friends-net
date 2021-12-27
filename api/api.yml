@@ -32,6 +32,21 @@ paths:
           $ref: '#/components/responses/LoginResponse'
         '400':
           description: User credentials are incorrect
+  '/register':
+    post:
+      summary: Registers new user
+      description: Allows user to sign up and get access to all other operations after signing in.
+      security: []
+      tags:
+        - AuthenticationController
+      requestBody:
+        $ref: '#/components/requestBodies/RegisterRequest'
+      operationId: register
+      responses:
+        '200':
+          description: User successfully registered.
+        '400':
+          description: User login is not in a valid format or is already taken
 
 components:
 
@@ -64,10 +79,16 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/LoginVO'
-
+            $ref: '#/components/schemas/UserCredentialsVO'
+    RegisterRequest:
+      required: true
+      description: Request to sign up to create new user account.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserCredentialsVO'
   schemas:
-    LoginVO:
+    UserCredentialsVO:
       description: Object with user authentication request data.
       type: object
       properties:

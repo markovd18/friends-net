@@ -3,8 +3,11 @@ package cz.markovda.friendsnet.controller;
 import cz.markovda.api.AuthenticationControllerApi;
 import cz.markovda.friendsnet.config.jwt.JwtUtils;
 import cz.markovda.friendsnet.service.IUserAuthService;
+import cz.markovda.friendsnet.service.validation.ValidationException;
+import cz.markovda.friendsnet.vos.IUserVO;
+import cz.markovda.friendsnet.vos.IVOFactory;
 import cz.markovda.vo.JwtVO;
-import cz.markovda.vo.LoginVO;
+import cz.markovda.vo.UserCredentialsVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +16,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -22,28 +24,39 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin
 public class AuthenticationController implements AuthenticationControllerApi {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final IUserAuthService userAuthService;
+    private final IVOFactory voFactory;
 
     @Override
-    public ResponseEntity<JwtVO> login(final LoginVO loginVO) {
+    public ResponseEntity<JwtVO> login(final UserCredentialsVO credentialsVO) {
         final UserDetails userDetails;
         try {
-            userDetails = userAuthService.loadUserByUsername(loginVO.getLogin());
+            userDetails = userAuthService.loadUserByUsername(credentialsVO.getLogin());
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
 
-        authenticate(loginVO.getLogin(), loginVO.getPassword());
+        authenticate(credentialsVO.getLogin(), credentialsVO.getPassword());
         final String token = jwtUtils.generateToken(userDetails);
         return ResponseEntity.ok(new JwtVO().token(token));
     }
 
-    record JwtResponse(String token) {}
+    @Override
+    public ResponseEntity<Void> register(final UserCredentialsVO userCredentialsVO) {
+        final IUserVO userToCreate = voFactory.createUser(userCredentialsVO.getLogin(), userCredentialsVO.getPassword());
+        try {
+            userAuthService.createNewUser(userToCreate);
+        } catch (final IllegalStateException | ValidationException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(null);
+    }
+
 
     private void authenticate(final String login, final String password) {
         try {
