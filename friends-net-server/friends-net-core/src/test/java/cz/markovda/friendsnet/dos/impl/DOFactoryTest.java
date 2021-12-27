@@ -39,25 +39,27 @@ public class DOFactoryTest {
 
     @Test
     public void createsUserWithLogin_andPassword() {
-        assertNotNull(factory.createUser("login", "password"), "Factory created instance od DO should not be null!");
+        assertNotNull(factory.createUser("login", "password", "Name"), "Factory created instance od DO should not be null!");
     }
 
     @Test
     public void createsUserWithLogin_andPassword_andCorrectValues() {
         final String login = "crazy-login";
         final String password = "Super_Strong_Password_123";
+        final String name = "Crazy Name";
 
-        IUserDO userDO = factory.createUser(login, password);
+        IUserDO userDO = factory.createUser(login, password, name);
         assertAll(() -> assertNotNull(userDO, "Factory created user DO may not be null!"),
                 () -> assertEquals(0, userDO.getId(), "Not set ID of factory created user DO should be 0!"),
                 () -> assertEquals(login, userDO.getLogin(), "Factory created user DO's login should match the factory argument!"),
                 () -> assertEquals(password, userDO.getPassword(), "Factory created user DO's password should match the factory argument!"),
+                () -> assertEquals(name, userDO.getName(), "Factory created user DO's name should match the factory argument!"),
                 () -> assertEquals(IUserDO.EnumUserRole.USER, userDO.getRole(), "Default user DO role should be USER!"));
     }
 
     @Test
     public void createsUserWithAllAttributes() {
-        assertNotNull(factory.createUser(1, "john_doe", "string-password"));
+        assertNotNull(factory.createUser(1, "john_doe", "string-password", "John Doe"));
     }
 
     @Test
@@ -65,12 +67,14 @@ public class DOFactoryTest {
         final int id = 15;
         final String login = "test-login";
         final String password = "weak";
+        final String name = "Test Name";
 
-        IUserDO userDO = factory.createUser(id, login, password);
+        IUserDO userDO = factory.createUser(id, login, password, name);
         assertAll(() -> assertNotNull(userDO, "Factory created user DO may not be null!"),
                 () -> assertEquals(id, userDO.getId(), "Factory created user DO's ID should match the factory argument!"),
                 () -> assertEquals(login, userDO.getLogin(), "Factory created user DO's login should match the factory argument!"),
                 () -> assertEquals(password, userDO.getPassword(), "Factory created user DO's password should match the factory argument!"),
+                () -> assertEquals(name, userDO.getName(), "Factory created user DO's name should match the factory argument!"),
                 () -> assertEquals(IUserDO.EnumUserRole.USER, userDO.getRole(), "Default user DO role should be USER!"));
     }
 
@@ -79,13 +83,15 @@ public class DOFactoryTest {
         final var id = 69;
         final var login = "another one";
         final var password = "strong";
+        final var name = "Another One";
         final var role = IUserDO.EnumUserRole.ADMIN;
 
-        IUserDO userDO = factory.createUser(id, login, password, role);
+        IUserDO userDO = factory.createUser(id, login, password, name, role);
         assertAll(() -> assertNotNull(userDO, "Factory created user DO may not be null!"),
                 () -> assertEquals(id, userDO.getId(), "Factory created user DO's ID should match the factory argument!"),
                 () -> assertEquals(login, userDO.getLogin(), "Factory created user DO's login should match the factory argument!"),
                 () -> assertEquals(password, userDO.getPassword(), "Factory created user DO's password should match the factory argument!"),
+                () -> assertEquals(name, userDO.getName(), "Factory created user DO's name should match the factory argument!"),
                 () -> assertEquals(role, userDO.getRole(), "Factory created user DO's role should match the factory argument!"));
     }
 }

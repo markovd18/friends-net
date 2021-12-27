@@ -11,6 +11,8 @@ public interface IUserVO {
 
     String getPassword();
 
+    String getName();
+
     EnumUserRole getRole();
 
     enum EnumUserRole {

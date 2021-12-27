@@ -39,6 +39,11 @@ public class UserDOTestUtils {
             }
 
             @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
             public EnumUserRole getRole() {
                 return role;
             }

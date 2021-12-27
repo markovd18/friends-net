@@ -50,8 +50,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors()
                 .and()
-                .csrf()
-                .and()
+                .csrf().disable()
+//                .and()
                 .authorizeRequests().antMatchers(HttpMethod.POST, "/login", "/register").permitAll()
                 .antMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()

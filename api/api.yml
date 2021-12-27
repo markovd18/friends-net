@@ -44,7 +44,7 @@ paths:
       operationId: register
       responses:
         '200':
-          description: User successfully registered.
+          description: User successfully registered./
         '400':
           description: User login is not in a valid format or is already taken
 
@@ -86,7 +86,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UserCredentialsVO'
+            $ref: '#/components/schemas/UserRegistrationDataVO'
   schemas:
     UserCredentialsVO:
       description: Object with user authentication request data.
@@ -94,7 +94,7 @@ components:
       properties:
         login:
           type: string
-          description: User's username
+          description: User's login
           pattern: '[a-zA-Z0-9-_]*'
           maxLength: 50
           minLength: 4
@@ -110,6 +110,21 @@ components:
       example:
         login: great-login123
         password: my-secret_Password
+    UserRegistrationDataVO:
+      description: Object with all required user data for registration.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/UserCredentialsVO'
+      properties:
+        name:
+          type: string
+          description: User's name that will be displayed.
+          maxLength: 50
+          example: John Doe
+      required:
+        - name
+        - login
+        - password
     JwtVO:
       description: Object carrying generated JSON Web Token used for user authentication.
       type: object

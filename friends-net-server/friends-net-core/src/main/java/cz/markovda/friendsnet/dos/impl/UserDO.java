@@ -15,6 +15,7 @@ public class UserDO implements IUserDO {
     private int id;
     private String login;
     private String password;
+    private String name;
     private EnumUserRole role;
 
     protected UserDO() {
@@ -30,9 +31,14 @@ public class UserDO implements IUserDO {
     }
 
     protected UserDO(final int id, final String login, final String password, final EnumUserRole role) {
+        this(id, login, password, null, role);
+    }
+
+    protected UserDO(final int id, final String login, final String password, final String name, final EnumUserRole role) {
         this.id = id;
         this.login = login;
         this.password = password;
+        this.name = name;
         this.role = role;
     }
 }

@@ -23,7 +23,7 @@ public class UserAuthIntegrationTest {
 
     @Test
     public void canRegisterNewUser() {
-        final IUserVO userVO = new UserVO("test-user", "test-password", IUserVO.EnumUserRole.USER);
+        final IUserVO userVO = new UserVO("test@user.com", "test-password", "Test User", IUserVO.EnumUserRole.USER);
         final IUserVO result = userAuthService.createNewUser(userVO);
 
         assertNotNull(result, "Created user should not be null!");
@@ -32,7 +32,7 @@ public class UserAuthIntegrationTest {
     @Test
     public void registeringUserWithTooLongLoginFails() {
         final IUserVO userVO = new UserVO("very-long-login-that-is-very-much-likely-longer_than-required",
-                "password", IUserVO.EnumUserRole.USER);
+                "password", "Not relevant", IUserVO.EnumUserRole.USER);
 
         assertThrows(ValidationException.class, () -> userAuthService.createNewUser(userVO),
                 "Creating user with too long login has to throw an exception!");
@@ -40,7 +40,7 @@ public class UserAuthIntegrationTest {
 
     @Test
     public void registeringUserWithTooShortLoginFails() {
-        final IUserVO userVO = new UserVO("a", "password", IUserVO.EnumUserRole.USER);
+        final IUserVO userVO = new UserVO("a", "password", "Some name", IUserVO.EnumUserRole.USER);
 
         assertThrows(ValidationException.class, () -> userAuthService.createNewUser(userVO),
                 "Creating user with too short login has to throw an exception!");
@@ -49,7 +49,7 @@ public class UserAuthIntegrationTest {
     @Test
     public void registeringUserWithLogin_thatDoesNotMatchPatternFails() {
         final IUserVO userVO = new UserVO("login?with&badŮchars",
-                "password", IUserVO.EnumUserRole.USER);
+                "password", "Name with bad login", IUserVO.EnumUserRole.USER);
 
         assertThrows(ValidationException.class, () -> userAuthService.createNewUser(userVO),
                 "Creating user with invalid chars in login has to throw an exception!");

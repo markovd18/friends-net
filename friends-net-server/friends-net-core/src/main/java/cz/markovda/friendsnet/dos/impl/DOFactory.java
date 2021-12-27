@@ -17,17 +17,17 @@ public class DOFactory implements IDOFactory {
     }
 
     @Override
-    public IUserDO createUser(final String login, final String password) {
-        return new UserDO(login, password);
+    public IUserDO createUser(final String login, final String password, final String name) {
+        return new UserDO(0, login, password, name, IUserDO.EnumUserRole.USER);
     }
 
     @Override
-    public IUserDO createUser(final int id, final String login, final String password) {
-        return new UserDO(id, login, password);
+    public IUserDO createUser(final int id, final String login, final String password, final String name) {
+        return new UserDO(id, login, password, name, IUserDO.EnumUserRole.USER);
     }
 
     @Override
-    public IUserDO createUser(int id, String login, String password, IUserDO.EnumUserRole role) {
-        return new UserDO(id, login, password, role);
+    public IUserDO createUser(final int id, final String login, final String password, final String name, final IUserDO.EnumUserRole role) {
+        return new UserDO(id, login, password, name, role);
     }
 }

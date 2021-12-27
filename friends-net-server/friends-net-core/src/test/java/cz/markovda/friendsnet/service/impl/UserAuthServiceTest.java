@@ -77,14 +77,14 @@ public class UserAuthServiceTest {
 
     @Test
     public void registersNewValidUser() {
-        final IUserVO userVO = new UserVO("login", "password", IUserVO.EnumUserRole.USER);
+        final IUserVO userVO = new UserVO("login", "password", "Sir John", IUserVO.EnumUserRole.USER);
         final String encodedPassword = "super-encoded-password";
         final IUserDO userToSave = UserDOTestUtils.prepareUser(0, userVO.getLogin(), encodedPassword, IUserDO.EnumUserRole.USER);
 
         when(userRepository.userWithLoginExists(userVO.getLogin())).thenReturn(false);
         when(userRepository.saveUser(userToSave)).thenReturn(1);
         when(passwordEncoder.encode(userVO.getPassword())).thenReturn(encodedPassword);
-        when(doFactory.createUser(userVO.getLogin(), encodedPassword)).thenReturn(userToSave);
+        when(doFactory.createUser(userVO.getLogin(), encodedPassword, userVO.getName())).thenReturn(userToSave);
 
         final IUserVO createdUser = userAuthService.createNewUser(userVO);
         assertAll(() -> assertNotNull(createdUser, "Created user may not be NULL!"),
@@ -95,7 +95,7 @@ public class UserAuthServiceTest {
 
     @Test
     public void throwsWhenRegisteredUserExists() {
-        final IUserVO userVO = new UserVO("great", "stuff", IUserVO.EnumUserRole.ADMIN);
+        final IUserVO userVO = new UserVO("great", "stuff", "Nameless", IUserVO.EnumUserRole.ADMIN);
 
         when(userRepository.userWithLoginExists(userVO.getLogin())).thenReturn(true);
         assertThrows(IllegalStateException.class, () -> userAuthService.createNewUser(userVO),
@@ -105,7 +105,7 @@ public class UserAuthServiceTest {
     @Test
     public void throwsWhenCreatedUserHasIdZero() {
         final IUserDO userDO = UserDOTestUtils.prepareUser();
-        final IUserVO userVO = new UserVO("another", "stuff", IUserVO.EnumUserRole.ADMIN);
+        final IUserVO userVO = new UserVO("another", "stuff", "Not nameless", IUserVO.EnumUserRole.ADMIN);
 
         when(userRepository.saveUser(userDO)).thenReturn(0);
         assertThrows(RuntimeException.class, () -> userAuthService.createNewUser(userVO));

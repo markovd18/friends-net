@@ -45,7 +45,7 @@ public class UserRepositoryTest {
         SimpleJdbcInsertOperations mock = mock(SimpleJdbcInsertOperations.class);
         userRepository.setUserInsertOperations(mock);
         DOFactory factory = new DOFactory();
-        IUserDO user = factory.createUser("john", "doe's password");
+        IUserDO user = factory.createUser("john.doe@email.com", "doe's password", "John Doe");
         prepareInsertOperationsMock(mock, user);
 
         when(jdbcTemplate.update(
@@ -59,6 +59,7 @@ public class UserRepositoryTest {
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("login", user.getLogin());
         parameters.put("password", user.getPassword());
+        parameters.put("name", user.getName());
         when(mock.executeAndReturnKey(parameters)).thenReturn(1);
     }
 
@@ -69,10 +70,12 @@ public class UserRepositoryTest {
         queryResult.put("id", 1);
         queryResult.put("login", "login");
         queryResult.put("password", "password");
+        queryResult.put("name", "Login Password");
 
         when(jdbcTemplate.queryForList(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
                 .thenReturn(List.of(queryResult));
-        when(factory.createUser((int) queryResult.get("id"), (String) queryResult.get("login"), (String) queryResult.get("password")))
+        when(factory.createUser((int) queryResult.get("id"), (String) queryResult.get("login"),
+                (String) queryResult.get("password"), (String) queryResult.get("name")))
                 .thenReturn(UserDOTestUtils.prepareEmptyUser());
 
         final Optional<IUserDO> result = userRepository.findUserWithRoleByLogin((String) queryResult.get("login"));
@@ -87,14 +90,16 @@ public class UserRepositoryTest {
         final int id = 1236;
         final String login = "some-login";
         final String password = "pass_word";
+        final String name = "Someone With Credentials";
 
         queryResult.put("id", id);
         queryResult.put("login", login);
         queryResult.put("password", password);
+        queryResult.put("name", name);
 
         when(jdbcTemplate.queryForList(UserRepository.USER_WITH_ROLE_BY_LOGIN_QUERY, queryResult.get("login")))
                 .thenReturn(List.of(queryResult));
-        when(factory.createUser(id, login, password)).thenReturn(UserDOTestUtils.prepareUser(id, login, password, IUserDO.EnumUserRole.USER));
+        when(factory.createUser(id, login, password, name)).thenReturn(UserDOTestUtils.prepareUser(id, login, password, IUserDO.EnumUserRole.USER));
 
         final Optional<IUserDO> result = userRepository.findUserWithRoleByLogin(login);
         assertNotNull(result, "Query result may not be null!");

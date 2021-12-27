@@ -8,7 +8,7 @@ package cz.markovda.friendsnet.dos;
 public interface IDOFactory {
 
     IUserDO createUser();
-    IUserDO createUser(String login, String password);
-    IUserDO createUser(int id, String login, String password);
-    IUserDO createUser(int id, String login, String password, IUserDO.EnumUserRole role);
+    IUserDO createUser(String login, String password, String name);
+    IUserDO createUser(int id, String login, String password, String name);
+    IUserDO createUser(int id, String login, String password, String name, IUserDO.EnumUserRole role);
 }

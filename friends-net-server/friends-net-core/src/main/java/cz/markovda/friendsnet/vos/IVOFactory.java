@@ -6,5 +6,5 @@ package cz.markovda.friendsnet.vos;
  */
 public interface IVOFactory {
 
-    IUserVO createUser(String login, String password);
+    IUserVO createUser(String login, String password, String name);
 }

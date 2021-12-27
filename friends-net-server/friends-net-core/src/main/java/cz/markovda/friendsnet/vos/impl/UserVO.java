@@ -3,16 +3,17 @@ package cz.markovda.friendsnet.vos.impl;
 import cz.markovda.friendsnet.vos.IUserVO;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 /**
  * @author <a href="mailto:">David Markov</a>
  * @since 26.12.21
  */
 public record UserVO(
-        @NotNull @Length(min = 4, max = 50) @Pattern(regexp = "[a-zA-Z0-9_-]*") String login,
+        @NotNull @Length(min = 4, max = 50) @Email String login,
         @NotNull String password,
+        @NotNull String name,
         EnumUserRole role
 ) implements IUserVO {
 
@@ -24,6 +25,11 @@ public record UserVO(
     @Override
     public String getPassword() {
         return password();
+    }
+
+    @Override
+    public String getName() {
+        return name();
     }
 
     @Override

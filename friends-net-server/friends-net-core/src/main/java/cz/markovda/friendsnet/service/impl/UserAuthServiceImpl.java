@@ -65,7 +65,7 @@ public class UserAuthServiceImpl implements IUserAuthService {
     private IUserVO saveNewUser(final IUserVO newUser) {
         log.debug("Saving new user...");
         final String encodedPassword = passwordEncoder.encode(newUser.getPassword());
-        final IUserDO userDO = doFactory.createUser(newUser.getLogin(), encodedPassword);
+        final IUserDO userDO = doFactory.createUser(newUser.getLogin(), encodedPassword, newUser.getName());
 
         final int createdUserId = userRepository.saveUser(userDO);
         if (createdUserId == 0) {
@@ -73,6 +73,6 @@ public class UserAuthServiceImpl implements IUserAuthService {
         }
 
         log.debug("New user saved.");
-        return new UserVO(userDO.getLogin(), userDO.getPassword(), IUserVO.EnumUserRole.valueOf(userDO.getRole().name()));
+        return new UserVO(userDO.getLogin(), userDO.getPassword(), userDO.getName(), IUserVO.EnumUserRole.valueOf(userDO.getRole().name()));
     }
 }

@@ -8,6 +8,7 @@ import cz.markovda.friendsnet.vos.IVOFactory;
 import cz.markovda.friendsnet.vos.impl.UserVO;
 import cz.markovda.vo.JwtVO;
 import cz.markovda.vo.UserCredentialsVO;
+import cz.markovda.vo.UserRegistrationDataVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -86,11 +87,12 @@ public class AuthenticationControllerTest {
 
     @Test
     public void returnsOk_whenValidUserRegisters() {
-        final UserCredentialsVO userCredentialsVO = new UserCredentialsVO()
+        final UserRegistrationDataVO userCredentialsVO = new UserRegistrationDataVO()
                 .login("new-user")
-                .password("badpswd");
-        IUserVO userVO = new UserVO(userCredentialsVO.getLogin(), userCredentialsVO.getPassword(), null);
-        when(voFactory.createUser(userCredentialsVO.getLogin(), userCredentialsVO.getPassword()))
+                .password("badpswd")
+                .name("New User");
+        IUserVO userVO = new UserVO(userCredentialsVO.getLogin(), userCredentialsVO.getPassword(), userCredentialsVO.getName(), null);
+        when(voFactory.createUser(userCredentialsVO.getLogin(), userCredentialsVO.getPassword(), userCredentialsVO.getName()))
                 .thenReturn(userVO);
         when(userAuthService.createNewUser(userVO)).thenReturn(userVO);
 
@@ -100,11 +102,12 @@ public class AuthenticationControllerTest {
 
     @Test
     public void returnsBadRequest_whenUserAuthServiceThrows() {
-        final UserCredentialsVO userCredentialsVO = new UserCredentialsVO()
+        final UserRegistrationDataVO userCredentialsVO = new UserRegistrationDataVO()
                 .login("bad?username")
-                .password("123456");
-        IUserVO userVO = new UserVO(userCredentialsVO.getLogin(), userCredentialsVO.getPassword(), null);
-        when(voFactory.createUser(userCredentialsVO.getLogin(), userCredentialsVO.getPassword()))
+                .password("123456")
+                .name("Bad Name Too");
+        IUserVO userVO = new UserVO(userCredentialsVO.getLogin(), userCredentialsVO.getPassword(), userCredentialsVO.getName(), null);
+        when(voFactory.createUser(userCredentialsVO.getLogin(), userCredentialsVO.getPassword(), userCredentialsVO.getName()))
                 .thenReturn(userVO);
         when(userAuthService.createNewUser(userVO)).thenThrow(new ValidationException(null));
         assertEquals(HttpStatus.BAD_REQUEST, authenticationController.register(userCredentialsVO).getStatusCode(),

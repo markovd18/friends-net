@@ -8,6 +8,7 @@ import cz.markovda.friendsnet.vos.IUserVO;
 import cz.markovda.friendsnet.vos.IVOFactory;
 import cz.markovda.vo.JwtVO;
 import cz.markovda.vo.UserCredentialsVO;
+import cz.markovda.vo.UserRegistrationDataVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,8 +47,9 @@ public class AuthenticationController implements AuthenticationControllerApi {
     }
 
     @Override
-    public ResponseEntity<Void> register(final UserCredentialsVO userCredentialsVO) {
-        final IUserVO userToCreate = voFactory.createUser(userCredentialsVO.getLogin(), userCredentialsVO.getPassword());
+    public ResponseEntity<Void> register(final UserRegistrationDataVO registrationDataVO) {
+        final IUserVO userToCreate = voFactory.createUser(registrationDataVO.getLogin(), registrationDataVO.getPassword(),
+                registrationDataVO.getName());
         try {
             userAuthService.createNewUser(userToCreate);
         } catch (final IllegalStateException | ValidationException e) {

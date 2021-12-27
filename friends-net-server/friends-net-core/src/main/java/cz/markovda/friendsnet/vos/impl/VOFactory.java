@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class VOFactory implements IVOFactory {
 
     @Override
-    public IUserVO createUser(final String login, final String password) {
-        return new UserVO(login, password, null);
+    public IUserVO createUser(final String login, final String password, final String name) {
+        return new UserVO(login, password, name, null);
     }
 }

@@ -8,6 +8,8 @@ public interface IUserDO {
 
     String getPassword();
 
+    String getName();
+
     EnumUserRole getRole();
 
     enum EnumUserRole {

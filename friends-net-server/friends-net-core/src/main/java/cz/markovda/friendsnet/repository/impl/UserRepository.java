@@ -68,6 +68,7 @@ public class UserRepository implements IUserRepository {
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("login", user.getLogin());
         parameters.put("password", user.getPassword());
+        parameters.put("name", user.getName());
 
         final int userId = userInsertOperations.executeAndReturnKey(parameters).intValue();
         if (userRolesNotCached()) {
@@ -90,7 +91,7 @@ public class UserRepository implements IUserRepository {
 
         final Map<String, Object> row = queryResult.get(0);
         return Optional.of(factory.createUser((Integer) row.get("id"),
-                (String) row.get("login"), (String) row.get("password")));
+                (String) row.get("login"), (String) row.get("password"), (String) row.get("name")));
     }
 
     @Override
