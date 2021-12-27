@@ -21,8 +21,8 @@ export * from "./model";
 let baseURL = 'http://localhost:8080'   //TODO env variable with end server address
 let baseAxios = axios.create({baseURL, headers: { Pragma: "no-cache"}})
 
-const TestApi = new Api.TestControllerApi(undefined, baseURL, baseAxios)
+const AuthApi = new Api.AuthenticationControllerApi(undefined, baseURL, baseAxios)
 
 export {
-    TestApi
+    AuthApi
 }

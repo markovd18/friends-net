@@ -5,9 +5,9 @@ info:
     Frineds Net server API.
   version: 1.0.0
 
-# Using basic HTTP authentication, can be switched to OAuth2, OpenId, ...
-#security:
-#   - JsonWebToken: []
+# Using Bearer HTTP authentication, can be switched to OAuth2, OpenId, ...
+security:
+   - JsonWebToken: []
 # Tags are used to group endpoints. There can be multiple tags per endpoint,
 # the first tag determines the interface (in case of Java) defining this endpoint
 # in the generated code.
@@ -47,6 +47,18 @@ paths:
           description: User successfully registered./
         '400':
           description: User login is not in a valid format or is already taken
+  '/test':
+    post:
+      summary: Test
+      description: very test
+      tags:
+        - AuthenticationController
+      operationId: test
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Not OK
 
 components:
 
