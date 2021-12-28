@@ -8,7 +8,7 @@ import Router from 'next/router'
 
 const Home: NextPage = () => {
 
-  const [cookies, setCookies] = useCookies(['accessToken']);
+  const [cookies] = useCookies(['accessToken']);
   if (cookies.accessToken) {
     Router.push('/home');
   }

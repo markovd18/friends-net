@@ -1,14 +1,54 @@
-import { Box, Button, FormControl, FormHelperText, Input, InputLabel } from "@mui/material";
+import { AuthApi, UserRegistrationDataVO } from "@markovda/fn-api";
+import { AlertColor } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
-import Router from "next/router";
+import * as React from "react";
+import { useState } from "react";
 import UnauthorizedNavbar from "../components/nav/UnauthorizedNavbar";
+import RegistrationForm from "../components/RegistrationForm";
+import SimpleSnackbar from "../components/SimpleSnackbar";
 
 const RegisterPage: NextPage = () => {
 
-    const handleSubmit = () => {
-        console.log("Registering")
-    }
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    const handleSnackbarClose = React.useCallback(() => {
+        setSnackbarOpen(false);
+    }, []);
+
+    const showSnackbar = React.useCallback((message: string, severity: AlertColor) => {
+        setSnackbarMessage(message);
+        setSnackbarSeverity(severity);
+        setSnackbarOpen(true);
+    }, []);
+
+    const processError = React.useCallback((status: number) => {
+        switch (status) {
+            case 400:
+                showSnackbar('Selected credentials are not available. Please try again.', 'warning');
+                return;
+            default:
+                showSnackbar('Unknown error while registering occured. Please try again later.', 'error');
+                return;
+        }
+    }, []);
+    const handleSubmit = React.useCallback(async (data: UserRegistrationDataVO): Promise<boolean> => {
+        try {
+            const status = (await AuthApi.register(data)).status;
+            if (status === 200) {
+                showSnackbar('Successfully registered! You now may log in.', 'success');
+                return true;
+            }
+
+            processError(status);
+        } catch(e) {
+            showSnackbar('Selected credentials are not available. Please try again.', 'warning');            
+        }
+
+        return false;
+    }, []);
 
     return (
         <>
@@ -18,28 +58,15 @@ const RegisterPage: NextPage = () => {
 
             </Head>
 
-            <main className="main">
-                
+            <main className="main">  
                 <UnauthorizedNavbar />
-                <form onSubmit={handleSubmit} >
-                    <FormControl variant="standard" required fullWidth>
-                        <InputLabel htmlFor="email-input">Email</InputLabel>
-                        <Input id="email-input" type="email" aria-describedby="email-desc"/>
-                        <FormHelperText id="email-desc">Email will be used as a login</FormHelperText>
-                    </FormControl>
-                    <FormControl variant="standard" required fullWidth>
-                        <InputLabel htmlFor="password-input">Password</InputLabel>
-                        <Input id="password-input" type="password"></Input>
-                    </FormControl>
-                    <FormControl variant="standard" required fullWidth>
-                        <InputLabel htmlFor="name-input">Name</InputLabel>
-                        <Input id="name-input" aria-describedby="name-desc"></Input>
-                        <FormHelperText id="name-desc">This is how others will see you.</FormHelperText>
-                    </FormControl>
-                    <Button variant="contained" type="submit">
-                        Sign Up
-                    </Button>
-                </form>    
+                <RegistrationForm onSubmit={handleSubmit} />  
+                <SimpleSnackbar 
+                    open={snackbarOpen} 
+                    message={snackbarMessage} 
+                    severity={snackbarSeverity as AlertColor} 
+                    handleClose={handleSnackbarClose}
+                />
             </main>
             
         </>

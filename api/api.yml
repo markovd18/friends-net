@@ -47,18 +47,6 @@ paths:
           description: User successfully registered./
         '400':
           description: User login is not in a valid format or is already taken
-  '/test':
-    post:
-      summary: Test
-      description: very test
-      tags:
-        - AuthenticationController
-      operationId: test
-      responses:
-        '200':
-          description: OK
-        '401':
-          description: Not OK
 
 components:
 
@@ -106,11 +94,11 @@ components:
       properties:
         login:
           type: string
-          description: User's login
-          pattern: '[a-zA-Z0-9-_]*'
+          format: email
+          description: User's email. Will be used as login.
           maxLength: 50
           minLength: 4
-          example: great-login123
+          example: great@email.com
         password:
           type: string
           format: password
@@ -120,19 +108,21 @@ components:
         - login
         - password
       example:
-        login: great-login123
+        login: great@email.com
         password: my-secret_Password
     UserRegistrationDataVO:
       description: Object with all required user data for registration.
-      type: object
       allOf:
         - $ref: '#/components/schemas/UserCredentialsVO'
-      properties:
-        name:
-          type: string
-          description: User's name that will be displayed.
-          maxLength: 50
-          example: John Doe
+        - type: object
+          properties:
+            name:
+              type: string
+              description: User's name that will be displayed.
+              maxLength: 50
+              example: John Doe
+          required:
+            - name
       required:
         - name
         - login
