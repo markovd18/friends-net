@@ -34,6 +34,7 @@ const RegisterPage: NextPage = () => {
                 return;
         }
     }, []);
+    
     const handleSubmit = React.useCallback(async (data: UserRegistrationDataVO): Promise<boolean> => {
         try {
             const status = (await AuthApi.register(data)).status;
@@ -55,7 +56,6 @@ const RegisterPage: NextPage = () => {
             <Head>
                 <title>Register to Friends Net</title>
                 <meta name="description" content="Friends Net registration page"/>
-
             </Head>
 
             <main className="main">  

@@ -19,7 +19,7 @@ public class DbConfiguration implements InitializingBean {
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
 
-    public static final String ADMIN_LOGIN = "admin";
+    public static final String ADMIN_LOGIN = "admin@admin.com";
     public static final String ADMIN_NAME = "Admin";
     public static final String ADMIN_PASSWORD = "Strong_password";
 
@@ -39,7 +39,7 @@ public class DbConfiguration implements InitializingBean {
     private void insertDefaultAdminAccount() {
         jdbcTemplate.update("INSERT INTO auth_user(id, login, password, name) VALUES (DEFAULT, ?, ?, ?)",
                 ADMIN_LOGIN, passwordEncoder.encode(ADMIN_PASSWORD), ADMIN_NAME);
-        final Integer idUser = jdbcTemplate.queryForObject("SELECT id FROM auth_user WHERE login = ?", Integer.class, "admin");
+        final Integer idUser = jdbcTemplate.queryForObject("SELECT id FROM auth_user WHERE login = ?", Integer.class, ADMIN_LOGIN);
         final Integer idRole = jdbcTemplate.queryForObject("SELECT id FROM auth_role WHERE name = ?", Integer.class, "ADMIN");
         jdbcTemplate.update("INSERT INTO auth_user_role(id_user, id_role) VALUES (?, ?)", idUser, idRole);
     }

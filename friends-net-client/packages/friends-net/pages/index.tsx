@@ -14,7 +14,7 @@ const Home: NextPage = () => {
   }
 
 
-  return (
+  return cookies.accessToken ? null : (
     <div className={styles.container}>
 
       <Head>
