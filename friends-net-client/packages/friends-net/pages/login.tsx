@@ -6,7 +6,7 @@ import Router from 'next/router';
 import * as React from 'react'
 import { useCookies } from 'react-cookie';
 import LoginForm from '../components/LoginForm';
-import UnauthorizedNavbar from '../components/nav/UnauthorizedNavbar';
+import UnauthNavbar from '../components/nav/UnauthNavbar';
 import SimpleSnackbar from '../components/SimpleSnackbar';
 import styles from '../styles/Home.module.css'
 
@@ -32,13 +32,13 @@ const LoginPage: NextPage = () => {
     }, []);
 
     const authenticate = React.useCallback(async (data: UserCredentialsVO) => {
-        const { token } = (await AuthApi.login(data)).data;
+        const { status, data: { token } } = (await AuthApi.login(data));
         setCookie('accessToken', token, { path: '/' });
     }, []);
 
     const handleSumbit = React.useCallback( async (data: UserCredentialsVO) => {
         try {
-            authenticate(data);
+            await authenticate(data);
         } catch (e) {
             showSnackbar('E-mail or password are incorrect', 'warning');
         }
@@ -51,7 +51,7 @@ const LoginPage: NextPage = () => {
                 <meta name="description" content="Friends Net login page"/>
             </Head>
             <main className={styles.main}>
-                <UnauthorizedNavbar />
+                <UnauthNavbar />
                 <LoginForm onSubmit={handleSumbit} />
                 <SimpleSnackbar 
                     open={snackbarOpen} 

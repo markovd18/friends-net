@@ -4,25 +4,14 @@ import { NextPage } from "next";
 import Head from "next/head";
 import * as React from "react";
 import { useState } from "react";
-import UnauthorizedNavbar from "../components/nav/UnauthorizedNavbar";
+import Navbar from "../components/nav/Navbar";
 import RegistrationForm from "../components/RegistrationForm";
 import SimpleSnackbar from "../components/SimpleSnackbar";
+import { useSnackbar } from "../hooks";
 
 const RegisterPage: NextPage = () => {
 
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-
-    const handleSnackbarClose = React.useCallback(() => {
-        setSnackbarOpen(false);
-    }, []);
-
-    const showSnackbar = React.useCallback((message: string, severity: AlertColor) => {
-        setSnackbarMessage(message);
-        setSnackbarSeverity(severity);
-        setSnackbarOpen(true);
-    }, []);
+    const [Snackbar, showSnackbar] = useSnackbar();
 
     const processError = React.useCallback((status: number) => {
         switch (status) {
@@ -59,14 +48,9 @@ const RegisterPage: NextPage = () => {
             </Head>
 
             <main className="main">  
-                <UnauthorizedNavbar />
+                <Navbar />
                 <RegistrationForm onSubmit={handleSubmit} />  
-                <SimpleSnackbar 
-                    open={snackbarOpen} 
-                    message={snackbarMessage} 
-                    severity={snackbarSeverity as AlertColor} 
-                    handleClose={handleSnackbarClose}
-                />
+                {Snackbar}
             </main>
             
         </>

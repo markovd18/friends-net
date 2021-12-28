@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useCookies } from 'react-cookie'
-import UnauthorizedNavbar from '../components/nav/UnauthorizedNavbar'
+import UnauthNavbar from '../components/nav/UnauthNavbar'
 import { Link } from '@mui/material'
 import Router from 'next/router'
 
@@ -22,7 +22,7 @@ const Home: NextPage = () => {
         <meta name="description" content="Griends net homepage" />
       </Head>
 
-      <UnauthorizedNavbar />
+      <UnauthNavbar />
       <main className={styles.main}>
         <h1 className={styles.title}>
           Welcome to Friends Net!

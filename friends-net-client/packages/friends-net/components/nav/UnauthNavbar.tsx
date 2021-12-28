@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material'
-import Navbar from './Navbar';
+import SimpleNavbar from './SimpleNavbar';
 
 const pages = ['Login', 'Register'];
 
-const UnauthorizedNavbar: React.FC<{}> = () => {
+const UnauthNavbar: React.FC<{}> = () => {
 
     return (
-        <Navbar >
+        <SimpleNavbar >
             {pages.map((page) => (
                 <Button
                     key={page}
@@ -16,8 +16,8 @@ const UnauthorizedNavbar: React.FC<{}> = () => {
                     {page}
                 </Button>
             ))}
-        </Navbar>
+        </SimpleNavbar>
     )
 };
 
-export default UnauthorizedNavbar;
+export default UnauthNavbar;

@@ -1,31 +1,15 @@
-import * as React from 'react'
-import { AppBar, Box, Link, Container, Toolbar, Typography } from '@mui/material'
+import { useCookies } from "react-cookie";
+import AuthNavbar from "./AuthNavbar";
+import UnauthNavbar from "./UnauthNavbar";
 
+const Navbar: React.FC<{}> = () => {
 
-const Navbar: React.FC<{}> = ({children}) => {
+    const [cookie] = useCookies(['accessToken']);
 
-    return (
-        <AppBar>
-            <Container maxWidth='lg'>
-                <Toolbar disableGutters>
-                
-                    <Typography
-                        variant='h6'
-                        noWrap
-                        component='div'
-                        sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
-                    >
-                    <Link underline='none' href='/' color={'white'}>Friends Net</Link>
-                    </Typography>
-
-                <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                    {children}
-                </Box>
-
-                </Toolbar>
-            </Container>
-        </AppBar>
-    )
-};
+    return cookie.accessToken ? (
+        // TODO useSnackbar here instead of in AuthNavbar
+        <AuthNavbar />
+    ) : <UnauthNavbar />
+}
 
 export default Navbar;
