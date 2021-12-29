@@ -7,7 +7,7 @@ ARG MODULES=friends-net-*/target/*.jar
 COPY ${MODULES} ./
 
 USER root
-RUN mv friends-net-core-* app.jar
+RUN mv friends-net-start-* app.jar
 
 USER spring:spring
 ENTRYPOINT ["java","-jar","/app.jar"]

@@ -10,10 +10,22 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
+    <!--   We need separate module with starting class only and dependencies on all desired modules, because spring
+       does not know how to scan plug-in modules natively :(
+
+       In ideal world the dependencies would've been the other way around:
+
+        Only single CORE module with authentication (login/registration/auth) and starting class.
+        All other modules would depend on this module, would be compiled into jar and packaged into the
+        resulting jar along with the core/auth module.
+
+        But this is unfortunately not possible yet (maybe never will) natively.
+   -->
+
     <artifactId>friends-net-start</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Module API</name>
-    <description>Module providing API for other modules by which then may be activated in core application.</description>
+    <name>Start</name>
+    <description>Starting module with the entire application.</description>
 
     <dependencies>
         <!--    Other dependencies      -->

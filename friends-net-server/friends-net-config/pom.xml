@@ -10,6 +10,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
+    <!--   We need separate module for shared configuration, because spring/maven doesn't
+       know how to use only single source of application.yml from project root :(   -->
+
     <artifactId>friends-net-config</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Config</name>
