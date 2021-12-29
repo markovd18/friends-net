@@ -1,0 +1,14 @@
+package cz.markovda.friendsnet.auth.dos;
+
+
+/**
+ * @author <a href="mailto:">David Markov</a>
+ * @since 25.12.21
+ */
+public interface IDOFactory {
+
+    IUserDO createUser();
+    IUserDO createUser(String login, String password, String name);
+    IUserDO createUser(int id, String login, String password, String name);
+    IUserDO createUser(int id, String login, String password, String name, IUserDO.EnumUserRole role);
+}

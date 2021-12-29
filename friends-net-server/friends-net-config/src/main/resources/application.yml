@@ -1,0 +1,20 @@
+logging:
+  level:
+    #    root: DEBUG
+    org:
+      apache: WARN
+    #      springframework:
+    #        web:
+    #          context:
+    #            support:
+    #              SpringBeanAutowiringSupport: ERROR
+    com: INFO
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/friends-net-db
+    username: root
+    password: superstrongpassword
+
+jwt:
+  secret: kiv/pia
