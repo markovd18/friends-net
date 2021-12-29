@@ -48,6 +48,19 @@ public class UserAuthServiceImpl implements IUserAuthService {
     }
 
     @Override
+    public IUserVO findUserByUsername(final String username) {
+        log.debug("Start of findUserByUsername method (args: {}).", username);
+
+        final IUserDO userDO = userRepository.findUserWithRoleByLogin(username)
+                .orElse(null);
+        if (userDO == null) {
+            return null;
+        }
+
+        return new UserVO(userDO.getLogin(), null, userDO.getName(), IUserVO.EnumUserRole.valueOf(userDO.getRole().name()));
+    }
+
+    @Override
     public IUserVO createNewUser(@NotNull @Valid final IUserVO newUser) {
         log.debug("Start of createNewUser method (args: {}).", newUser);
         validator.validate(newUser);
@@ -73,6 +86,6 @@ public class UserAuthServiceImpl implements IUserAuthService {
         }
 
         log.debug("New user saved.");
-        return new UserVO(userDO.getLogin(), userDO.getPassword(), userDO.getName(), IUserVO.EnumUserRole.valueOf(userDO.getRole().name()));
+        return new UserVO(userDO.getLogin(), null, userDO.getName(), IUserVO.EnumUserRole.valueOf(userDO.getRole().name()));
     }
 }

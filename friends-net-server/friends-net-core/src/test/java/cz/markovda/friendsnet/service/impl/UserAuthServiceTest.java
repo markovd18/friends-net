@@ -18,6 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -89,7 +90,7 @@ public class UserAuthServiceTest {
         final IUserVO createdUser = userAuthService.createNewUser(userVO);
         assertAll(() -> assertNotNull(createdUser, "Created user may not be NULL!"),
                 () -> assertEquals(userVO.getLogin(), createdUser.getLogin(), "Login of created user has to be equal to the argument!"),
-                () -> assertEquals(encodedPassword, createdUser.getPassword(), "Password of created user has to be equal to the argument!"),
+                () -> assertNull(createdUser.getPassword(), "Password of created user should not be returned!"),
                 () -> assertEquals(IUserVO.EnumUserRole.USER, createdUser.getRole(), "Created user has to have role USER!"));
     }
 
@@ -109,6 +110,28 @@ public class UserAuthServiceTest {
 
         when(userRepository.saveUser(userDO)).thenReturn(0);
         assertThrows(RuntimeException.class, () -> userAuthService.createNewUser(userVO));
+    }
+
+    @Test
+    public void findsExistingUser() {
+        final var username = "really existing";
+
+        final IUserDO userDO = UserDOTestUtils.prepareUser(username);
+        when(userRepository.findUserWithRoleByLogin(username)).thenReturn(Optional.of(userDO));
+        final IUserVO userVO = userAuthService.findUserByUsername(username);
+        assertAll(() -> assertEquals(userDO.getLogin(), userVO.getLogin(), "Login of returned user has to match the login of DB record!"),
+                () -> assertNull(userVO.getPassword(), "Password of the user should not be returned!"),
+                () -> assertEquals(userDO.getName(), userVO.getName(), "Name of returned user has to match the name of DB record!"),
+                () -> assertEquals(IUserVO.EnumUserRole.valueOf(userDO.getRole().name()), userVO.getRole(),
+                        "Role of returned user has to match the role of DB record!"));
+    }
+
+    @Test
+    public void returnsNull_whenUserDoesNotExist() {
+        final var username = "I do not exist";
+
+        when(userRepository.findUserWithRoleByLogin(username)).thenReturn(Optional.empty());
+        assertNull(userAuthService.findUserByUsername(username), "When user does not exist, service should return NULL!");
     }
 
 }

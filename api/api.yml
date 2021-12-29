@@ -44,7 +44,7 @@ paths:
       operationId: register
       responses:
         '200':
-          description: User successfully registered./
+          description: User successfully registered.
         '400':
           description: User login is not in a valid format or is already taken
 
@@ -63,6 +63,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BadRequestVO'
+
     '401':
       description: Access token is missing or invalid
     LoginResponse:
@@ -70,7 +71,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/JwtVO'
+            $ref: '#/components/schemas/UserAuthenticationVO'
 
   requestBodies:
     LoginRequest:
@@ -80,6 +81,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UserCredentialsVO'
+
     RegisterRequest:
       required: true
       description: Request to sign up to create new user account.
@@ -87,6 +89,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UserRegistrationDataVO'
+  
   schemas:
     UserCredentialsVO:
       description: Object with user authentication request data.
@@ -110,6 +113,7 @@ components:
       example:
         login: great@email.com
         password: my-secret_Password
+
     UserRegistrationDataVO:
       description: Object with all required user data for registration.
       allOf:
@@ -127,16 +131,35 @@ components:
         - name
         - login
         - password
-    JwtVO:
-      description: Object carrying generated JSON Web Token used for user authentication.
+
+    UserAuthenticationVO:
+      description: Object carrying logged in user's detail information and generated JSON Web Token for authentication.
       type: object
       properties:
+        login:
+          type: string
+          format: email
+          description: User's login.
+          maxLength: 50
+          minLength: 4
+          example: example@email.com
+        name:
+          type: string
+          description: User's displayed name.
+          example: John Doe
         token:
           type: string
           description: Generated JSON Web Token.
           example: 0$[wfwnfuowburmgjo2126+
+      required:
+        - login
+        - name
+        - token
       example:
+        login: example@email.com
+        name: John Doe
         token: 0$[wfwnfuowburmgjo2126+
+
     BadRequestVO:
       description: Object describing a Bad Request (400) HTTP error.
       type: object

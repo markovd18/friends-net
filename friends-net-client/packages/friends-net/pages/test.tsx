@@ -3,11 +3,12 @@ import type { NextPage } from 'next'
 import Button from '@mui/material/Button'
 import { AuthApi } from '@markovda/fn-api'
 import { useCookies } from 'react-cookie'
-import Router from 'next/router'
+import { useRouter } from 'next/router'
 
 const TestPage : NextPage = () => {
 
-    const [cookies, setCookie, removeCookie] = useCookies(['accessToken']);
+    const [, setCookie, removeCookie] = useCookies(['accessToken']);
+    const router = useRouter();
 
     const onButtonClicked = async () => {
         // const status = (await AuthApi.register({login: "test-react", password: "heslo-react"})).status;
@@ -16,7 +17,7 @@ const TestPage : NextPage = () => {
         const token = (await AuthApi.login({login: "admin", password: "Strong_password"})).data;
         console.log("token", token);
         setCookie('accessToken', token.token, { path: '/' });
-        Router.push('/');
+        router.push('/');
     }
 
     const deleteToken = () => {

@@ -1,15 +1,28 @@
+import { useSnackbar } from "packages/friends-net/hooks";
+import useUserData from "packages/friends-net/hooks/useUserData";
+import { useCallback } from "react";
 import { useCookies } from "react-cookie";
 import AuthNavbar from "./AuthNavbar";
 import UnauthNavbar from "./UnauthNavbar";
 
 const Navbar: React.FC<{}> = () => {
 
-    const [cookie] = useCookies(['accessToken']);
+    const [cookie,, removeCookie] = useCookies(['accessToken']);   
+    const { logoutUser } = useUserData();
 
-    return cookie.accessToken ? (
-        // TODO useSnackbar here instead of in AuthNavbar
-        <AuthNavbar />
-    ) : <UnauthNavbar />
+    const handleLogout = useCallback(() => {
+        removeCookie('accessToken', { path: '/' });
+        logoutUser();
+    }, []);
+
+    return (
+        <>
+            {cookie.accessToken 
+            ? <AuthNavbar onLogout={handleLogout}/> 
+            : <UnauthNavbar />
+            }
+        </>
+    )
 }
 
 export default Navbar;

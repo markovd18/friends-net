@@ -12,6 +12,8 @@ import javax.validation.constraints.NotNull;
  */
 public interface IUserAuthService extends UserDetailsService {
 
+    IUserVO findUserByUsername(@NotNull String username);
+
     IUserVO createNewUser(@NotNull @Valid IUserVO newUser);
 
 }

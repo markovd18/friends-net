@@ -4,13 +4,14 @@ import styles from '../styles/Home.module.css'
 import { useCookies } from 'react-cookie'
 import UnauthNavbar from '../components/nav/UnauthNavbar'
 import { Link } from '@mui/material'
-import Router from 'next/router'
+import { useRouter } from 'next/router'
 
 const Home: NextPage = () => {
 
   const [cookies] = useCookies(['accessToken']);
+  const router = useRouter();
   if (cookies.accessToken) {
-    Router.push('/home');
+    router.push('/home');
   }
 
 

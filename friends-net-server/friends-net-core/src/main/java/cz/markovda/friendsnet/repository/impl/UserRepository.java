@@ -54,7 +54,7 @@ public class UserRepository implements IUserRepository {
         }
     }
 
-    protected static final String USER_WITH_ROLE_BY_LOGIN_QUERY = "SELECT u.id, u.login, u.password, ar.name " +
+    protected static final String USER_WITH_ROLE_BY_LOGIN_QUERY = "SELECT u.id, u.login, u.password, u.name, ar.name as role_name " +
             "FROM auth_user u " +
             "INNER JOIN auth_user_role aur ON u.id = aur.id_user " +
             "INNER JOIN auth_role ar ON ar.id = aur.id_role " +
@@ -91,7 +91,8 @@ public class UserRepository implements IUserRepository {
 
         final Map<String, Object> row = queryResult.get(0);
         return Optional.of(factory.createUser((Integer) row.get("id"),
-                (String) row.get("login"), (String) row.get("password"), (String) row.get("name")));
+                (String) row.get("login"), (String) row.get("password"),
+                (String) row.get("name"), IUserDO.EnumUserRole.valueOf((String) row.get("role_name"))));
     }
 
     @Override

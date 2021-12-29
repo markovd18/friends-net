@@ -6,7 +6,7 @@ import cz.markovda.friendsnet.service.validation.ValidationException;
 import cz.markovda.friendsnet.vos.IUserVO;
 import cz.markovda.friendsnet.vos.IVOFactory;
 import cz.markovda.friendsnet.vos.impl.UserVO;
-import cz.markovda.vo.JwtVO;
+import cz.markovda.vo.UserAuthenticationVO;
 import cz.markovda.vo.UserCredentialsVO;
 import cz.markovda.vo.UserRegistrationDataVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Objects;
@@ -54,18 +52,14 @@ public class AuthenticationControllerTest {
         final UserCredentialsVO userCredentialsVO = new UserCredentialsVO()
                 .login("existing")
                 .password("password");
-        final UserDetails userDetails = User.builder()
-                .username(userCredentialsVO.getLogin())
-                .password(userCredentialsVO.getPassword())
-                .authorities("ROLE_ADMIN")
-                .build();
+        final IUserVO userDetails = new UserVO(userCredentialsVO.getLogin(), null, "name", IUserVO.EnumUserRole.USER);
         final String generatedToken = "test-token";
-        when(userAuthService.loadUserByUsername(userCredentialsVO.getLogin())).thenReturn(userDetails);
-        when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword())))
+        when(userAuthService.findUserByUsername(userCredentialsVO.getLogin())).thenReturn(userDetails);
+        when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDetails.getLogin(), userDetails.getPassword())))
                 .thenReturn(null);
         when(jwtUtils.generateToken(userDetails)).thenReturn(generatedToken);
 
-        final ResponseEntity<JwtVO> response = authenticationController.login(userCredentialsVO);
+        final ResponseEntity<UserAuthenticationVO> response = authenticationController.login(userCredentialsVO);
         assertAll(() -> assertNotNull(response, "Controller has to respond with non-null object!"),
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "Response to existing user login has to be OK!"),
                 () -> assertNotNull(response.getBody(), "Response body may not be null!"),

@@ -6,7 +6,7 @@ import cz.markovda.friendsnet.service.IUserAuthService;
 import cz.markovda.friendsnet.service.validation.ValidationException;
 import cz.markovda.friendsnet.vos.IUserVO;
 import cz.markovda.friendsnet.vos.IVOFactory;
-import cz.markovda.vo.JwtVO;
+import cz.markovda.vo.UserAuthenticationVO;
 import cz.markovda.vo.UserCredentialsVO;
 import cz.markovda.vo.UserRegistrationDataVO;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -33,17 +31,20 @@ public class AuthenticationController implements AuthenticationControllerApi {
     private final IVOFactory voFactory;
 
     @Override
-    public ResponseEntity<JwtVO> login(final UserCredentialsVO credentialsVO) {
-        final UserDetails userDetails;
-        try {
-            userDetails = userAuthService.loadUserByUsername(credentialsVO.getLogin());
-        } catch (UsernameNotFoundException e) {
+    public ResponseEntity<UserAuthenticationVO> login(final UserCredentialsVO credentialsVO) {
+        final IUserVO userVO = userAuthService.findUserByUsername(credentialsVO.getLogin());
+        if (userVO == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        authenticate(credentialsVO.getLogin(), credentialsVO.getPassword());
-        final String token = jwtUtils.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtVO().token(token));
+        try {
+            authenticate(credentialsVO.getLogin(), credentialsVO.getPassword());
+        } catch (final Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final String token = jwtUtils.generateToken(userVO);
+        return ResponseEntity.ok(new UserAuthenticationVO().login(credentialsVO.getLogin()).name(userVO.getName()).token(token));
     }
 
     @Override

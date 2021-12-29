@@ -5,30 +5,22 @@ import { useCookies } from "react-cookie";
 import SimpleNavbar from "./SimpleNavbar";
 
 
+type Props = {
+    onLogout: () => void;
+}
 
-const AuthNavbar: React.FC<{}> = () => {
-    
-    const [,, removeCookie] = useCookies(['accessToken']);
-    const [Snackbar, showSnackbar] = useSnackbar();   
-
-    const handleLogout = useCallback(() => {
-        removeCookie('accessToken');
-        showSnackbar('Succesfully logged out!', 'success');
-    }, []);
+const AuthNavbar: React.FC<Props> = ({onLogout}) => {   
 
     return (
-        <>
-            <SimpleNavbar>
-                <Button
-                        key='logout'
-                        sx={{ my: 2, color: 'white', display: 'block' }}
-                        onClick={handleLogout}
-                    >
-                        Logout
-                    </Button>
-            </SimpleNavbar>
-            {Snackbar}
-        </>
+        <SimpleNavbar>
+            <Button
+                    key='logout'
+                    sx={{ my: 2, color: 'white', display: 'block' }}
+                    onClick={onLogout}
+                >
+                    Logout
+            </Button>
+        </SimpleNavbar>
     )
 }
 

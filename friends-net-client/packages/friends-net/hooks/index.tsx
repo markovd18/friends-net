@@ -1,5 +1,7 @@
 import useSnackbar from "./useSnackbar";
+import useAuthRedirect from "./useAuthRedirect"
 
 export {
-    useSnackbar
+    useSnackbar,
+    useAuthRedirect
 }

@@ -1,5 +1,6 @@
 package cz.markovda.friendsnet.config.jwt;
 
+import cz.markovda.friendsnet.vos.IUserVO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -52,9 +53,9 @@ public class JwtUtils implements Serializable {
     }
 
     //generate token for user
-    public String generateToken(final UserDetails userDetails) {
+    public String generateToken(final IUserVO userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        return doGenerateToken(claims, userDetails.getLogin());
     }
 
     //while creating the token -
