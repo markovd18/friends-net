@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,4 +20,8 @@ public interface IUserRepository {
     Optional<IUserDO> findUserWithRoleByLogin(@NotNull String login);
 
     boolean userWithLoginExists(@NotNull String login);
+
+    List<IUserDO> findUsersWithNameLike(@NotNull String searchString);
+
+    Optional<Integer> findUserId(@NotNull String login);
 }

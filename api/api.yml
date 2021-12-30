@@ -14,6 +14,8 @@ security:
 tags:
   - name: AuthenticationController
     description: Controller for authentication, signing in and out and signing up.
+  - name: UserSearchController
+    description: Controller for searching of users.
 
 # Paths are the URIs within your REST Application.
 paths:
@@ -32,6 +34,7 @@ paths:
           $ref: '#/components/responses/LoginResponse'
         '400':
           description: User credentials are incorrect
+
   '/register':
     post:
       summary: Registers new user
@@ -47,6 +50,21 @@ paths:
           description: User successfully registered.
         '400':
           description: User login is not in a valid format or is already taken
+
+  '/api/findUsers':
+    get:
+      summary: Searches for users
+      description: Finds users who's name contains given substring.
+      tags:
+        - UserSearchController
+      operationId: findUsers
+      parameters:
+       - $ref: '#/components/parameters/UserSearchParameter'
+      responses:
+       '200':
+         $ref: '#/components/responses/UserSearchResponse'
+       '401':
+         description: Unauthenticated
 
 components:
 
@@ -66,12 +84,20 @@ components:
 
     '401':
       description: Access token is missing or invalid
+
     LoginResponse:
       description: Response on successfull login request.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/UserAuthenticationVO'
+
+    UserSearchResponse:
+      description: Response on successfull user search query.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FoundUsersVO'
 
   requestBodies:
     LoginRequest:
@@ -89,7 +115,19 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UserRegistrationDataVO'
-  
+
+  parameters:
+    UserSearchParameter:
+      name: nameLike
+      in: query
+      required: true
+      description: Substring sought in user's names.
+      allowEmptyValue: false
+      schema:
+        type: string
+        minLength: 3
+      example: Adam
+
   schemas:
     UserCredentialsVO:
       description: Object with user authentication request data.
@@ -132,6 +170,25 @@ components:
         - login
         - password
 
+    UserIdentificationDataVO:
+      description: Object with user's identification data.
+      properties:
+        name:
+          type: string
+          description: User's name that will be displayed.
+          maxLength: 50
+          example: John Doe
+        login:
+          type: string
+          format: email
+          description: User's email. Will be used as login.
+          maxLength: 50
+          minLength: 4
+          example: great@email.com
+      example:
+        name: John Doe
+        login: great@email.com
+
     UserAuthenticationVO:
       description: Object carrying logged in user's detail information and generated JSON Web Token for authentication.
       type: object
@@ -159,6 +216,12 @@ components:
         login: example@email.com
         name: John Doe
         token: 0$[wfwnfuowburmgjo2126+
+
+    FoundUsersVO:
+      description: Object carrying a list of found users.
+      type: array
+      items:
+        $ref: '#/components/schemas/UserIdentificationDataVO'
 
     BadRequestVO:
       description: Object describing a Bad Request (400) HTTP error.

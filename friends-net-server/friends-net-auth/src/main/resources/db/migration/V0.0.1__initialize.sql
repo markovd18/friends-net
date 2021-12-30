@@ -2,7 +2,8 @@ CREATE TABLE auth_user(
     id SERIAL PRIMARY KEY,
     login varchar(50) UNIQUE NOT NULL,
     password varchar(70) NOT NULL,
-    name varchar(50) NOT NULL);
+    name varchar(50) NOT NULL
+);
 
 CREATE TABLE auth_role(
     id SERIAL PRIMARY KEY,
