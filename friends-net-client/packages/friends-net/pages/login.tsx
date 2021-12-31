@@ -7,7 +7,6 @@ import { useCookies } from 'react-cookie';
 import LoginForm from '../components/LoginForm';
 import UnauthNavbar from '../components/nav/UnauthNavbar';
 import SimpleSnackbar from '../components/SimpleSnackbar';
-import { UserDataProvider } from '../contexts/UserContext';
 import { useAuthRedirect } from '../hooks';
 import useUserData from '../hooks/useUserData';
 import styles from '../styles/Home.module.css'
@@ -18,8 +17,7 @@ const LoginPage: NextPage = () => {
     const [snackbarMessage, setSnackbarMessage] = useState<string>("");
     const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
 
-    const {loginUser} = useUserData();
-    const [, setCookie] = useCookies(['accessToken']);
+    const [,,loginUser,] = useUserData();
     const redirecting = useAuthRedirect('/home');
 
     const handleSnackbarClose = useCallback(() => {
@@ -34,11 +32,15 @@ const LoginPage: NextPage = () => {
 
     const authenticate = useCallback(async (data: UserCredentialsVO) => {
         const { data: { login, name, token } } = (await AuthApi.login(data));
-        setCookie('accessToken', token, { path: '/' });
-        loginUser({login: login, name: name});
+        loginUser({login: login, name: name, accessToken: token});
     }, []);
 
     const handleError = useCallback((error) => {
+        if (!error.response) {
+            showSnackbar('Server not responding. Please try again later.', 'error');
+            return;
+        }
+
         switch (error.response.status){
             case 400:
             case 401:
@@ -80,5 +82,4 @@ const LoginPage: NextPage = () => {
     )
 }
 
-LoginPage.provider = UserDataProvider;
 export default LoginPage;

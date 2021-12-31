@@ -2,13 +2,13 @@ import { Avatar, Card, CardContent, Container, Stack, Typography } from "@mui/ma
 import { NextPage } from "next";
 import Head from "next/head";
 import Navbar from "../components/nav/Navbar";
-import { UserDataProvider } from "../contexts/UserContext";
+import PageContentContainer from "../components/PageContentContainer";
 import useUnauthRedirect from "../hooks/useUnauthRedirect";
 import useUserData from "../hooks/useUserData";
 
 const HomePage: NextPage = () => {
 
-    const {userData} = useUserData();
+    const [name, login] = useUserData();
     const redirecting = useUnauthRedirect('/login');
 
     return redirecting ? null : (
@@ -20,21 +20,21 @@ const HomePage: NextPage = () => {
 
             <main>
                 <Navbar />
-                <Container maxWidth='lg' sx={{flex: 1, display: "flex", flexDirection: "column"}}>
+                <PageContentContainer>
                     <Card sx={{ maxWidth: 345, 
                         minHeight: 100, padding: 4, flex: 1, 
                         display: "flex", flexDirection: "column", 
                         justifyContent: "center", alignContent: "center",
-                        marginLeft: 2, marginTop: 20, position: "fixed" }}>
+                        position: "fixed" }}>
                         <CardContent>
                             <Stack direction={"row"} spacing={3}>
                                 <Typography gutterBottom variant="h5" component="div">
-                                    {userData.name}
+                                    {name}
                                 </Typography>
-                                <Avatar sx={{width: 48, height: 48}}>{userData.name?.charAt(0)}</Avatar>    
+                                <Avatar sx={{width: 48, height: 48}}>{name?.charAt(0)}</Avatar>    
                             </Stack>
                             <Typography variant="body2">
-                                {userData.login}
+                                {login}
                             </Typography>
                         </CardContent>
 
@@ -43,18 +43,16 @@ const HomePage: NextPage = () => {
                     <Card sx={{ 
                         minHeight: 1000, padding: 4, flex: 1, 
                         display: "flex", flexDirection: "column", 
-                        
-                        marginLeft: 50, marginTop: 20 }}>
+                        marginLeft: 50 }}>
                         <CardContent>
                         
                         </CardContent>
 
                     </Card>
-                </Container>
+                </PageContentContainer>
             </main>
         </>
     )
 }
 
-HomePage.provider = UserDataProvider;
 export default HomePage;

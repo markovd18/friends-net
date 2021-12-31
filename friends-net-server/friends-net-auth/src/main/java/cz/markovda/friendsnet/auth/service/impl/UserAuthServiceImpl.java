@@ -57,6 +57,7 @@ public class UserAuthServiceImpl implements IUserAuthService {
             return null;
         }
 
+        log.debug("End of findUserByUsername method.");
         return new UserVO(userDO.getLogin(), null, userDO.getName(), IUserVO.EnumUserRole.valueOf(userDO.getRole().name()));
     }
 

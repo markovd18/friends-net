@@ -51,7 +51,7 @@ paths:
         '400':
           description: User login is not in a valid format or is already taken
 
-  '/api/findUsers':
+  '/api/users':
     get:
       summary: Searches for users
       description: Finds users who's name contains given substring.
@@ -66,6 +66,22 @@ paths:
        '401':
          description: Unauthenticated
 
+  '/api/friendship/request':
+    post:
+      summary: Sends friend request
+      description: Sends friend request to user with given username. They may accept, decline or block the request sender.
+      tags:
+        - UserRelationshipController
+      operationId: createFriendRequest
+      parameters:
+        - $ref: '#/components/parameters/FriendRequestParameter'
+      responses:
+        '200':
+          description: OK. Friend request successfully sent.
+        '400':
+          description: User with given username does not exist.
+        '401':
+          description: Unauthenticated
 components:
 
   securitySchemes:
@@ -127,6 +143,17 @@ components:
         type: string
         minLength: 3
       example: Adam
+
+    FriendRequestParameter:
+      name: username
+      in: query
+      required: true
+      description: Username of the user we want to send friend request to.
+      allowEmptyValue: false
+      schema:
+        type: string
+        minLength: 4
+      example: boss23@mail.com
 
   schemas:
     UserCredentialsVO:

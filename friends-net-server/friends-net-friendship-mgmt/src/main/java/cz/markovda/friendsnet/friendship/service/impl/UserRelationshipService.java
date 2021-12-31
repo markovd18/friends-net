@@ -38,14 +38,23 @@ public class UserRelationshipService implements IUserRelationshipService {
             throw new AccessDeniedException("Anonymous user may not create relationships");
         }
 
-        int senderId = getUserId(authenticationService.getLoginName());
-        int receiverId = getUserId(receiverName);
-        userRelationshipRepository.saveNewRelationship(doFactory.createUserRelationship(senderId, receiverId, LocalDateTime.now(clock)));
+        final String senderLogin = authenticationService.getLoginName();
+        if (senderLogin.equals(receiverName)) {
+            throw new IllegalArgumentException("User cannot create relationship with themselves!");
+        }
+
+        saveNewRelationship(receiverName, senderLogin);
         log.debug("End of createNewRelationship method.");
+    }
+
+    private void saveNewRelationship(final String receiverName, final String senderLogin) {
+        final int senderId = getUserId(senderLogin);
+        final int receiverId = getUserId(receiverName);
+        userRelationshipRepository.saveNewRelationship(doFactory.createUserRelationship(senderId, receiverId, LocalDateTime.now(clock)));
     }
 
     private Integer getUserId(final String login) {
         return userRepository.findUserId(login)
-                .orElseThrow(() -> new IllegalStateException("ID of user " + login + " not found!"));
+                .orElseThrow(() -> new IllegalArgumentException("ID of user " + login + " not found!"));
     }
 }

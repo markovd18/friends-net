@@ -22,7 +22,11 @@ let baseURL = 'http://localhost:8080'   //TODO env variable with end server addr
 let baseAxios = axios.create({baseURL, headers: { Pragma: "no-cache"}})
 
 const AuthApi = new Api.AuthenticationControllerApi(undefined, baseURL, baseAxios)
+const FriendshipApi = new Api.UserRelationshipControllerApi(undefined, baseURL, baseAxios);
+const UserSearchApi = new Api.UserSearchControllerApi(undefined, baseURL, baseAxios);
 
 export {
-    AuthApi
+    AuthApi,
+    FriendshipApi,
+    UserSearchApi
 }

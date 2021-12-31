@@ -1,7 +1,5 @@
-import { AlertColor, Button } from "@mui/material";
-import { useSnackbar } from "packages/friends-net/hooks";
-import { useCallback, useState } from "react";
-import { useCookies } from "react-cookie";
+import { Button } from "@mui/material";
+import { useRouter } from "next/router";
 import SimpleNavbar from "./SimpleNavbar";
 
 
@@ -11,6 +9,8 @@ type Props = {
 
 const AuthNavbar: React.FC<Props> = ({onLogout}) => {   
 
+    const router = useRouter();
+
     return (
         <SimpleNavbar>
             <Button
@@ -19,6 +19,13 @@ const AuthNavbar: React.FC<Props> = ({onLogout}) => {
                     onClick={onLogout}
                 >
                     Logout
+            </Button>
+            <Button
+                key='friendships'
+                sx={{ my: 2, color: 'white', display: 'block'}}
+                onClick={() => router.push('/friendships')}
+            >
+                Friendships
             </Button>
         </SimpleNavbar>
     )

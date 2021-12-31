@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * @author <a href="mailto:">David Markov</a>
  * @since 30.12.21
  */
-@Component
+@Component("UserRelationsDOFactory")
 public class DOFactory implements IDOFactory {
 
     @Override

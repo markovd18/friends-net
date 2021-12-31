@@ -1,7 +1,7 @@
 
 import type { NextPage } from 'next'
 import Button from '@mui/material/Button'
-import { AuthApi } from '@markovda/fn-api'
+import { AuthApi, UserSearchApi } from '@markovda/fn-api'
 import { useCookies } from 'react-cookie'
 import { useRouter } from 'next/router'
 
@@ -24,10 +24,17 @@ const TestPage : NextPage = () => {
         removeCookie('accessToken', { path: '/'})
     }
 
+    const searchForUsers = async () => {
+        const users = (await UserSearchApi.findUsers("makarek")).data;
+        console.log("found:", users);
+    }
+
     return (
         <div>
             <Button variant='contained' onClick={onButtonClicked}>Hello, Material UI!</Button>
             <Button onClick={deleteToken}>Remove token</Button>
+
+            <Button variant='outlined' onClick={searchForUsers}></Button>
         </div>
     )
 }
