@@ -1,5 +1,7 @@
 package cz.markovda.friendsnet.friendship.service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.validation.constraints.NotNull;
 
 /**
@@ -8,5 +10,6 @@ import javax.validation.constraints.NotNull;
  */
 public interface IUserRelationshipService {
 
+    @Transactional
     void createNewRelationship(@NotNull String receiverName);
 }

@@ -42,7 +42,7 @@ public class AuthenticationService implements IAuthenticationService {
     @Override
     public boolean isUserAnonymous() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && authentication.isAuthenticated();
+        return authentication == null || !authentication.isAuthenticated();
     }
 
     private String getNameFromSecurityContext() {

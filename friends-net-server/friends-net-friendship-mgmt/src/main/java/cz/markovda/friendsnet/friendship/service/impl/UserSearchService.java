@@ -30,7 +30,7 @@ public class UserSearchService implements IUserSearchService {
     public List<IUserVO> findUsersWithNamesContainingString(final String searchString) {
         log.debug("Start of findUsersWithNamesContainingString method (args: {})", searchString);
         Assert.notNull(searchString, "Search string may not be null!");
-        final List<IUserDO> foundUsers = userRepository.findUsersWithNameLike(searchString.toLowerCase(Locale.ROOT));
+        final List<IUserDO> foundUsers = userRepository.findUsersWithNameLike(searchString);
         log.debug("End of findUsersWithNamesContainingString method.");
         return createUsersVO(foundUsers);
     }

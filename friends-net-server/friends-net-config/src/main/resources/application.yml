@@ -1,6 +1,6 @@
 logging:
   level:
-    #    root: DEBUG
+    cz: DEBUG
     org:
       apache: WARN
     #      springframework:

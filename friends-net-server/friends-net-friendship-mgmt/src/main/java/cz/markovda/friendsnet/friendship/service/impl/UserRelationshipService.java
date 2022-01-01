@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.time.Clock;
@@ -30,6 +31,7 @@ public class UserRelationshipService implements IUserRelationshipService {
     private final IDOFactory doFactory;
     private final Clock clock;
 
+    @Transactional
     @Override
     public void createNewRelationship(@NotNull final String receiverName) {
         log.debug("Start for createNewRelationship method (args: {}).", receiverName);
@@ -50,6 +52,9 @@ public class UserRelationshipService implements IUserRelationshipService {
     private void saveNewRelationship(final String receiverName, final String senderLogin) {
         final int senderId = getUserId(senderLogin);
         final int receiverId = getUserId(receiverName);
+        if (userRelationshipRepository.relationshipExists(senderId, receiverId)) {
+            throw new IllegalStateException("Cannot recreate existing relationship!");
+        }
         userRelationshipRepository.saveNewRelationship(doFactory.createUserRelationship(senderId, receiverId, LocalDateTime.now(clock)));
     }
 

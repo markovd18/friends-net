@@ -6,6 +6,7 @@ import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -35,6 +36,14 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
         if (affectedRows != 1) {
             throw new RuntimeException("Error while inserting new friend request into database");
         }
+    }
+
+    @Override
+    public boolean relationshipExists(final int senderId, final int receiverId) {
+        return !jdbcTemplate.queryForList("SELECT (1) FROM user_relationship " +
+                        "WHERE (id_sender = ? AND id_receiver = ?)" +
+                        "OR (id_sender = ? AND id_receiver = ?)",
+                senderId, receiverId, receiverId, senderId).isEmpty();
     }
 
     private int findRelationshipStatusId(final IUserRelationshipDO.EnumRelationshipStatus status) {

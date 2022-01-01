@@ -58,6 +58,7 @@ public class UserRelationshipServiceTest {
         when(userRepository.findUserId(senderLogin)).thenReturn(Optional.of(senderId));
         when(userRepository.findUserId(receiverLogin)).thenReturn(Optional.of(receiverId));
         mockClock(createdAt);
+        when(userRelationshipRepository.relationshipExists(senderId, receiverId)).thenReturn(false);
         when(doFactory.createUserRelationship(senderId, receiverId, createdAt))
                 .thenReturn(UserRelationshipTestUtils.prepareNewFriendRequest(senderId, receiverId, createdAt));
 
@@ -113,6 +114,23 @@ public class UserRelationshipServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> userRelationshipService.createNewRelationship(senderLogin),
                 "Creating new relationship with self has to throw!");
+    }
+
+    @Test
+    public void throwsIllegalState_whenRelationshipExists() {
+        final var senderLogin = "sender";
+        final var receiverLogin = "receiver";
+        final var senderId = 2;
+        final var receiverId = 4;
+
+        when(authenticationService.isUserAnonymous()).thenReturn(false);
+        when(authenticationService.getLoginName()).thenReturn(senderLogin);
+        when(userRepository.findUserId(senderLogin)).thenReturn(Optional.of(senderId));
+        when(userRepository.findUserId(receiverLogin)).thenReturn(Optional.of(receiverId));
+        when(userRelationshipRepository.relationshipExists(senderId, receiverId)).thenReturn(true);
+
+        assertThrows(IllegalStateException.class, () -> userRelationshipService.createNewRelationship(receiverLogin),
+                "Attempt to recreate existing relationship should throw!");
     }
 
     private void mockClock(final LocalDateTime createdAt) {

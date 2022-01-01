@@ -1,4 +1,4 @@
-import { Avatar, Card, CardContent, Container, Stack, Typography } from "@mui/material";
+import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
 import Navbar from "../components/nav/Navbar";

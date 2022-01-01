@@ -215,6 +215,9 @@ components:
       example:
         name: John Doe
         login: great@email.com
+      required:
+        - name
+        - login
 
     UserAuthenticationVO:
       description: Object carrying logged in user's detail information and generated JSON Web Token for authentication.

@@ -95,7 +95,7 @@ public class UserRepository implements IUserRepository {
 
         final var preparedString = "%" + searchString + "%";
         final List<Map<String, Object>> queryResult = jdbcTemplate.queryForList(
-                "SELECT login, name FROM auth_user WHERE name like ?", preparedString);
+                "SELECT login, name FROM auth_user WHERE LOWER(name) like ?", preparedString.toLowerCase());
 
         return createUserDOList(queryResult);
     }
