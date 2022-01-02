@@ -1,5 +1,6 @@
 package cz.markovda.friendsnet.friendship.utils;
 
+import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import cz.markovda.friendsnet.friendship.dos.IUserRelationshipDO;
 
 import java.time.LocalDateTime;

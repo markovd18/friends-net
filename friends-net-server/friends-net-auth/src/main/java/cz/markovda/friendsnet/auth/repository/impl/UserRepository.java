@@ -90,17 +90,6 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public List<IUserDO> findUsersWithNameLike(@NotNull final String searchString) {
-        Assert.notNull(searchString, "Search string may not be null!");
-
-        final var preparedString = "%" + searchString + "%";
-        final List<Map<String, Object>> queryResult = jdbcTemplate.queryForList(
-                "SELECT login, name FROM auth_user WHERE LOWER(name) like ?", preparedString.toLowerCase());
-
-        return createUserDOList(queryResult);
-    }
-
-    @Override
     public Optional<Integer> findUserId(@NotNull final String login) {
         Assert.notNull(login, "Login may not be null!");
         final List<Integer> ids = jdbcTemplate.queryForList("SELECT id FROM auth_user WHERE login = ?", Integer.class, login);

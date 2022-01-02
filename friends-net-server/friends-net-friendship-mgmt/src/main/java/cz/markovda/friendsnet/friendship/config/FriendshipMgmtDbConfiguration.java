@@ -1,6 +1,6 @@
 package cz.markovda.friendsnet.friendship.config;
 
-import cz.markovda.friendsnet.friendship.dos.IUserRelationshipDO;
+import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ public class FriendshipMgmtDbConfiguration implements InitializingBean {
     }
 
     private void createDefaultRelationshipStatuses() {
-        for (var status : IUserRelationshipDO.EnumRelationshipStatus.values()) {
+        for (var status : EnumRelationshipStatus.values()) {
             jdbcTemplate.update("INSERT INTO relationship_status(id, name) VALUES (DEFAULT, ?)", status.name());
         }
     }

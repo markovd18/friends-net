@@ -19,9 +19,4 @@ public interface IUserRelationshipDO {
     LocalDateTime getLastUpdated();
 
 
-    enum EnumRelationshipStatus {
-        REQUEST_SENT,
-        FRIENDS,
-        BLOCKED
-    }
 }

@@ -21,7 +21,5 @@ public interface IUserRepository {
 
     boolean userWithLoginExists(@NotNull String login);
 
-    List<IUserDO> findUsersWithNameLike(@NotNull String searchString);
-
     Optional<Integer> findUserId(@NotNull String login);
 }

@@ -1,6 +1,7 @@
 package cz.markovda.friendsnet.friendship.service;
 
 import cz.markovda.friendsnet.auth.vos.IUserVO;
+import cz.markovda.friendsnet.vos.IUserSearchResultVO;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -11,5 +12,17 @@ import java.util.List;
  */
 public interface IUserSearchService {
 
-    List<IUserVO> findUsersWithNamesContainingString(@NotNull String searchString);
+    List<IUserSearchResultVO> findUsersWithNamesContainingString(@NotNull String searchString);
+
+    List<IUserSearchResultVO> findUsersBlockedToAuthenticatedUser();
+
+    List<IUserSearchResultVO> findAuthenticatedUsersFriends();
+
+    List<IUserSearchResultVO> findUsersBlockedToUser(@NotNull String username);
+
+    List<IUserSearchResultVO> findUsersFriends(@NotNull String username);
+
+    List<IUserSearchResultVO> findPendingRequestsForAuthenticatedUser();
+
+    List<IUserSearchResultVO> findPendingRequestsForUser(@NotNull String username);
 }

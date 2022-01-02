@@ -1,9 +1,10 @@
 package cz.markovda.friendsnet.friendship.controller;
 
 import cz.markovda.api.UserSearchControllerApi;
-import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;
-import cz.markovda.vo.UserIdentificationDataVO;
+import cz.markovda.friendsnet.vos.IUserSearchResultVO;
+import cz.markovda.vo.EnumRelationshipStatus;
+import cz.markovda.vo.UserRelationshipVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,16 +23,42 @@ public class UserSearchController implements UserSearchControllerApi {
     private final IUserSearchService userSearchService;
 
     @Override
-    public ResponseEntity<List<UserIdentificationDataVO>> findUsers(final String nameLike) {
-        final List<IUserVO> foundUsers = userSearchService.findUsersWithNamesContainingString(nameLike);
+    public ResponseEntity<List<UserRelationshipVO>> findBlockedUsers() {
+        final List<IUserSearchResultVO> foundUsers = userSearchService.findUsersBlockedToAuthenticatedUser();
         return ResponseEntity.ok(foundUsers.stream()
-                .map(this::createUserIdentificationData)
+                .map(this::createUserRelationshipVO)
                 .collect(Collectors.toList()));
     }
 
-    private UserIdentificationDataVO createUserIdentificationData(final IUserVO userVO) {
-        return new UserIdentificationDataVO()
-                .login(userVO.getLogin())
-                .name(userVO.getName());
+    @Override
+    public ResponseEntity<List<UserRelationshipVO>> findFriendRequests() {
+        final List<IUserSearchResultVO> foundUsers = userSearchService.findPendingRequestsForAuthenticatedUser();
+        return ResponseEntity.ok(foundUsers.stream()
+                .map(this::createUserRelationshipVO)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ResponseEntity<List<UserRelationshipVO>> findFriends() {
+        final List<IUserSearchResultVO> foundUsers = userSearchService.findAuthenticatedUsersFriends();
+        return ResponseEntity.ok(foundUsers.stream()
+                .map(this::createUserRelationshipVO)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ResponseEntity<List<UserRelationshipVO>> findUsers(final String nameLike) {
+        final List<IUserSearchResultVO> foundUsers = userSearchService.findUsersWithNamesContainingString(nameLike);
+        return ResponseEntity.ok(foundUsers.stream()
+                .map(this::createUserRelationshipVO)
+                .collect(Collectors.toList()));
+    }
+
+    private UserRelationshipVO createUserRelationshipVO(final IUserSearchResultVO userSearchResultVO) {
+        return new UserRelationshipVO()
+                .login(userSearchResultVO.getLogin())
+                .name(userSearchResultVO.getName())
+                .relationshipStatus(userSearchResultVO.getRelationshipStatus() == null
+                        ? null : EnumRelationshipStatus.valueOf(userSearchResultVO.getRelationshipStatus().name()));
     }
 }

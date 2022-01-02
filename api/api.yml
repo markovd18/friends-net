@@ -82,6 +82,44 @@ paths:
           description: User with given username does not exist.
         '401':
           description: Unauthenticated
+    get:
+      summary: Finds all friend requests
+      description: Finds all pending friend requests for currently authenticated user.
+      tags:
+        - UserSearchController
+      operationId: findFriendRequests
+      responses:
+        '200':
+          $ref: '#/components/responses/UserSearchResponse'
+        '401':
+          description: Unauthenticated
+
+  '/api/users/friends':
+    get:
+      summary: Finds user's friends.
+      description: Finds all users that are friends with authenticated user.
+      tags:
+        - UserSearchController
+      operationId: findFriends
+      responses:
+        '200':
+          $ref: '#/components/responses/UserSearchResponse'
+        '401':
+          description: Unauthenticated
+
+  '/api/users/blocked':
+    get:
+      summary: Finds blocked users
+      description: Finds all users that authenticated user blocked.
+      tags:
+        - UserSearchController
+      operationId: findBlockedUsers
+      responses:
+        '200':
+          $ref: '#/components/responses/UserSearchResponse'
+        '401':
+          description: Unauthenticated
+
 components:
 
   securitySchemes:
@@ -179,6 +217,30 @@ components:
         login: great@email.com
         password: my-secret_Password
 
+    UserRelationshipVO:
+      description: Object with data about found user and it's relationship status with searching user.
+      allOf:
+        - $ref: '#/components/schemas/UserIdentificationDataVO'
+        - type: object
+          properties:
+            relationshipStatus:
+              $ref: '#/components/schemas/EnumRelationshipStatus'
+      required:
+        - name
+        - login
+      example:
+        name: John Doe
+        login: john.doe@gmail.com
+        relationshipStatus: BLOCKED
+
+    EnumRelationshipStatus:
+      description: Relationship status of two users.
+      type: string
+      enum:
+        - REQUEST_SENT
+        - FRIENDS
+        - BLOCKED
+
     UserRegistrationDataVO:
       description: Object with all required user data for registration.
       allOf:
@@ -251,7 +313,7 @@ components:
       description: Object carrying a list of found users.
       type: array
       items:
-        $ref: '#/components/schemas/UserIdentificationDataVO'
+        $ref: '#/components/schemas/UserRelationshipVO'
 
     BadRequestVO:
       description: Object describing a Bad Request (400) HTTP error.

@@ -1,5 +1,7 @@
 package cz.markovda.friendsnet.friendship.repository.impl;
 
+import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
+import cz.markovda.friendsnet.friendship.dos.IDOFactory;
 import cz.markovda.friendsnet.friendship.dos.IUserRelationshipDO;
 import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import cz.markovda.friendsnet.friendship.utils.UserRelationshipTestUtils;
@@ -25,12 +27,14 @@ import static org.mockito.Mockito.when;
 public class UserRelationshipRepositoryImplTest {
 
     private JdbcTemplate jdbcTemplate;
+    private IDOFactory factory;
     private IUserRelationshipRepository userRelationshipRepository;
 
     @BeforeEach
     public void prepareTest() {
         jdbcTemplate = mock(JdbcTemplate.class);
-        userRelationshipRepository = new UserRelationshipRepository(jdbcTemplate);
+        factory = mock(IDOFactory.class);
+        userRelationshipRepository = new UserRelationshipRepository(jdbcTemplate, factory);
     }
 
     @Test
@@ -70,7 +74,7 @@ public class UserRelationshipRepositoryImplTest {
     }
 
     private int findRelationshipStatusId(final List<Map<String, Object>> queryResult,
-                                         final IUserRelationshipDO.EnumRelationshipStatus status) {
+                                         final EnumRelationshipStatus status) {
         for (final Map<String, Object> row : queryResult) {
             if (status.name().equals(row.get("name"))) {
                 return (Integer) row.get("id");
@@ -88,14 +92,14 @@ public class UserRelationshipRepositoryImplTest {
 
     private List<Map<String, Object>> createRelationshipStatusQueryResult() {
         final List<Map<String, Object>> queryResult = new ArrayList<>();
-        final var statuses = IUserRelationshipDO.EnumRelationshipStatus.values();
+        final var statuses = EnumRelationshipStatus.values();
         for (int i = 0; i < statuses.length; ++i) {
             queryResult.add(createRelationshipStatusRowMap(statuses[i], i));
         }
         return queryResult;
     }
 
-    private Map<String, Object> createRelationshipStatusRowMap(final IUserRelationshipDO.EnumRelationshipStatus status,
+    private Map<String, Object> createRelationshipStatusRowMap(final EnumRelationshipStatus status,
                                                                final int i) {
         final Map<String, Object> map = new HashMap<>();
         map.put("id", i);

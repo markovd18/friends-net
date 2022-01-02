@@ -1,6 +1,6 @@
 package cz.markovda.friendsnet.friendship.dos.impl;
 
-import cz.markovda.friendsnet.friendship.dos.IUserRelationshipDO;
+import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -29,8 +29,8 @@ public class UserRelationshipDOTest {
                         "Creation time should match the constructor argument!"),
                 () -> assertEquals(createdAt, relationshipDO.getLastUpdated(),
                         "Last update time of new relationship should match the creation time!"),
-                () -> assertEquals(IUserRelationshipDO.EnumRelationshipStatus.REQUEST_SENT, relationshipDO.getRelationshipStatus(),
-                        "Initial relationship status should be " + IUserRelationshipDO.EnumRelationshipStatus.REQUEST_SENT.name()));
+                () -> assertEquals(EnumRelationshipStatus.REQUEST_SENT, relationshipDO.getRelationshipStatus(),
+                        "Initial relationship status should be " + EnumRelationshipStatus.REQUEST_SENT.name()));
 
     }
 }
