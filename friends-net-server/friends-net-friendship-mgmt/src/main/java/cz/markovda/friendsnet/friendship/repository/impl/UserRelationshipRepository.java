@@ -33,16 +33,11 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
             "id_sender, id_receiver, id_status, created_at, last_updated) VALUES (?, ?, ?, ?, ?)";
 
     protected static final String FIND_POTENTIAL_FRIENDS_QUERY =
-            "SELECT DISTINCT i.name, i.login, i.status FROM " +
-                "(SELECT au.name, au.login, ur.id_sender, ur.id_receiver, rs.name AS status FROM auth_user au " +
-                    "LEFT JOIN user_relationship ur ON au.id = ur.id_receiver " +
-                        "OR au.id = ur.id_sender " +
-                    "LEFT JOIN relationship_status rs ON rs.id = ur.id_status " +
-                "WHERE (rs.name IS NULL OR rs.name = 'REQUEST_SENT') " +
-                    "AND lower(au.name) LIKE ?) AS i " +
-                "LEFT JOIN auth_user au2 ON i.id_sender = au2.id " +
-                    "OR i.id_receiver = au2.id " +
-            "WHERE au2.login = ? OR au2.name IS NULL;";
+            "SELECT au.name, au.login, rs.name AS status FROM auth_user au " +
+            "left join user_relationship ur ON au.id IN (ur.id_sender, ur.id_receiver) AND (" +
+                    "SELECT id FROM auth_user WHERE auth_user.login = ?) IN (ur.id_sender, ur.id_receiver) " +
+            "LEFT JOIN relationship_status rs ON rs.id = ur.id_status " +
+            "WHERE lower(au.name) LIKE ? AND (rs IS NULL OR rs.name = 'REQUEST_SENT') AND au.login != ?";
 
     protected static final String FIND_USERS_WITH_RELATIONSHIP_TO_USER =
             "SELECT i.name, i.login FROM (" +
@@ -89,7 +84,7 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
         Assert.notNull(searchString, "Searched name may not be null");
 
         final var preparedString = "%" + searchString.toLowerCase() + "%";
-        final List<Map<String, Object>> queryResult = jdbcTemplate.queryForList(FIND_POTENTIAL_FRIENDS_QUERY, preparedString, authenticatedUser);
+        final List<Map<String, Object>> queryResult = jdbcTemplate.queryForList(FIND_POTENTIAL_FRIENDS_QUERY, authenticatedUser, preparedString, authenticatedUser);
         return createSearchResultList(queryResult);
     }
 
@@ -112,6 +107,13 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
         Assert.notNull(username, "Username may not be null");
         final List<Map<String, Object>> queryResult = findRequestSendersToUserWithStatus(username, EnumRelationshipStatus.REQUEST_SENT);
         return createSearchResultList(queryResult);
+    }
+
+    @Override
+    public void removeRelationship(@NotNull final String firstUsername, @NotNull final String secondUsername) {
+        Assert.notNull(firstUsername, "Username may not be null");
+        Assert.notNull(secondUsername, "Username may not be null");
+//        jdbcTemplate.update("DELETE ur FROM user_relationship ur INNER JOIN auth_user au ON ur. WHERE ")
     }
 
     private List<Map<String, Object>> findRequestSendersToUserWithStatus(final String username, final EnumRelationshipStatus status) {

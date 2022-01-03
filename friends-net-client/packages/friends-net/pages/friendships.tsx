@@ -1,5 +1,5 @@
 import { FriendshipApi, UserRelationshipVO, UserSearchApi } from "@markovda/fn-api";
-import { Grid, Typography } from "@mui/material";
+import { CircularProgress, Grid, Typography } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import PageContentContainer from "../components/PageContentContainer";
 import { useAuthHeader, useSnackbar, useUnauthRedirect, useUserData } from "../hooks";
 import { FriendshipsPageTab } from "../utils/enums/RelationshipStatus";
 import UserCardGrid from "../components/friendships-page/UserCardGrid";
+import { Box } from "@mui/system";
 
 const FriendshipsPage : NextPage = () => {
 
@@ -16,6 +17,7 @@ const FriendshipsPage : NextPage = () => {
     const [showingSearchResults, setShowingSearchResults] = useState(false);
     const [lastSearchString, setLastSearchString] = useState<string>();
     const [lastSearchResult, setLastSearchResult] = useState<UserRelationshipVO[]>([]);
+    const [isDataLoading, setIsDataLoading] = useState(false);
 
     const redirecting = useUnauthRedirect('/');
     const [,login,,logoutUser] = useUserData();
@@ -23,11 +25,37 @@ const FriendshipsPage : NextPage = () => {
     const [Snackbar, showSnackbar] = useSnackbar();
 
     useEffect(() => {
+
+        const fetchData = async () => {
+            setIsDataLoading(true);
+            let data: UserRelationshipVO[] = [];
+            try {
+                switch (activeTab) {
+                    case FriendshipsPageTab.BLOCKED:
+                        data = (await UserSearchApi.findBlockedUsers(authHeader)).data;
+                        break;
+                    case FriendshipsPageTab.FRIENDS:
+                        data = (await UserSearchApi.findFriends(authHeader)).data;
+                        break;
+                    case FriendshipsPageTab.FRIEND_REQUESTS:
+                        data = (await UserSearchApi.findFriendRequests(authHeader)).data;
+                        break;
+                }
+                
+                setLastSearchResult(data);
+                setIsDataLoading(false);
+            } catch (error) {
+                handleSearchError(error);
+            }
+        }
+
+        fetchData();
+   }, [activeTab]);
+
+    useEffect(() => {
         UserSearchApi.findFriends(authHeader).then(response => {
             setLastSearchResult(response.data);
-        }).catch(error => {
-            handleSearchError(error);
-        });
+        }).catch(error => handleSearchError(error));
     }, []);
 
     const changeActiveTab = useCallback(async (newActiveTab: FriendshipsPageTab) => {
@@ -39,22 +67,7 @@ const FriendshipsPage : NextPage = () => {
     }, []);
 
     const switchActiveTab = useCallback(async (newActiveTab: FriendshipsPageTab) => {
-        if (newActiveTab === activeTab) {
-            return;
-        }
-
-        switch (newActiveTab) {
-            case FriendshipsPageTab.BLOCKED:
-                setLastSearchResult((await UserSearchApi.findBlockedUsers(authHeader)).data);
-                break;
-            case FriendshipsPageTab.FRIENDS:
-                setLastSearchResult((await UserSearchApi.findFriends(authHeader)).data);
-                break;
-            case FriendshipsPageTab.FRIEND_REQUESTS:
-                setLastSearchResult((await UserSearchApi.findFriendRequests(authHeader)).data);
-                break;
-        }
-
+        setLastSearchResult([]);
         setActiveTab(newActiveTab);
         setShowingSearchResults(false);
     }, []);
@@ -132,20 +145,27 @@ const FriendshipsPage : NextPage = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={9}>
-                            {showingSearchResults &&
+                            {isDataLoading ? (
+                                <Box sx={{display: 'flex'}}>
+                                    <CircularProgress />
+                                </Box>
+                            ) : (
                                 <>
-                                    <Typography variant="h4">
-                                        Search results for "{lastSearchString}":
-                                    </Typography>
+                                    {showingSearchResults && 
+                                        <>
+                                            <Typography variant="h4">
+                                                Search results for "{lastSearchString}":
+                                            </Typography>
+                                        </>}
+                                    
+                                    <UserCardGrid 
+                                        data={lastSearchResult}
+                                        loggedInUsername={login}
+                                        pageTab={activeTab}
+                                        onSendFriendRequest={sendFriendRequest}
+                                    />
                                 </>
-                            }
-
-                            <UserCardGrid 
-                                data={lastSearchResult}
-                                loggedInUsername={login}
-                                pageTab={activeTab}
-                                onSendFriendRequest={sendFriendRequest}
-                            />
+                            )}
                         </Grid>
                     </Grid>
                     {Snackbar}

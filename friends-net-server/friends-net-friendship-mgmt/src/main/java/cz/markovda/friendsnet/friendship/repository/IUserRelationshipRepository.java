@@ -25,4 +25,6 @@ public interface IUserRelationshipRepository {
     List<IUserSearchResultDO> findUsersFriends(@NotNull String username);
 
     List<IUserSearchResultDO> findPendingRequests(@NotNull String username);
+
+    void removeRelationship(@NotNull String firstUsername, @NotNull String secondUsername);
 }
