@@ -3,8 +3,8 @@ logging:
     cz: DEBUG
     org:
       apache: WARN
-    #      springframework:
-    #        web:
+      springframework:
+        web: DEBUG
     #          context:
     #            support:
     #              SpringBeanAutowiringSupport: ERROR

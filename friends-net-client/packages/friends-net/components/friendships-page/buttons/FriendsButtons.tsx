@@ -4,10 +4,9 @@ import { Button } from "@mui/material";
 type Props = {
     userData: UserRelationshipVO,
     onRemoveUser?: (username: string) => void,
-    onBlockUser?: (username: string) => void
 }
 
-const FriendsButtons: React.FC<Props> = ({userData, onRemoveUser, onBlockUser}) => {
+const FriendsButtons: React.FC<Props> = ({userData, onRemoveUser}) => {
 
     return (
         <>
@@ -16,13 +15,6 @@ const FriendsButtons: React.FC<Props> = ({userData, onRemoveUser, onBlockUser}) 
                 onClick={onRemoveUser ? () => onRemoveUser(userData.login) : undefined}
             >
                 Remove friend
-            </Button>
-            <Button
-                variant="contained"
-                color="error"
-                onClick={onBlockUser ? () => onBlockUser(userData.login) : undefined}
-            >
-                Block user
             </Button>
         </>
     )

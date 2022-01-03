@@ -40,6 +40,16 @@ public class UserRelationshipTestUtils {
             public LocalDateTime getLastUpdated() {
                 return createdAt;
             }
+
+            @Override
+            public void acceptRequest(final LocalDateTime acceptedAt) {
+
+            }
+
+            @Override
+            public void block(final LocalDateTime blockedAt) {
+
+            }
         };
     }
 }

@@ -74,7 +74,7 @@ paths:
         - UserRelationshipController
       operationId: createFriendRequest
       parameters:
-        - $ref: '#/components/parameters/FriendRequestParameter'
+        - $ref: '#/components/parameters/UsernameQueryParameter'
       responses:
         '200':
           description: OK. Friend request successfully sent.
@@ -93,6 +93,70 @@ paths:
           $ref: '#/components/responses/UserSearchResponse'
         '401':
           description: Unauthenticated
+
+  '/api/friendship':
+    delete:
+      summary: Deletes relationship with user
+      description: Deltes relationship with user in query. Can be used for removing friend request or removing existing friend.
+      tags:
+        - UserRelationshipController
+      operationId: deleteRelationship
+      parameters:
+        - $ref: '#/components/parameters/UsernameQueryParameter'
+      responses:
+        '200':
+          description: OK. Relationship successfully deleted.
+        '400':
+          description: Target user not found.
+        '401':
+          description: Unauthenticated
+    put:
+      summary: Accepts friendship request
+      description: Accepts friendship request from user in query.
+      tags:
+        - UserRelationshipController
+      operationId: acceptFriendRequest
+      parameters:
+        - $ref: '#/components/parameters/UsernameQueryParameter'
+      responses:
+        '200':
+          description: OK. Friend request successfully accepted.
+        '400':
+          description: Target friend request not found.
+        '401':
+          description: Unauthenticated
+
+  '/api/friendship/block':
+    put:
+      summary: Blocks target user
+      description: Blocks user with pending friend request for authenticated user or if he is in friend relationship with authenticated user.
+      tags:
+        - UserRelationshipController
+      operationId: blockUser
+      parameters:
+        - $ref: '#/components/parameters/UsernameQueryParameter'
+      responses:
+        '200':
+          description: OK. User succesfully blocked.
+        '400':
+          description: User with valid relationship status not found.
+        '401':
+          description: Unauthenticated
+    delete:
+      summary: Unblocks target user
+      description: Unblocks user who has been previously blocked by authenticated user. Relationship will be deleted and friend request may be sent again.
+      tags:
+        - UserRelationshipController
+      operationId: unblockUser
+      parameters:
+        - $ref: '#/components/parameters/UsernameQueryParameter'
+      responses:
+        '200':
+          description: OK. User successfully unblocked.
+        '400':
+          description: Relationship in invalid state or blocked user with given username not found.
+        '401':
+          description: Unauthenticated or unauthorized
 
   '/api/users/friends':
     get:
@@ -182,7 +246,7 @@ components:
         minLength: 3
       example: Adam
 
-    FriendRequestParameter:
+    UsernameQueryParameter:
       name: username
       in: query
       required: true

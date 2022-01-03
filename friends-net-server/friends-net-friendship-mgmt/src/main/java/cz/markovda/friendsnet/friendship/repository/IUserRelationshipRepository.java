@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:">David Markov</a>
@@ -26,5 +27,9 @@ public interface IUserRelationshipRepository {
 
     List<IUserSearchResultDO> findPendingRequests(@NotNull String username);
 
-    void removeRelationship(@NotNull String firstUsername, @NotNull String secondUsername);
+    int removeRelationship(@NotNull String firstUsername, @NotNull String secondUsername);
+
+    Optional<IUserRelationshipDO> findRelationship(@NotNull String firstUsername, @NotNull String secondUsername);
+
+    int updateRelationship(@NotNull IUserRelationshipDO relationshipDO);
 }

@@ -87,7 +87,7 @@ const FriendshipsPage : NextPage = () => {
         }
     }, []);
 
-    const handleFriendRequestError = useCallback(error => {
+    const handleRelationshipChangeError = useCallback(error => {
         if (!error.response) {
             showSnackbar('Server not responding. Please try again later.', 'error');
             return;
@@ -95,7 +95,7 @@ const FriendshipsPage : NextPage = () => {
 
         switch (error.response.status) {
             case 400:
-                showSnackbar('Invalid user for sending friend request', 'warning');
+                showSnackbar('Target user not found', 'warning');
                 break;
             case 401:
                 logoutUser();
@@ -122,7 +122,43 @@ const FriendshipsPage : NextPage = () => {
             await FriendshipApi.createFriendRequest(login, authHeader);
             await changeActiveTab(FriendshipsPageTab.FRIEND_REQUESTS);
         } catch (error) {
-            handleFriendRequestError(error);
+            handleRelationshipChangeError(error);
+        }
+    }, []);
+
+    const removeUser = useCallback(async (login: string) => {
+        try {
+            await FriendshipApi.deleteRelationship(login, authHeader);
+            await changeActiveTab(FriendshipsPageTab.FRIEND_REQUESTS);
+        } catch (error) {
+            handleRelationshipChangeError(error);
+        }
+    }, []);
+
+    const acceptFriendRequest = useCallback(async (login: string) => {
+        try {
+            await FriendshipApi.acceptFriendRequest(login, authHeader);
+            await changeActiveTab(FriendshipsPageTab.FRIEND_REQUESTS);
+        } catch (error) {
+            handleRelationshipChangeError(error);
+        }
+    }, []);
+
+    const blockUser = useCallback(async (login: string) => {
+        try {
+            await FriendshipApi.blockUser(login, authHeader);
+            await changeActiveTab(FriendshipsPageTab.FRIEND_REQUESTS);
+        } catch(error) {
+            handleRelationshipChangeError(error);
+        }
+    }, []);
+
+    const unblockUser = useCallback(async (login: string) => {
+        try {
+            await FriendshipApi.unblockUser(login, authHeader);
+            await changeActiveTab(FriendshipsPageTab.FRIEND_REQUESTS);
+        } catch (error) {
+            handleRelationshipChangeError(error);
         }
     }, []);
 
@@ -163,6 +199,10 @@ const FriendshipsPage : NextPage = () => {
                                         loggedInUsername={login}
                                         pageTab={activeTab}
                                         onSendFriendRequest={sendFriendRequest}
+                                        onRemoveUser={removeUser}
+                                        onAcceptRequest={acceptFriendRequest}
+                                        onBlockUser={blockUser}
+                                        onUnblockUser={unblockUser}
                                     />
                                 </>
                             )}

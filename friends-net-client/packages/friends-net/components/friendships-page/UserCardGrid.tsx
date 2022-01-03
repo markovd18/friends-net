@@ -42,6 +42,7 @@ const UserCardGrid: React.FC<UserCardGridProps> = ({
                                 onSendFriendRequest={onSendFriendRequest}
                                 loggedInUsername={loggedInUsername}
                                 userData={userData}
+                                onRemoveUser={onRemoveUser}
                             />
                         }
                         {pageTab === FriendshipsPageTab.FRIEND_REQUESTS &&
@@ -56,7 +57,6 @@ const UserCardGrid: React.FC<UserCardGridProps> = ({
                             <FriendsButtons 
                                 userData={userData}
                                 onRemoveUser={onRemoveUser}
-                                onBlockUser={onBlockUser}
                             />
                         }
                         {pageTab === FriendshipsPageTab.BLOCKED && 

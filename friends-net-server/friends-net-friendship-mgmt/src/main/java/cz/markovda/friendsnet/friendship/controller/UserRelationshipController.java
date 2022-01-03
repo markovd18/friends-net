@@ -19,11 +19,35 @@ public class UserRelationshipController implements UserRelationshipControllerApi
     private final IUserRelationshipService userRelationshipService;
 
     @Override
+    public ResponseEntity<Void> acceptFriendRequest(final String username) {
+       return runRequest(() -> userRelationshipService.acceptFriendRequest(username));
+    }
+
+    @Override
+    public ResponseEntity<Void> blockUser(final String username) {
+        return runRequest(() -> userRelationshipService.blockUser(username));
+    }
+
+    @Override
     public ResponseEntity<Void> createFriendRequest(final String username) {
+        return runRequest(() -> userRelationshipService.createNewRelationship(username));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteRelationship(final String username) {
+        return runRequest(() -> userRelationshipService.removeRelationship(username));
+    }
+
+    @Override
+    public ResponseEntity<Void> unblockUser(final String username) {
+        return runRequest(() -> userRelationshipService.unblockUser(username));
+    }
+
+    private ResponseEntity<Void> runRequest(Runnable runnable) {
         try {
-            userRelationshipService.createNewRelationship(username);
+            runnable.run();
             return ResponseEntity.ok(null);
-        } catch (final IllegalArgumentException e) {
+        } catch (final IllegalStateException e) {
             return ResponseEntity.badRequest().build();
         } catch (final AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

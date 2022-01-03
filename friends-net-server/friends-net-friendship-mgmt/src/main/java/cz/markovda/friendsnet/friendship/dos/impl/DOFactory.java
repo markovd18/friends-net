@@ -27,6 +27,18 @@ public class DOFactory implements IDOFactory {
     }
 
     @Override
+    public IUserRelationshipDO createUserRelationship(final int senderId, final int receiverId,
+                                                      @NotNull final LocalDateTime createdAt,
+                                                      @NotNull final LocalDateTime updatedAt,
+                                                      @NotNull final EnumRelationshipStatus status) {
+        Assert.notNull(createdAt,"Relationship creation time may not be null!");
+        Assert.notNull(updatedAt, "Relationship last update time may not be null!");
+        Assert.notNull(status, "Relationship status may not be null!");
+        Assert.isTrue(!createdAt.isAfter(updatedAt), "Creation time may not be after last update!");
+        return new UserRelationshipDO(senderId, receiverId, createdAt, updatedAt, status);
+    }
+
+    @Override
     public IUserSearchResultDO createUserSearchResult(@NotNull final String name,
                                                       @NotNull final String login,
                                                       @Nullable final EnumRelationshipStatus status) {

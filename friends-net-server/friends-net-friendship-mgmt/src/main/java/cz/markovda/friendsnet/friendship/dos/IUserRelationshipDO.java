@@ -1,5 +1,6 @@
 package cz.markovda.friendsnet.friendship.dos;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -18,5 +19,7 @@ public interface IUserRelationshipDO {
 
     LocalDateTime getLastUpdated();
 
+    void acceptRequest(@NotNull LocalDateTime acceptedAt);
 
+    void block(@NotNull LocalDateTime blockedAt);
 }

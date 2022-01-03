@@ -13,6 +13,9 @@ public interface IDOFactory {
 
     IUserRelationshipDO createUserRelationship(int senderId, int receiverId, @NotNull LocalDateTime createdAt);
 
+    IUserRelationshipDO createUserRelationship(int senderId, int receiverId, @NotNull LocalDateTime createdAt,
+                                               @NotNull LocalDateTime updatedAt, @NotNull EnumRelationshipStatus status);
+
     IUserSearchResultDO createUserSearchResult(@NotNull String name,
                                                @NotNull String login,
                                                @Nullable EnumRelationshipStatus status);

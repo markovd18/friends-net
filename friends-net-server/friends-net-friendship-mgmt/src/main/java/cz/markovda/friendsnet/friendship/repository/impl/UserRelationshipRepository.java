@@ -11,9 +11,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -40,15 +43,11 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
             "WHERE lower(au.name) LIKE ? AND (rs IS NULL OR rs.name = 'REQUEST_SENT') AND au.login != ?";
 
     protected static final String FIND_USERS_WITH_RELATIONSHIP_TO_USER =
-            "SELECT i.name, i.login FROM (" +
-                "SELECT au.name, au.login, ur.id_receiver, ur.id_sender FROM auth_user au " +
-                        "INNER JOIN user_relationship ur ON au.id = ur.id_receiver " +
-                            "OR au.id = ur.id_sender " +
-                        "INNER JOIN relationship_status rs ON rs.id = ur.id_status " +
-                    "WHERE rs.id = ? AND au.login != ?) AS i " +
-                "INNER JOIN auth_user au2 ON i.id_sender = au2.id " +
-                "OR i.id_receiver = au2.id " +
-            "WHERE au2.name = ?";
+            "SELECT au.login, au.name, rs.name as status FROM auth_user au " +
+                "INNER JOIN user_relationship ur ON au.id IN (ur.id_sender, ur.id_receiver) AND (" +
+                    "SELECT id FROM auth_user WHERE auth_user.login = ?) IN (ur.id_sender, ur.id_receiver) " +
+                "INNER JOIN relationship_status rs ON ur.id_status = rs.id " +
+            "where rs.id = ? and au.login != ?";
 
     protected static final String FIND_SENDERS_OF_REQUEST_TO_USER_WITH_STATUS =
             "SELECT au2.name, au2.login FROM ("+
@@ -57,6 +56,23 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
                     "INNER JOIN relationship_status rs ON rs.id = ur.id_status " +
                 "WHERE rs.id = ? and au.login = ?) AS i " +
             "INNER JOIN auth_user au2 ON i.id_sender = au2.id";
+
+    protected static final String REMOVE_RELATIONSHIP_QUERY =
+            "DELETE FROM user_relationship " +
+            "WHERE (id_sender, id_receiver) IN ( " +
+                "SELECT ur2.id_sender, ur2.id_receiver FROM (" +
+                    "SELECT ur.id_sender, ur.id_receiver FROM user_relationship ur " +
+                        "INNER JOIN auth_user au on au.id = ur.id_receiver or au.id = ur.id_sender " +
+                    "WHERE au.login = ?) as ur2 " +
+                    "INNER JOIN auth_user au2 on ur2.id_sender = au2.id or ur2.id_receiver = au2.id WHERE au2.login = ?)";
+
+    protected static final String FIND_USER_RELATIONSHIP =
+            "SELECT ur.*, rs.name AS status FROM user_relationship ur " +
+                    "INNER JOIN relationship_status rs ON ur.id_status = rs.id " +
+                    "INNER JOIN auth_user au ON au.id IN (ur.id_sender, ur.id_receiver) AND (" +
+                        "SELECT id FROM auth_user WHERE auth_user.login = ?" +
+                    ") IN (ur.id_sender, ur.id_receiver) " +
+            "where au.login like ?";
 
     @Override
     public void saveNewRelationship(@NotNull final IUserRelationshipDO relationshipDO) {
@@ -110,10 +126,36 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
     }
 
     @Override
-    public void removeRelationship(@NotNull final String firstUsername, @NotNull final String secondUsername) {
+    public int removeRelationship(@NotNull final String firstUsername, @NotNull final String secondUsername) {
         Assert.notNull(firstUsername, "Username may not be null");
         Assert.notNull(secondUsername, "Username may not be null");
-//        jdbcTemplate.update("DELETE ur FROM user_relationship ur INNER JOIN auth_user au ON ur. WHERE ")
+        return jdbcTemplate.update(REMOVE_RELATIONSHIP_QUERY, firstUsername, secondUsername);
+    }
+
+    @Override
+    public Optional<IUserRelationshipDO> findRelationship(@NotNull final String firstUsername,
+                                                          @NotNull final String secondUsername) {
+        Assert.notNull(firstUsername, "Username may not be null");
+        Assert.notNull(secondUsername, "Username may not be null");
+        final List<Map<String, Object>> queryResult = jdbcTemplate.queryForList(FIND_USER_RELATIONSHIP, firstUsername, secondUsername);
+        if (queryResult.size() > 1) {
+            throw new RuntimeException("Found more than one record of single relationship");
+        }
+
+        return Optional.of(createUserRelationship(queryResult.get(0)));
+    }
+
+    @Override
+    public int updateRelationship(@NotNull final IUserRelationshipDO relationshipDO) {
+        Assert.notNull(relationshipDO, "Updated relationship object may not be null");
+        final int senderId = relationshipDO.getSenderId();
+        final int receiverId = relationshipDO.getReceiverId();
+        final int statusId = findRelationshipStatusId(relationshipDO.getRelationshipStatus());
+        final LocalDateTime createdAt = relationshipDO.getCreatedAt();
+        final LocalDateTime lastUpdated = relationshipDO.getLastUpdated();
+        return jdbcTemplate.update("UPDATE user_relationship SET created_at = ?, last_updated = ?, id_status = ? " +
+                        "WHERE (id_sender, id_receiver) = (?, ?)",
+                createdAt, lastUpdated, statusId, senderId, receiverId);
     }
 
     private List<Map<String, Object>> findRequestSendersToUserWithStatus(final String username, final EnumRelationshipStatus status) {
@@ -123,7 +165,7 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
     private List<Map<String, Object>> findUsersWithRelationshipToUser(final String username,
                                                                       final EnumRelationshipStatus relationshipStatus) {
         return jdbcTemplate.queryForList(FIND_USERS_WITH_RELATIONSHIP_TO_USER,
-                findRelationshipStatusId(relationshipStatus), username, username);
+                username, findRelationshipStatusId(relationshipStatus), username);
     }
 
     private List<IUserSearchResultDO> createSearchResultList(final List<Map<String, Object>> queryResult) {
@@ -137,6 +179,18 @@ public class UserRelationshipRepository implements IUserRelationshipRepository {
         final var status = statusCol == null ? null : EnumRelationshipStatus.valueOf(statusCol);
         return factory.createUserSearchResult((String) row.get("name"),
                                             (String) row.get("login"),
+                                            status);
+    }
+
+    private IUserRelationshipDO createUserRelationship(final Map<String, Object> row) {
+        final String statusCol = (String) row.get("status");
+        final var status = EnumRelationshipStatus.valueOf(statusCol);
+        final Timestamp createdAt = (Timestamp) row.get("created_at");
+        final Timestamp lastUpdated = (Timestamp) row.get("last_updated");
+        return factory.createUserRelationship((Integer) row.get("id_sender"),
+                                            (Integer) row.get("id_receiver"),
+                                            createdAt.toLocalDateTime(),
+                                            lastUpdated.toLocalDateTime(),
                                             status);
     }
 
