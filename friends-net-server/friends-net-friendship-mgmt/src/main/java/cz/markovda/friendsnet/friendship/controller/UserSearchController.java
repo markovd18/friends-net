@@ -2,7 +2,7 @@ package cz.markovda.friendsnet.friendship.controller;
 
 import cz.markovda.api.UserSearchControllerApi;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;
-import cz.markovda.friendsnet.vos.IUserSearchResultVO;
+import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
 import cz.markovda.vo.EnumRelationshipStatus;
 import cz.markovda.vo.UserRelationshipVO;
 import lombok.RequiredArgsConstructor;

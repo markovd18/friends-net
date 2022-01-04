@@ -1,7 +1,6 @@
 package cz.markovda.friendsnet.friendship.service;
 
-import cz.markovda.friendsnet.auth.vos.IUserVO;
-import cz.markovda.friendsnet.vos.IUserSearchResultVO;
+import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

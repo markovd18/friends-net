@@ -2,6 +2,7 @@ package cz.markovda.friendsnet.auth.config.jwt;
 
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,10 +23,29 @@ import java.util.function.Function;
 @Component
 public class JwtUtils implements Serializable {
 
+    public static final String BEARER_PREFIX = "Bearer ";
+
     @Serial
     private static final long serialVersionUID = -2550185165626007488L;
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
     private String secret;
+
+    public boolean tokenStartsWithBearerHeader(final String requestTokenHeader) {
+        return requestTokenHeader != null && requestTokenHeader.startsWith(BEARER_PREFIX);
+    }
+
+    public AuthenticationData parseAuthenticationData(final String requestTokenHeader) {
+        final String jwtToken = requestTokenHeader.substring(JwtUtils.BEARER_PREFIX.length());
+        final String username = getUsernameFromToken(jwtToken);
+        return new AuthenticationData(username, jwtToken);
+    }
+
+    public record AuthenticationData(String username, String jwtToken) {
+
+        public boolean containsUsername() {
+            return username != null;
+        }
+    }
 
     //retrieve username from jwt token
     public String getUsernameFromToken(final String token) {

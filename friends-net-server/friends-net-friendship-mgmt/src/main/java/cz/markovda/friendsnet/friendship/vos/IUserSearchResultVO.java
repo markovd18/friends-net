@@ -1,4 +1,4 @@
-package cz.markovda.friendsnet.vos;
+package cz.markovda.friendsnet.friendship.vos;
 
 import org.springframework.lang.Nullable;
 

@@ -11,7 +11,7 @@ import java.time.Clock;
  * @since 29.12.21
  */
 @Configuration
-@ComponentScan(basePackages = "cz.markovda.friendsnet.friendship")
+@ComponentScan(basePackages = {"cz.markovda.friendsnet.friendship", "cz.markovda.friendsnet.messaging"})
 public class FriendshipManagementModule {
 
     @Bean

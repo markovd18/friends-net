@@ -1,6 +1,6 @@
-package cz.markovda.friendsnet.vos.impl;
+package cz.markovda.friendsnet.friendship.vos.impl;
 
-import cz.markovda.friendsnet.vos.IUserSearchResultVO;
+import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
 import org.springframework.lang.Nullable;
 
 /**

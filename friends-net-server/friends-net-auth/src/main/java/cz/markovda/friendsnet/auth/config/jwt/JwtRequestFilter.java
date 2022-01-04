@@ -24,8 +24,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    public static final String BEARER_PREFIX = "Bearer ";
-
     private final IUserAuthService userAuthService;
     private final JwtUtils jwtTokenUtils;
 
@@ -43,7 +41,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     private void authenticateFromAuthorizationHeader(HttpServletRequest request, String authorizationHeader) {
-        if (tokenStartsWithBearerHeader(authorizationHeader)) {
+        if (jwtTokenUtils.tokenStartsWithBearerHeader(authorizationHeader)) {
             authenticateUserFromToken(request, authorizationHeader);
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
@@ -51,7 +49,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     private void authenticateUserFromToken(final HttpServletRequest request, final String requestTokenHeader) {
-        AuthenticationData authenticationData = parseAuthenticationData(requestTokenHeader);
+        JwtUtils.AuthenticationData authenticationData = parseAuthenticationData(requestTokenHeader);
         if (authenticationData != null && authenticationData.containsUsername() && isCurrentlyNobodyAuthenticated()) {
             setAuthentication(request, authenticationData);
         }
@@ -61,11 +59,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         return SecurityContextHolder.getContext().getAuthentication() == null;
     }
 
-    private AuthenticationData parseAuthenticationData(final String requestTokenHeader) {
-        final String jwtToken = requestTokenHeader.substring(BEARER_PREFIX.length());
+    private JwtUtils.AuthenticationData parseAuthenticationData(final String requestTokenHeader) {
         try {
-            final String username = jwtTokenUtils.getUsernameFromToken(jwtToken);
-            return new AuthenticationData(username, jwtToken);
+            return jwtTokenUtils.parseAuthenticationData(requestTokenHeader);
         } catch (IllegalArgumentException e) {
             logger.error("Unable to get JWT Token");
         } catch (ExpiredJwtException e) {
@@ -75,15 +71,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private boolean tokenStartsWithBearerHeader(final String requestTokenHeader) {
-        return requestTokenHeader != null && requestTokenHeader.startsWith(BEARER_PREFIX);
-    }
-
     private String getAuthorizationHeader(final HttpServletRequest request) {
         return request.getHeader("Authorization");
     }
 
-    private void setAuthentication(final HttpServletRequest request, final AuthenticationData authenticationData) {
+    private void setAuthentication(final HttpServletRequest request, final JwtUtils.AuthenticationData authenticationData) {
         final UserDetails userDetails = userAuthService.loadUserByUsername(authenticationData.username());
         if (jwtTokenUtils.isTokenValid(authenticationData.jwtToken(), userDetails)) {
             setAuthentication(request, userDetails);
@@ -96,12 +88,5 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         usernamePasswordAuthenticationToken
                 .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-    }
-
-    record AuthenticationData(String username, String jwtToken) {
-
-        boolean containsUsername() {
-            return username != null;
-        }
     }
 }

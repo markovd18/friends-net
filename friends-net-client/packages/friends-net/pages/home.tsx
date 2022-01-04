@@ -1,16 +1,51 @@
 import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
+import { Client } from "@stomp/stompjs";
 import { NextPage } from "next";
 import Head from "next/head";
+import { useEffect } from "react";
 import Navbar from "../components/nav/Navbar";
 import PageContentContainer from "../components/PageContentContainer";
+import { useAuthHeader } from "../hooks";
 import useUnauthRedirect from "../hooks/useUnauthRedirect";
 import useUserData from "../hooks/useUserData";
+import handler from "./api/hello";
 
 const HomePage: NextPage = () => {
 
     const [name, login] = useUserData();
     const redirecting = useUnauthRedirect('/login');
+    const authHeader = useAuthHeader();
 
+    useEffect(() => {
+        if (redirecting || !authHeader) {
+            return () => {};
+        }
+
+        const onConnect = () => {
+            client.publish({destination: '/messaging/status-change', body: JSON.stringify({status: "ONLINE"})})
+        }
+
+        let stompConfig = {
+            brokerURL: 'ws://localhost:8080/api/messaging/status-change',
+            connectHeaders: authHeader?.headers,
+            reconnectDelay: 5000, 
+            onConnect: () => console.log("connected"),
+            onDisconnect: () => console.log("disconnected")
+        }
+        console.log(stompConfig);
+        let client = new Client({
+            brokerURL: 'ws://localhost:8080/messaging/status-change',
+            connectHeaders: { 'Authorization': authHeader.headers.Authorization},
+            reconnectDelay: 5000, 
+            onConnect: onConnect,
+            onDisconnect: () => console.log("disconnected"),
+            beforeConnect: () => { }
+        });
+
+
+        client.activate();
+        return () => client.deactivate();
+    }, [redirecting]);
     return redirecting ? null : (
         <>
             <Head>

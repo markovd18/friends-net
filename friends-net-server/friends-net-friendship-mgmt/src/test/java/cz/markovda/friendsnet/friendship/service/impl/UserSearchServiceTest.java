@@ -1,13 +1,11 @@
 package cz.markovda.friendsnet.friendship.service.impl;
 
-import cz.markovda.friendsnet.auth.dos.IUserDO;
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
-import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import cz.markovda.friendsnet.friendship.dos.IUserSearchResultDO;
 import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;
-import cz.markovda.friendsnet.vos.IUserSearchResultVO;
+import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
