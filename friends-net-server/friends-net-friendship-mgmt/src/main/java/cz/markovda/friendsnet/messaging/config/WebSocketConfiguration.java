@@ -17,7 +17,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -66,7 +65,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/messaging/chat")
-                .setAllowedOriginPatterns("http://localhost:3000", "client:3000").withSockJS();
+                .setAllowedOriginPatterns("http://localhost:3000", "client:3000");
         registry.addEndpoint("/messaging/status-change")
                 .setAllowedOriginPatterns("http://localhost:3000", "client:3000");
     }
@@ -96,7 +95,9 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     private String getAuthorizationHeader(final Message<?> message) {
         final MessageHeaders headers = message.getHeaders();
+        @SuppressWarnings("unchecked")
         Map<String, Object> nativeHeaders = (Map<String, Object>) headers.get("nativeHeaders");
+        @SuppressWarnings("unchecked")
         final List<String> values = (List<String>) nativeHeaders.get("Authorization");
         return values == null || values.isEmpty() ? null : values.get(0);
     }

@@ -8,7 +8,6 @@ import PageContentContainer from "../components/PageContentContainer";
 import { useAuthHeader } from "../hooks";
 import useUnauthRedirect from "../hooks/useUnauthRedirect";
 import useUserData from "../hooks/useUserData";
-import handler from "./api/hello";
 
 const HomePage: NextPage = () => {
 
@@ -25,14 +24,6 @@ const HomePage: NextPage = () => {
             client.publish({destination: '/messaging/status-change', body: JSON.stringify({status: "ONLINE"})})
         }
 
-        let stompConfig = {
-            brokerURL: 'ws://localhost:8080/api/messaging/status-change',
-            connectHeaders: authHeader?.headers,
-            reconnectDelay: 5000, 
-            onConnect: () => console.log("connected"),
-            onDisconnect: () => console.log("disconnected")
-        }
-        console.log(stompConfig);
         let client = new Client({
             brokerURL: 'ws://localhost:8080/messaging/status-change',
             connectHeaders: { 'Authorization': authHeader.headers.Authorization},

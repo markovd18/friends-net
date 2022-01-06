@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:">David Markov</a>
@@ -66,6 +67,15 @@ public interface IUserRelationshipRepository extends JpaRepository<UserRelations
             "INNER JOIN relationship_status rs ON rs.id = ur.id_status " +
             "WHERE rs.name = 'FRIENDS'", nativeQuery = true)
     List<IUserSearchResultDO> findUsersFriends(@Param("username") String username);
+
+    @Transactional(readOnly = true)
+    @Query(value = "SELECT au.login FROM auth_user au " +
+            "INNER JOIN user_relationship ur on au.id IN (ur.id_sender, ur.id_receiver) " +
+                "AND (SELECT id from auth_user WHERE login = :userLogin) IN (ur.id_sender, ur.id_receiver) " +
+                "AND au.login != :userLogin " +
+            "INNER JOIN relationship_status rs ON rs.id = ur.id_status " +
+            "WHERE rs.name = 'FRIENDS' AND au.login IN :usernames", nativeQuery = true)
+    List<String> findUsersFriendsUsernamesIn(@Param("userLogin") String userLogin, @Param("usernames") Set<String> usernames);
 
     @Transactional(readOnly = true)
     @Query("SELECT au.login as login, au.name as name, ur.status.name as relationshipStatus " +
