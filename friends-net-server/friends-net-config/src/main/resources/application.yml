@@ -5,6 +5,12 @@ logging:
       apache: WARN
       springframework:
         web: DEBUG
+      hibernate:
+        SQL: DEBUG
+      type:
+        descriptor:
+          sql:
+            BasicBinder: TRACE
     #          context:
     #            support:
     #              SpringBeanAutowiringSupport: ERROR

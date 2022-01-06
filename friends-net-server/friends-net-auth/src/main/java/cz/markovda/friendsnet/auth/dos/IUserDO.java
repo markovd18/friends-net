@@ -2,15 +2,13 @@ package cz.markovda.friendsnet.auth.dos;
 
 public interface IUserDO {
 
-    int getId();
+    Integer getId();
 
     String getLogin();
 
     String getPassword();
 
     String getName();
-
-    EnumUserRole getRole();
 
     enum EnumUserRole {
         ADMIN,

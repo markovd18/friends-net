@@ -1,20 +1,20 @@
 package cz.markovda.friendsnet.friendship.service.impl;
 
-import cz.markovda.friendsnet.auth.repository.IUserRepository;
+import cz.markovda.friendsnet.auth.dos.impl.UserDO;
+import cz.markovda.friendsnet.auth.repository.IUserJpaRepository;
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
-import cz.markovda.friendsnet.friendship.dos.IDOFactory;
+import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
+import cz.markovda.friendsnet.friendship.dos.RelationshipStatusDO;
+import cz.markovda.friendsnet.friendship.repository.IRelationshipStatusRepository;
 import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
+import cz.markovda.friendsnet.friendship.service.IRelationshipStatusService;
 import cz.markovda.friendsnet.friendship.service.IUserRelationshipService;
-import cz.markovda.friendsnet.friendship.utils.UserRelationshipTestUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,20 +29,43 @@ public class UserRelationshipServiceTest {
 
     private IUserRelationshipService userRelationshipService;
     private IAuthenticationService authenticationService;
-    private IUserRepository userRepository;
+    private IUserJpaRepository userRepository;
     private IUserRelationshipRepository userRelationshipRepository;
-    private IDOFactory doFactory;
-    private Clock clock;
+    private static IRelationshipStatusService relationshipStatusService;
+    private static IRelationshipStatusRepository relationshipStatusRepository;
+
+    public static final int REQUEST_SENT_ID = 1;
+    public static final int FRIENDS_ID = 2;
+    public static final int BLOCKED_ID = 3;
+
+    @BeforeAll
+    static void prepareStatuses() {
+        relationshipStatusService = mock(IRelationshipStatusService.class);
+        relationshipStatusRepository = mock(IRelationshipStatusRepository.class);
+
+        final var requestSentStatus = new RelationshipStatusDO(EnumRelationshipStatus.REQUEST_SENT);
+        final var friendsStatus = new RelationshipStatusDO(EnumRelationshipStatus.FRIENDS);
+        final var blockedStatus = new RelationshipStatusDO(EnumRelationshipStatus.BLOCKED);
+
+        when(relationshipStatusService.getRelationshipStatusId(EnumRelationshipStatus.REQUEST_SENT)).thenReturn(REQUEST_SENT_ID);
+        when(relationshipStatusService.getRelationshipStatusId(EnumRelationshipStatus.FRIENDS)).thenReturn(FRIENDS_ID);
+        when(relationshipStatusService.getRelationshipStatusId(EnumRelationshipStatus.BLOCKED)).thenReturn(BLOCKED_ID);
+
+        when(relationshipStatusRepository.getById(REQUEST_SENT_ID)).thenReturn(requestSentStatus);
+        when(relationshipStatusRepository.getById(FRIENDS_ID)).thenReturn(friendsStatus);
+        when(relationshipStatusRepository.getById(BLOCKED_ID)).thenReturn(blockedStatus);
+
+        when(relationshipStatusRepository.findAllReadOnly()).thenReturn(Set.of(requestSentStatus, friendsStatus, blockedStatus));
+    }
 
     @BeforeEach
     public void prepareTest() {
        authenticationService = mock(IAuthenticationService.class);
        userRelationshipRepository = mock(IUserRelationshipRepository.class);
-       userRepository = mock(IUserRepository.class);
-       doFactory = mock(IDOFactory.class);
-       clock = mock(Clock.class);
+       userRepository = mock(IUserJpaRepository.class);
+
        userRelationshipService = new UserRelationshipService(authenticationService, userRepository,
-               userRelationshipRepository, doFactory, clock);
+               userRelationshipRepository, relationshipStatusService, relationshipStatusRepository);
     }
 
     @Test
@@ -51,16 +74,13 @@ public class UserRelationshipServiceTest {
         final var senderId = 1;
         final var receiverLogin = "receiver";
         final var receiverId = 2;
-        final var createdAt = LocalDateTime.now();
 
         when(authenticationService.isUserAnonymous()).thenReturn(false);
         when(authenticationService.getLoginName()).thenReturn(senderLogin);
-        when(userRepository.findUserId(senderLogin)).thenReturn(Optional.of(senderId));
-        when(userRepository.findUserId(receiverLogin)).thenReturn(Optional.of(receiverId));
-        mockClock(createdAt);
-        when(userRelationshipRepository.relationshipExists(senderId, receiverId)).thenReturn(false);
-        when(doFactory.createUserRelationship(senderId, receiverId, createdAt))
-                .thenReturn(UserRelationshipTestUtils.prepareNewFriendRequest(senderId, receiverId, createdAt));
+        when(userRepository.findIdsByLoginIn(Set.of(senderLogin, receiverLogin))).thenReturn(Set.of(senderId, receiverId));
+        when(userRelationshipRepository.existsByUsernames(senderLogin, receiverLogin)).thenReturn(false);
+        when(userRepository.getById(senderId)).thenReturn(new UserDO(senderLogin, "", "", null));
+        when(userRepository.getById(receiverId)).thenReturn(new UserDO(receiverLogin, "", "", null));
 
         assertDoesNotThrow(() -> userRelationshipService.createNewRelationship(receiverLogin),
                 "User relationship should be created when receiver exists and sender is authenticated!");
@@ -75,42 +95,24 @@ public class UserRelationshipServiceTest {
     }
 
     @Test
-    public void throwsIllegalArgumentException_whenReceiverDoesNotExist() {
+    public void throwsIllegalState_whenReceiverOrSenderDoesNotExist() {
         final var receiverLogin = "throws";
-
-        when(authenticationService.isUserAnonymous()).thenReturn(false);
-        when(authenticationService.getLoginName()).thenReturn("logged in");
-        when(userRepository.findUserId(receiverLogin)).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> userRelationshipService.createNewRelationship(receiverLogin),
-                "Creating new relationship has to throw when receiver does not exist!");
-    }
-
-    @Test
-    public void throwsIllegalArgument_whenSenderDoesNotExist() {
-        final var senderLogin = "throws";
-        final var receiverLogin = "receiver";
+        final var senderLogin = "me";
 
         when(authenticationService.isUserAnonymous()).thenReturn(false);
         when(authenticationService.getLoginName()).thenReturn(senderLogin);
-        when(userRepository.findUserId(receiverLogin)).thenReturn(Optional.of(1));
+        when(userRepository.findIdsByLoginIn(Set.of(senderLogin, receiverLogin))).thenReturn(Set.of(1));
 
-        assertThrows(IllegalArgumentException.class, () -> userRelationshipService.createNewRelationship(receiverLogin),
-                "Creating new relationship has to throw when receiver does not exist!");
+        assertThrows(IllegalStateException.class, () -> userRelationshipService.createNewRelationship(receiverLogin),
+                "Creating new relationship has to throw when one of user's does not exist!");
     }
 
     @Test
     public void throwsIllegalArgument_whenReceiverIsSender() {
         final var senderLogin = "receiver";
-        final var senderId = 56;
-        final var createdAt = LocalDateTime.now();
 
         when(authenticationService.isUserAnonymous()).thenReturn(false);
         when(authenticationService.getLoginName()).thenReturn(senderLogin);
-        when(userRepository.findUserId(senderLogin)).thenReturn(Optional.of(senderId));
-        mockClock(createdAt);
-        when(doFactory.createUserRelationship(senderId, senderId, createdAt))
-                .thenReturn(UserRelationshipTestUtils.prepareNewFriendRequest(senderId, senderId, createdAt));
 
         assertThrows(IllegalArgumentException.class, () -> userRelationshipService.createNewRelationship(senderLogin),
                 "Creating new relationship with self has to throw!");
@@ -120,21 +122,14 @@ public class UserRelationshipServiceTest {
     public void throwsIllegalState_whenRelationshipExists() {
         final var senderLogin = "sender";
         final var receiverLogin = "receiver";
-        final var senderId = 2;
-        final var receiverId = 4;
 
         when(authenticationService.isUserAnonymous()).thenReturn(false);
         when(authenticationService.getLoginName()).thenReturn(senderLogin);
-        when(userRepository.findUserId(senderLogin)).thenReturn(Optional.of(senderId));
-        when(userRepository.findUserId(receiverLogin)).thenReturn(Optional.of(receiverId));
-        when(userRelationshipRepository.relationshipExists(senderId, receiverId)).thenReturn(true);
+        when(userRelationshipRepository.existsByUsernames(senderLogin, receiverLogin)).thenReturn(true);
+        when(userRepository.findIdsByLoginIn(Set.of(senderLogin, receiverLogin))).thenReturn(Set.of(1, 2));
 
         assertThrows(IllegalStateException.class, () -> userRelationshipService.createNewRelationship(receiverLogin),
                 "Attempt to recreate existing relationship should throw!");
     }
 
-    private void mockClock(final LocalDateTime createdAt) {
-        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
-        when(clock.instant()).thenReturn(createdAt.toInstant(ZoneOffset.UTC));
-    }
 }

@@ -1,10 +1,17 @@
 package cz.markovda.friendsnet.friendship.config;
 
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
+import cz.markovda.friendsnet.friendship.dos.RelationshipStatusDO;
+import cz.markovda.friendsnet.friendship.repository.IRelationshipStatusRepository;
+import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:">David Markov</a>
@@ -14,8 +21,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @RequiredArgsConstructor
 public class FriendshipMgmtDbConfiguration implements InitializingBean {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final IRelationshipStatusRepository relationshipStatusRepository;
+    private final IUserRelationshipRepository userRelationshipJpaRepository;
 
+    @Transactional
     @Override
     public void afterPropertiesSet() {
         if (areNoDefaultRelationshipStatusesSet()) {
@@ -24,12 +33,17 @@ public class FriendshipMgmtDbConfiguration implements InitializingBean {
     }
 
     private void createDefaultRelationshipStatuses() {
-        for (var status : EnumRelationshipStatus.values()) {
-            jdbcTemplate.update("INSERT INTO relationship_status(id, name) VALUES (DEFAULT, ?)", status.name());
-        }
+        final Set<RelationshipStatusDO> statuses = createDefaultStatusesFromEnumValues();
+        relationshipStatusRepository.saveAll(statuses);
     }
 
     private boolean areNoDefaultRelationshipStatusesSet() {
-        return jdbcTemplate.queryForList("SELECT (1) FROM relationship_status").isEmpty();
+        return relationshipStatusRepository.count() == 0;
+    }
+
+    private Set<RelationshipStatusDO> createDefaultStatusesFromEnumValues() {
+        return Arrays.stream(EnumRelationshipStatus.values())
+                .map(RelationshipStatusDO::new)
+                .collect(Collectors.toSet());
     }
 }

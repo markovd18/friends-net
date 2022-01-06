@@ -1,11 +1,18 @@
 package cz.markovda.friendsnet.auth.config;
 
+import cz.markovda.friendsnet.auth.dos.EnumUserRole;
+import cz.markovda.friendsnet.auth.dos.impl.UserDO;
+import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
+import cz.markovda.friendsnet.auth.repository.IUserJpaRepository;
+import cz.markovda.friendsnet.auth.repository.IUserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:">David Markov</a>
@@ -17,7 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class DbConfiguration implements InitializingBean {
 
     private final PasswordEncoder passwordEncoder;
-    private final JdbcTemplate jdbcTemplate;
+    private final IUserJpaRepository userRepository;
+    private final IUserRoleRepository userRoleRepository;
 
     public static final String ADMIN_LOGIN = "admin@admin.com";
     public static final String ADMIN_NAME = "Admin";
@@ -25,36 +33,43 @@ public class DbConfiguration implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
+        Set<UserRoleDO> defaultRoles = null;
         if (noDefaultRolesConfigured()) {
-            insertDefaultRoles();
+            defaultRoles = insertDefaultRoles();
         }
 
         if (defaultAdminAccountDoesNotExist()) {
-            insertDefaultAdminAccount();
+            insertDefaultAdminAccount(defaultRoles);
         }
 
         logAdminDetails();
     }
 
-    private void insertDefaultAdminAccount() {
-        jdbcTemplate.update("INSERT INTO auth_user(id, login, password, name) VALUES (DEFAULT, ?, ?, ?)",
-                ADMIN_LOGIN, passwordEncoder.encode(ADMIN_PASSWORD), ADMIN_NAME);
-        final Integer idUser = jdbcTemplate.queryForObject("SELECT id FROM auth_user WHERE login = ?", Integer.class, ADMIN_LOGIN);
-        final Integer idRole = jdbcTemplate.queryForObject("SELECT id FROM auth_role WHERE name = ?", Integer.class, "ADMIN");
-        jdbcTemplate.update("INSERT INTO auth_user_role(id_user, id_role) VALUES (?, ?)", idUser, idRole);
+    private void insertDefaultAdminAccount(Set<UserRoleDO> defaultRoles) {
+        if (defaultRoles == null) {
+            defaultRoles = getDefaultRoles();
+        }
+
+        final UserDO adminUser = new UserDO(ADMIN_LOGIN, passwordEncoder.encode(ADMIN_PASSWORD), ADMIN_NAME, defaultRoles);
+        userRepository.save(adminUser);
+    }
+
+    private Set<UserRoleDO> getDefaultRoles() {
+        return userRoleRepository.findAllByNameIn(Set.of(EnumUserRole.ADMIN, EnumUserRole.USER));
     }
 
     private boolean defaultAdminAccountDoesNotExist() {
-        return jdbcTemplate.queryForList("SELECT (1) FROM auth_user WHERE login = ?", ADMIN_LOGIN).isEmpty();
+        return !userRepository.existsByLogin(ADMIN_LOGIN);
     }
 
     private boolean noDefaultRolesConfigured() {
-        return jdbcTemplate.queryForList("SELECT (1) FROM auth_role").isEmpty();
+        return userRoleRepository.count() == 0;
     }
 
-    private void insertDefaultRoles() {
-        jdbcTemplate.update("INSERT INTO auth_role(id, name) VALUES (DEFAULT, 'ADMIN')");
-        jdbcTemplate.update("INSERT INTO auth_role(id, name) VALUES (DEFAULT, 'USER')");
+    private Set<UserRoleDO> insertDefaultRoles() {
+        final UserRoleDO adminRole = new UserRoleDO(EnumUserRole.ADMIN);
+        final UserRoleDO userRole = new UserRoleDO(EnumUserRole.USER);
+        return new HashSet<>(userRoleRepository.saveAll(Set.of(adminRole, userRole)));
     }
 
     private void logAdminDetails() {

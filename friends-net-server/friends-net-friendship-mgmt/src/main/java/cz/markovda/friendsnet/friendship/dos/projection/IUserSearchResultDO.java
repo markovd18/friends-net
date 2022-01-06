@@ -1,5 +1,6 @@
-package cz.markovda.friendsnet.friendship.dos;
+package cz.markovda.friendsnet.friendship.dos.projection;
 
+import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import org.springframework.lang.Nullable;
 
 /**

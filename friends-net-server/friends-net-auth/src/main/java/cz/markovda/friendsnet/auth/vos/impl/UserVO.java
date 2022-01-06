@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:">David Markov</a>
@@ -13,8 +14,8 @@ import javax.validation.constraints.NotNull;
 public record UserVO(
         @NotNull @Length(min = 4, max = 50) @Email String login,
         @NotNull String password,
-        @NotNull String name,
-        EnumUserRole role
+        @NotNull @Length(min = 3, max = 50) String name,
+        Set<EnumUserRole> roles
 ) implements IUserVO {
 
     @Override
@@ -33,7 +34,7 @@ public record UserVO(
     }
 
     @Override
-    public EnumUserRole getRole() {
-        return role();
+    public Set<EnumUserRole> getRoles() {
+        return roles();
     }
 }

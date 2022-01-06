@@ -47,7 +47,7 @@ public class UserRelationshipController implements UserRelationshipControllerApi
         try {
             runnable.run();
             return ResponseEntity.ok(null);
-        } catch (final IllegalStateException e) {
+        } catch (final IllegalStateException | IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         } catch (final AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

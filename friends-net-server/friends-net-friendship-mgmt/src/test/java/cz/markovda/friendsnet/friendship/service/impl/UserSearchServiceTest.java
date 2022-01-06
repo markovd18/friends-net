@@ -2,7 +2,7 @@ package cz.markovda.friendsnet.friendship.service.impl;
 
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
-import cz.markovda.friendsnet.friendship.dos.IUserSearchResultDO;
+import cz.markovda.friendsnet.friendship.dos.projection.IUserSearchResultDO;
 import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;
 import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
@@ -15,7 +15,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,8 +30,8 @@ public class UserSearchServiceTest {
 
     @BeforeEach
     public void prepareTest() {
-        userRelationshipRepository = mock(IUserRelationshipRepository.class);
         authenticationService = mock(IAuthenticationService.class);
+        userRelationshipRepository = mock(IUserRelationshipRepository.class);
 
         userSearchService = new UserSearchService(userRelationshipRepository, authenticationService);
     }
@@ -41,7 +40,7 @@ public class UserSearchServiceTest {
     public void returnsNonNullList_whenNonNullStringPassed() {
         final var searchString = "search";
 
-        when(userRelationshipRepository.findNonFriendUsers_withNotBlockedRelationship_withNameLike("Anonymous", searchString))
+        when(userRelationshipRepository.findPotentialFriendsWithNameLike("Anonymous", searchString))
                 .thenReturn(new ArrayList<>());
 
         assertNotNull(userSearchService.findUsersWithNamesContainingString(searchString),
@@ -56,7 +55,7 @@ public class UserSearchServiceTest {
         final IUserSearchResultVO searchResultVO = prepareSearchResultVO(foundUser);
 
         when(authenticationService.getLoginName()).thenReturn(authUser);
-        when(userRelationshipRepository.findNonFriendUsers_withNotBlockedRelationship_withNameLike(authUser, searchString))
+        when(userRelationshipRepository.findPotentialFriendsWithNameLike(authUser, searchString))
                 .thenReturn(List.of(foundUser));
 
         final List<IUserSearchResultVO> foundUsers = userSearchService.findUsersWithNamesContainingString(searchString);

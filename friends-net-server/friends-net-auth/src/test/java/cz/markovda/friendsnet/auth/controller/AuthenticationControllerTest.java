@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Objects;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +53,7 @@ public class AuthenticationControllerTest {
         final UserCredentialsVO userCredentialsVO = new UserCredentialsVO()
                 .login("existing")
                 .password("password");
-        final IUserVO userDetails = new UserVO(userCredentialsVO.getLogin(), null, "name", IUserVO.EnumUserRole.USER);
+        final IUserVO userDetails = new UserVO(userCredentialsVO.getLogin(), null, "name", Set.of(IUserVO.EnumUserRole.USER));
         final String generatedToken = "test-token";
         when(userAuthService.findUserByUsername(userCredentialsVO.getLogin())).thenReturn(userDetails);
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDetails.getLogin(), userDetails.getPassword())))

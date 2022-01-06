@@ -2,7 +2,7 @@ package cz.markovda.friendsnet.friendship.service.impl;
 
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
-import cz.markovda.friendsnet.friendship.dos.IUserSearchResultDO;
+import cz.markovda.friendsnet.friendship.dos.projection.IUserSearchResultDO;
 import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;
 import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
@@ -32,34 +32,40 @@ public class UserSearchService implements IUserSearchService {
         log.debug("Start of findUsersWithNamesContainingString method (args: {})", searchString);
         Assert.notNull(searchString, "Search string may not be null!");
         final var authUserLogin = authenticationService.getLoginName();
-        final List<IUserSearchResultDO> foundUsers = userRelationshipRepository.findNonFriendUsers_withNotBlockedRelationship_withNameLike(authUserLogin, searchString);
-        log.debug("End of findUsersWithNamesContainingString method.");
-        return createSearchResults(foundUsers);
+        final String preparedSearchString = "%" + searchString + "%";
+        final List<IUserSearchResultDO> foundUsers = userRelationshipRepository.findPotentialFriendsWithNameLike(authUserLogin, preparedSearchString);
+        final List<IUserSearchResultVO> result = createSearchResults(foundUsers);
+        log.debug("End of findUsersWithNamesContainingString method. Found {} results.", result.size());
+        return result;
     }
 
     @Override
     public List<IUserSearchResultVO> findUsersBlockedToAuthenticatedUser() {
         log.debug("Start of findUsersBlockedToAuthenticatedUser method.");
         final String username = authenticationService.getLoginName();
+        final List<IUserSearchResultVO> result = findUsersBlockedToUser(username);
         log.debug("End of findUsersBlockedToAuthenticatedUser method.");
-        return findUsersBlockedToUser(username);
+        return result;
     }
 
     @Override
     public List<IUserSearchResultVO> findAuthenticatedUsersFriends() {
         log.debug("Start of findAuthenticatedUsersFriends method.");
         final String username = authenticationService.getLoginName();
+        final List<IUserSearchResultVO> result =  findUsersFriends(username);
         log.debug("End of findAuthenticatedUsersFriends method.");
-        return findUsersFriends(username);
+        return result;
     }
 
     @Override
     public List<IUserSearchResultVO> findUsersBlockedToUser(final String username) {
         log.debug("Start of findUsersBlockedToUser method (args: {}).", username);
         Assert.notNull(username, "Username may not be null");
-        final List<IUserSearchResultDO> searchResults = userRelationshipRepository.findBlockedUsersByUser(username);
-        log.debug("End of findUsersBlockedToUser method.");
-        return createSearchResults(searchResults);
+        final List<IUserSearchResultDO> searchResults = userRelationshipRepository.findUsersWithRelationshipToUser(
+                username, EnumRelationshipStatus.BLOCKED);
+        final List<IUserSearchResultVO> result = createSearchResults(searchResults);
+        log.debug("End of findUsersBlockedToUser method. Found {} results.", result.size());
+        return result;
     }
 
     @Override
@@ -67,25 +73,29 @@ public class UserSearchService implements IUserSearchService {
         log.debug("Start of findUsersFriends method (args: {}).", username);
         Assert.notNull(username, "Username may not be null");
         final List<IUserSearchResultDO> searchResults = userRelationshipRepository.findUsersFriends(username);
-        log.debug("End of findUsersFriends method.");
-        return createSearchResults(searchResults);
+        final List<IUserSearchResultVO> result = createSearchResults(searchResults);
+        log.debug("End of findUsersFriends method. Found {} results.", result.size());
+        return result;
     }
 
     @Override
     public List<IUserSearchResultVO> findPendingRequestsForAuthenticatedUser() {
         log.debug("Start of findPendingRequestsForAuthenticatedUser method.");
         final String username = authenticationService.getLoginName();
+        final List<IUserSearchResultVO> result = findPendingRequestsForUser(username);
         log.debug("End of findPendingRequestsForAuthenticatedUser method.");
-        return findPendingRequestsForUser(username);
+        return result;
     }
 
     @Override
     public List<IUserSearchResultVO> findPendingRequestsForUser(String username) {
         log.debug("Start of findPendingRequestsForUser (args: {}).", username);
         Assert.notNull(username, "Username may not be null");
-        final List<IUserSearchResultDO> searchResults = userRelationshipRepository.findPendingRequests(username);
-        log.debug("End of findPendingRequestsForUser method.");
-        return createSearchResults(searchResults);
+        final List<IUserSearchResultDO> searchResults = userRelationshipRepository.findUsersWithRelationshipToUser(
+                username, EnumRelationshipStatus.REQUEST_SENT);
+        final List<IUserSearchResultVO> result = createSearchResults(searchResults);
+        log.debug("End of findPendingRequestsForUser method. Found {} results.", result.size());
+        return result;
     }
 
     private List<IUserSearchResultVO> createSearchResults(final List<IUserSearchResultDO> searchResults) {

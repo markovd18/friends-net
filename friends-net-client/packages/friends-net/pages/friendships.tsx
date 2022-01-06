@@ -52,11 +52,11 @@ const FriendshipsPage : NextPage = () => {
         fetchData();
    }, [activeTab]);
 
-    useEffect(() => {
-        UserSearchApi.findFriends(authHeader).then(response => {
-            setLastSearchResult(response.data);
-        }).catch(error => handleSearchError(error));
-    }, []);
+    // useEffect(() => {
+    //     UserSearchApi.findFriends(authHeader).then(response => {
+    //         setLastSearchResult(response.data);
+    //     }).catch(error => handleSearchError(error));
+    // }, []);
 
     const changeActiveTab = useCallback(async (newActiveTab: FriendshipsPageTab) => {
         try {
