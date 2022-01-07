@@ -1,7 +1,7 @@
 package cz.markovda.friendsnet.friendship.service.impl;
 
 import cz.markovda.friendsnet.auth.dos.impl.UserDO;
-import cz.markovda.friendsnet.auth.repository.IUserJpaRepository;
+import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import cz.markovda.friendsnet.friendship.dos.RelationshipStatusDO;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class UserRelationshipService implements IUserRelationshipService {
 
     private final IAuthenticationService authenticationService;
-    private final IUserJpaRepository userRepository;
+    private final IUserRepository userRepository;
     private final IUserRelationshipRepository userRelationshipRepository;
     private final IRelationshipStatusService relationshipStatusService;
     private final IRelationshipStatusRepository relationshipStatusRepository;

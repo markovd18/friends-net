@@ -4,7 +4,7 @@ import cz.markovda.friendsnet.auth.dos.EnumUserRole;
 import cz.markovda.friendsnet.auth.dos.IUserRoleDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
-import cz.markovda.friendsnet.auth.repository.IUserJpaRepository;
+import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.repository.IUserRoleRepository;
 import cz.markovda.friendsnet.auth.service.IUserAuthService;
 import cz.markovda.friendsnet.auth.service.validation.Validator;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserAuthServiceImpl implements IUserAuthService {
 
-    private final IUserJpaRepository userRepository;
+    private final IUserRepository userRepository;
     private final IUserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final Validator validator;

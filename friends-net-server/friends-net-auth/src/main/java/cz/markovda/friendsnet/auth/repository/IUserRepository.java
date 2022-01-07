@@ -14,7 +14,7 @@ import java.util.Set;
  * @author <a href="mailto:">David Markov</a>
  * @since 05.01.22
  */
-public interface IUserJpaRepository extends JpaRepository<UserDO, Integer> {
+public interface IUserRepository extends JpaRepository<UserDO, Integer> {
 
     @Transactional(readOnly = true)
     @Query("SELECT au FROM auth_user au JOIN FETCH au.roles WHERE au.login = :login")
@@ -24,6 +24,9 @@ public interface IUserJpaRepository extends JpaRepository<UserDO, Integer> {
 
     Optional<Integer> findIdByLogin(String login);
 
-    @Query("SELECT au.id from auth_user au WHERE au.login in :logins")
+    @Query("SELECT au.id FROM auth_user au WHERE au.login in :logins")
     Set<Integer> findIdsByLoginIn(Collection<String> logins);
+
+    @Query("SELECT au.name FROM auth_user au WHERE au.login = :login")
+    Optional<String> findNameByLogin(@Param("login") String login);
 }

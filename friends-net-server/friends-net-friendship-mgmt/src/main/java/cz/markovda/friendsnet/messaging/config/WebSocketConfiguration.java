@@ -57,9 +57,8 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/user/queue/specific-user", "/user/queue/friend-status");
+        registry.enableSimpleBroker("/queue/specific-user", "/queue/friend-status");
         registry.setApplicationDestinationPrefixes("/messaging");
-        registry.setUserDestinationPrefix("/user");
     }
 
     @Override

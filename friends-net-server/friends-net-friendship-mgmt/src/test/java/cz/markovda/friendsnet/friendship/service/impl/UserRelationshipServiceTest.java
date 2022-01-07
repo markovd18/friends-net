@@ -1,7 +1,7 @@
 package cz.markovda.friendsnet.friendship.service.impl;
 
 import cz.markovda.friendsnet.auth.dos.impl.UserDO;
-import cz.markovda.friendsnet.auth.repository.IUserJpaRepository;
+import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import cz.markovda.friendsnet.friendship.dos.RelationshipStatusDO;
@@ -29,7 +29,7 @@ public class UserRelationshipServiceTest {
 
     private IUserRelationshipService userRelationshipService;
     private IAuthenticationService authenticationService;
-    private IUserJpaRepository userRepository;
+    private IUserRepository userRepository;
     private IUserRelationshipRepository userRelationshipRepository;
     private static IRelationshipStatusService relationshipStatusService;
     private static IRelationshipStatusRepository relationshipStatusRepository;
@@ -62,7 +62,7 @@ public class UserRelationshipServiceTest {
     public void prepareTest() {
        authenticationService = mock(IAuthenticationService.class);
        userRelationshipRepository = mock(IUserRelationshipRepository.class);
-       userRepository = mock(IUserJpaRepository.class);
+       userRepository = mock(IUserRepository.class);
 
        userRelationshipService = new UserRelationshipService(authenticationService, userRepository,
                userRelationshipRepository, relationshipStatusService, relationshipStatusRepository);

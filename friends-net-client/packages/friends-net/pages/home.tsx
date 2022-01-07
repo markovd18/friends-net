@@ -21,7 +21,7 @@ const HomePage: NextPage = () => {
         }
 
         const onConnect = () => {
-            client.publish({destination: '/messaging/status-change', body: JSON.stringify({status: "ONLINE"})})
+            client.subscribe('/messaging/user/queue/friend-status', message => console.log("message:", message), { 'Authorization': authHeader.headers.Authorization});
         }
 
         let client = new Client({

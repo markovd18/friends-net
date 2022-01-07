@@ -69,13 +69,13 @@ public interface IUserRelationshipRepository extends JpaRepository<UserRelations
     List<IUserSearchResultDO> findUsersFriends(@Param("username") String username);
 
     @Transactional(readOnly = true)
-    @Query(value = "SELECT au.login FROM auth_user au " +
+    @Query(value = "SELECT au.login as login, au.name as name FROM auth_user au " +
             "INNER JOIN user_relationship ur on au.id IN (ur.id_sender, ur.id_receiver) " +
                 "AND (SELECT id from auth_user WHERE login = :userLogin) IN (ur.id_sender, ur.id_receiver) " +
                 "AND au.login != :userLogin " +
             "INNER JOIN relationship_status rs ON rs.id = ur.id_status " +
             "WHERE rs.name = 'FRIENDS' AND au.login IN :usernames", nativeQuery = true)
-    List<String> findUsersFriendsUsernamesIn(@Param("userLogin") String userLogin, @Param("usernames") Set<String> usernames);
+    List<IUserSearchResultDO> findUsersFriendsByUsernameIn(@Param("userLogin") String userLogin, @Param("usernames") Set<String> usernames);
 
     @Transactional(readOnly = true)
     @Query("SELECT au.login as login, au.name as name, ur.status.name as relationshipStatus " +

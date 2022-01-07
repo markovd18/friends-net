@@ -5,7 +5,7 @@ import cz.markovda.friendsnet.auth.dos.IUserRoleDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserDOTestUtils;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
-import cz.markovda.friendsnet.auth.repository.IUserJpaRepository;
+import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.repository.IUserRoleRepository;
 import cz.markovda.friendsnet.auth.service.validation.Validator;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
@@ -38,13 +38,13 @@ import static org.mockito.Mockito.when;
 public class UserAuthServiceTest {
 
     private UserAuthServiceImpl userAuthService;
-    private IUserJpaRepository userRepository;
+    private IUserRepository userRepository;
     private IUserRoleRepository userRoleRepository;
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     public void prepareTest() {
-        userRepository = mock(IUserJpaRepository.class);
+        userRepository = mock(IUserRepository.class);
         userRoleRepository = mock(IUserRoleRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
         userAuthService = new UserAuthServiceImpl(userRepository, userRoleRepository, passwordEncoder, mock(Validator.class));

@@ -3,7 +3,7 @@ package cz.markovda.friendsnet.auth.config;
 import cz.markovda.friendsnet.auth.dos.EnumUserRole;
 import cz.markovda.friendsnet.auth.dos.impl.UserDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
-import cz.markovda.friendsnet.auth.repository.IUserJpaRepository;
+import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.repository.IUserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.Set;
 public class DbConfiguration implements InitializingBean {
 
     private final PasswordEncoder passwordEncoder;
-    private final IUserJpaRepository userRepository;
+    private final IUserRepository userRepository;
     private final IUserRoleRepository userRoleRepository;
 
     public static final String ADMIN_LOGIN = "admin@admin.com";
