@@ -1,4 +1,4 @@
-package cz.markovda.friendsnet.auth.service.validation;
+package cz.markovda.friendsnet.auth.service.validation.impl;
 
 import lombok.RequiredArgsConstructor;
 

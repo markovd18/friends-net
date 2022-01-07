@@ -15,4 +15,6 @@ public interface IAuthenticationService {
     Collection<IUserVO.EnumUserRole> getRole();
 
     boolean isUserAnonymous();
+
+    boolean isUserAdmin();
 }

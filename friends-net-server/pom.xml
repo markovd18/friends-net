@@ -30,6 +30,7 @@
 		<module>friends-net-auth</module>
 		<module>friends-net-api</module>
 		<module>friends-net-friendship-mgmt</module>
+		<module>friends-net-posts</module>
 	</modules>
 
 	<!--	DEPENDENCIES	-->

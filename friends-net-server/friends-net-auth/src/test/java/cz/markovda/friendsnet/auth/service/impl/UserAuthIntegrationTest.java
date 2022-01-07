@@ -1,7 +1,7 @@
 package cz.markovda.friendsnet.auth.service.impl;
 
 import cz.markovda.friendsnet.auth.service.IUserAuthService;
-import cz.markovda.friendsnet.auth.service.validation.ValidationException;
+import cz.markovda.friendsnet.auth.service.validation.impl.ValidationException;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.impl.UserVO;
 import org.junit.jupiter.api.Test;

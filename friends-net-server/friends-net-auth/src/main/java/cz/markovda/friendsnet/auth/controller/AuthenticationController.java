@@ -3,7 +3,7 @@ package cz.markovda.friendsnet.auth.controller;
 import cz.markovda.api.AuthenticationControllerApi;
 import cz.markovda.friendsnet.auth.config.jwt.JwtUtils;
 import cz.markovda.friendsnet.auth.service.IUserAuthService;
-import cz.markovda.friendsnet.auth.service.validation.ValidationException;
+import cz.markovda.friendsnet.auth.service.validation.impl.ValidationException;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.IVOFactory;
 import cz.markovda.vo.UserAuthenticationVO;

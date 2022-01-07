@@ -7,7 +7,7 @@ import cz.markovda.friendsnet.auth.dos.impl.UserDOTestUtils;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
 import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.repository.IUserRoleRepository;
-import cz.markovda.friendsnet.auth.service.validation.Validator;
+import cz.markovda.friendsnet.auth.service.validation.impl.Validator;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.impl.UserVO;
 import org.junit.jupiter.api.BeforeEach;

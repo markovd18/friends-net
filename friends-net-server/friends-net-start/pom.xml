@@ -66,6 +66,11 @@
             <artifactId>friends-net-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cz.markovda</groupId>
+            <artifactId>friends-net-posts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

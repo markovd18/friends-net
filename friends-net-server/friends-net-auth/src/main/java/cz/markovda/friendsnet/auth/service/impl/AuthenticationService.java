@@ -45,6 +45,13 @@ public class AuthenticationService implements IAuthenticationService {
         return authentication == null || !authentication.isAuthenticated();
     }
 
+    @Override
+    public boolean isUserAdmin() {
+        return getRolesFromSecurityContext()
+                .stream()
+                .anyMatch(role -> role == IUserVO.EnumUserRole.ADMIN);
+    }
+
     private String getNameFromSecurityContext() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }

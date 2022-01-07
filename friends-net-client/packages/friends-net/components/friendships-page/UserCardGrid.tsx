@@ -35,7 +35,7 @@ const UserCardGrid: React.FC<UserCardGridProps> = ({
     (
         <Grid container spacing={2} marginTop={1}>
             {data.map(userData => (
-                <Grid item xs={3} key={userData.login}>
+                <Grid item xs={12} sm={8} md={3} key={userData.login}>
                     <UserSearchCard userData={userData}>
                         {pageTab === FriendshipsPageTab.SEARCH_RESULTS && 
                             <SearchResultButtons 

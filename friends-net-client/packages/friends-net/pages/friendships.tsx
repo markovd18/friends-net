@@ -25,6 +25,7 @@ const FriendshipsPage : NextPage = () => {
     const [Snackbar, showSnackbar] = useSnackbar();
 
     useEffect(() => {
+        setLastSearchResult([]);
 
         const fetchData = async () => {
             setIsDataLoading(true);
@@ -67,7 +68,6 @@ const FriendshipsPage : NextPage = () => {
     }, []);
 
     const switchActiveTab = useCallback(async (newActiveTab: FriendshipsPageTab) => {
-        setLastSearchResult([]);
         setActiveTab(newActiveTab);
         setShowingSearchResults(false);
     }, []);
@@ -173,14 +173,14 @@ const FriendshipsPage : NextPage = () => {
                 <Navbar />
                 <PageContentContainer>
                     <Grid container columnSpacing={5}>
-                        <Grid item xs={12} sm={3}>
+                        <Grid item xs={12} sm={4}>
                             <FriendshipsPageTabCard 
                                 activeTab={activeTab}
                                 onClick={changeActiveTab} 
                                 onSearchSubmit={handleUserSearch}   
                             />
                         </Grid>
-                        <Grid item xs={12} sm={9}>
+                        <Grid item xs={12} sm={8}>
                             {isDataLoading ? (
                                 <Box sx={{display: 'flex'}}>
                                     <CircularProgress />

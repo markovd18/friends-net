@@ -5,6 +5,7 @@ logging:
       apache: WARN
       springframework:
         web: DEBUG
+        messaging: TRACE
       hibernate:
         SQL: DEBUG
       type:

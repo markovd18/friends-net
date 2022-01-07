@@ -20,6 +20,9 @@ public interface IUserRepository extends JpaRepository<UserDO, Integer> {
     @Query("SELECT au FROM auth_user au JOIN FETCH au.roles WHERE au.login = :login")
     Optional<UserDO> findByLoginFetchRoles(@Param("login") String login);
 
+    @Transactional(readOnly = true)
+    Optional<UserDO> findByLogin(String login);
+
     boolean existsByLogin(String login);
 
     Optional<Integer> findIdByLogin(String login);

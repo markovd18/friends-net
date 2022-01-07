@@ -37,6 +37,7 @@ const HomePage: NextPage = () => {
         client.activate();
         return () => client.deactivate();
     }, [redirecting]);
+    
     return redirecting ? null : (
         <>
             <Head>
@@ -48,10 +49,10 @@ const HomePage: NextPage = () => {
                 <Navbar />
                 <PageContentContainer>
                     <Card sx={{ maxWidth: 345, 
-                        minHeight: 100, padding: 4, flex: 1, 
+                        minHeight: 100, minWidth: 100, padding: 4, flex: 1, 
                         display: "flex", flexDirection: "column", 
                         justifyContent: "center", alignContent: "center",
-                        position: "fixed" }}>
+                        position: "fixed"}}>
                         <CardContent>
                             <Stack direction={"row"} spacing={3}>
                                 <Typography gutterBottom variant="h5" component="div">
@@ -67,9 +68,9 @@ const HomePage: NextPage = () => {
                     </Card>
 
                     <Card sx={{ 
-                        minHeight: 1000, padding: 4, flex: 1, 
+                        minHeight: 1000, minWidth: 200, padding: 4, flex: 1, 
                         display: "flex", flexDirection: "column", 
-                        marginLeft: 50 }}>
+                        marginLeft: 40 }}>
                         <CardContent>
                         
                         </CardContent>

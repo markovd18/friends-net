@@ -13,12 +13,12 @@ const SimpleNavbar: React.FC<{}> = ({children}) => {
                         variant='h6'
                         noWrap
                         component='div'
-                        sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+                        sx={{ mr: 2, display: { xs: 'flex', md: 'flex' } }}
                     >
                     <Link underline='none' href='/' color={'white'}>Friends Net</Link>
                     </Typography>
 
-                <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'flex' } }}>
                     {children}
                 </Box>
 

@@ -1,5 +1,6 @@
-package cz.markovda.friendsnet.auth.service.validation;
+package cz.markovda.friendsnet.auth.service.validation.impl;
 
+import cz.markovda.friendsnet.auth.service.validation.IValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ import java.util.Set;
  */
 @Component
 @RequiredArgsConstructor
-public class Validator {
+public class Validator implements IValidator {
 
     private final javax.validation.Validator validator;
 

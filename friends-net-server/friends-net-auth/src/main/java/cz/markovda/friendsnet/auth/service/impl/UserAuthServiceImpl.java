@@ -7,7 +7,7 @@ import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
 import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.repository.IUserRoleRepository;
 import cz.markovda.friendsnet.auth.service.IUserAuthService;
-import cz.markovda.friendsnet.auth.service.validation.Validator;
+import cz.markovda.friendsnet.auth.service.validation.IValidator;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.impl.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class UserAuthServiceImpl implements IUserAuthService {
     private final IUserRepository userRepository;
     private final IUserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final Validator validator;
+    private final IValidator validator;
 
     private Map<EnumUserRole, Integer> userRoleToIdCache;
 

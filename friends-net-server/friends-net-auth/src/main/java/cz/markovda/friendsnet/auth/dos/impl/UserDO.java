@@ -11,10 +11,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.LinkedHashSet;
@@ -30,6 +32,10 @@ import java.util.Set;
 @Builder
 @Getter
 @Entity(name = UserDO.TABLE_NAME)
+@Table(indexes = {
+        @Index(name = "idx_auth_user_login", columnList = "login"),
+        @Index(name = "idx_auth_user_login_name", columnList = "login, name")
+})
 public class UserDO {
 
     public static final String TABLE_NAME = "auth_user";

@@ -16,6 +16,8 @@ tags:
     description: Controller for authentication, signing in and out and signing up.
   - name: UserSearchController
     description: Controller for searching of users.
+  - name: PostController
+    description: Controller for operations with posts and announcements
 
 # Paths are the URIs within your REST Application.
 paths:
@@ -184,6 +186,22 @@ paths:
         '401':
           description: Unauthenticated
 
+  '/api/post':
+    post:
+      summary: Creates new post
+      tags:
+        - PostController
+      operationId: createNewPost
+      requestBody:
+        $ref: '#/components/requestBodies/CreatePostRequest'
+      responses:
+        '200':
+          description: OK. New post successfully created
+        '400':
+          description: Post data are invalid.
+        '401':
+          description: Unauthorized
+
 components:
 
   securitySchemes:
@@ -233,6 +251,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UserRegistrationDataVO'
+
+    CreatePostRequest:
+      required: true
+      description: Request to create new post.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewPostDataVO'
 
   parameters:
     UserSearchParameter:
@@ -378,6 +404,34 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/UserRelationshipVO'
+
+    NewPostDataVO:
+      description: Data of new post to create
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the post
+          minLength: 3
+          maxLength: 255
+          example: Very interesting title
+        content:
+          type: string
+          description: Content of the post.
+          example: Report of sudden car crash on D1 highway in the direction to Brno from Prague. Two people are injured.
+        dateCreated:
+          type: string
+          format: date
+          description: Date and time of the post creation.
+          example: '2022-01-07:15:00:00'
+        isAnnouncement:
+          type: boolean
+          description: Flag whether the post is an announcement or not. Only admins may create announcements.
+      required:
+        - title
+        - content
+        - dateCreated
+        - isAnnouncement
 
     BadRequestVO:
       description: Object describing a Bad Request (400) HTTP error.
