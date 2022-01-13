@@ -5,7 +5,7 @@ package cz.markovda.friendsnet.messaging.vos;
  * @since 04.01.22
  */
 public record FriendStatusChangedMessage(
-        String username,
+        String login,
         String name,
         EnumFriendStatus status) {
 }

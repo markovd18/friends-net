@@ -1,19 +1,49 @@
-import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
-import { Client } from "@stomp/stompjs";
+import { UserIdentificationDataVO } from "@markovda/fn-api";
+import { Avatar, Card, CardContent, List, ListItem, ListItemButton, ListItemText, Stack, Typography } from "@mui/material";
+import { Client, IMessage } from "@stomp/stompjs";
 import { NextPage } from "next";
 import Head from "next/head";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import FriendshipsPageTab from "../components/FriendshipsPageTab";
+import OnlineUserCard from "../components/home-page/OnlineUserCard";
 import Navbar from "../components/nav/Navbar";
 import PageContentContainer from "../components/PageContentContainer";
 import { useAuthHeader } from "../hooks";
 import useUnauthRedirect from "../hooks/useUnauthRedirect";
 import useUserData from "../hooks/useUserData";
+import { FriendStatus } from "../utils/enums/FriendStatus";
+import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
 
 const HomePage: NextPage = () => {
 
     const [name, login] = useUserData();
+    const [onlineUsers, setOnlineUsers] = useState<UserIdentificationDataVO[]>([]);
     const redirecting = useUnauthRedirect('/login');
     const authHeader = useAuthHeader();
+
+    const convertStatusMessageToObject = (message: IMessage): IFriendStatusChangeMessage[] => {
+        return JSON.parse(message.body);
+    }
+
+    const processFriendStatusChangeMessage = (message: IMessage) => {
+        console.log("message:", message.body);
+
+        const statusList = convertStatusMessageToObject(message);
+        let wentOnline: UserIdentificationDataVO[] = [];
+        let wentOffline: UserIdentificationDataVO[] = [];
+        statusList.forEach(friend => friend.status === FriendStatus.ONLINE ? 
+            wentOnline.push(friend) : 
+            wentOffline.push(friend));
+
+        console.debug("went online:", wentOnline);
+        console.debug("went offline:", wentOffline);
+        
+        setOnlineUsers(beforeOnline => {
+            let newOnline = beforeOnline.filter(online => 
+                wentOffline.find(offline => offline.login === online.login) === undefined);
+            return newOnline.concat(wentOnline);
+        });
+    }
 
     useEffect(() => {
         if (redirecting || !authHeader) {
@@ -21,7 +51,7 @@ const HomePage: NextPage = () => {
         }
 
         const onConnect = () => {
-            client.subscribe('/user/queue/friend-status', message => console.log("message:", message), { 'Authorization': authHeader.headers.Authorization});
+            client.subscribe('/user/queue/friend-status', processFriendStatusChangeMessage, { 'Authorization': authHeader.headers.Authorization});
         }
 
         let client = new Client({
@@ -76,6 +106,18 @@ const HomePage: NextPage = () => {
                         </CardContent>
 
                     </Card>
+
+                    <List
+                        
+                    >
+                        {onlineUsers.map(user => (
+                            <ListItem component="div" disablePadding key={user.login}>
+                                <ListItemButton>
+                                    <ListItemText primary={user.name}/>
+                                </ListItemButton>
+                            </ListItem>
+                        ))}
+                    </List>
                 </PageContentContainer>
             </main>
         </>

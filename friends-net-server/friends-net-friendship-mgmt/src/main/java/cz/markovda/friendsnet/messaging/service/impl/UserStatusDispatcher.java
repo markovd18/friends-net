@@ -102,7 +102,7 @@ public class UserStatusDispatcher implements IUserStatusDispatcher {
     }
 
     private void distributeStatusChangeMessage(final FriendStatusChangedMessage message) {
-        final List<IUserSearchResultDO> onlineFriends = getOnlineFriends(message.username());
+        final List<IUserSearchResultDO> onlineFriends = getOnlineFriends(message.login());
         sendUserStatusChangeMessageToFriends(message, onlineFriends);
     }
 
