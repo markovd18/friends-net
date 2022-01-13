@@ -4,6 +4,7 @@ import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.friendship.dos.projection.IUserSearchResultDO;
 import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import cz.markovda.friendsnet.messaging.service.IUserStatusDispatcher;
+import cz.markovda.friendsnet.messaging.utils.MessagingUtils;
 import cz.markovda.friendsnet.messaging.vos.EnumFriendStatus;
 import cz.markovda.friendsnet.messaging.vos.FriendStatusChangedMessage;
 import lombok.RequiredArgsConstructor;
@@ -11,14 +12,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.AbstractSubProtocolEvent;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -29,22 +30,39 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserStatusDispatcher implements IUserStatusDispatcher {
 
-    public static final String FRIEND_STATUS_ENDPOINT = "/queue/friend-status";
-
     private final SimpMessagingTemplate simpleMessagingTemplate;
     private final IUserRelationshipRepository userRelationshipRepository;
     private final IUserRepository userRepository;
 
-    private final Map<String, String> onlineUserLogins = new HashMap<>();
-    private final Object lock = new Object();
+    private final Map<String, String> onlineUserLogins = new ConcurrentHashMap<>();
 
     @EventListener
-    public void handleNewUserConnected(final SessionConnectedEvent event) {
+    public void handleNewUserConnected(final SessionSubscribeEvent event) {
+        if (isFriendStatusSubscriptionEvent(event)) {
+            addNewOnlineUser(event);
+        }
+    }
+
+    @EventListener
+    public void handleUserDisconnected(final SessionDisconnectEvent event) {
+        final String username = getUsernameFromSessionEvent(event);
+        if (username != null) {
+            distributeUserDisconnectedMessage(username);
+        }
+    }
+
+    private void addNewOnlineUser(final SessionSubscribeEvent event) {
         final String username = getUsernameFromSessionEvent(event);
         if (username != null) {
             final String name = getNameByLogin(username);
-            doSynchronized(() -> onlineUserLogins.put(username, name));
+            onlineUserLogins.put(username, name);
+            distributeOnlineFriendsStatusMessage(username);
         }
+    }
+
+    private boolean isFriendStatusSubscriptionEvent(final SessionSubscribeEvent event) {
+        final String destination = MessagingUtils.getHeader(event.getMessage(), "simpDestination", String.class);
+        return destination != null && destination.equals("/user/queue/friend-status");
     }
 
     private String getNameByLogin(String username) {
@@ -52,23 +70,15 @@ public class UserStatusDispatcher implements IUserStatusDispatcher {
                 .orElseThrow(() -> new IllegalStateException("User's name not found by username " + username));
     }
 
-    @EventListener
-    public void handleUserDisconnected(final SessionDisconnectEvent event) {
-        final String username = getUsernameFromSessionEvent(event);
-        if (username != null) {
-            doSynchronized(() -> distributeUserDisconnectedMessage(username));
-        }
-    }
-
-    @Override
-    public synchronized List<FriendStatusChangedMessage> distributeOnlineFriendsStatusMessage(final String username) {
+    public void distributeOnlineFriendsStatusMessage(final String username) {
         final List<IUserSearchResultDO> onlineFriends = getOnlineFriends(username);
         final String name = onlineUserLogins.get(username);
         sendUserStatusChangeMessageToFriends(new FriendStatusChangedMessage(username, name, EnumFriendStatus.ONLINE), onlineFriends);
-        return createFriendOnlineMessages(onlineFriends);
+        final List<FriendStatusChangedMessage> messages = createFriendOnlineMessages(onlineFriends);
+        sendUserStatusChangeMessagesToUsers(messages, List.of(username));
     }
 
-    private List<FriendStatusChangedMessage> createFriendOnlineMessages(List<IUserSearchResultDO> onlineFriends) {
+    private List<FriendStatusChangedMessage> createFriendOnlineMessages(final List<IUserSearchResultDO> onlineFriends) {
         return onlineFriends.stream()
                 .map(user -> new FriendStatusChangedMessage(user.getLogin(), user.getName(), EnumFriendStatus.ONLINE))
                 .collect(Collectors.toList());
@@ -83,16 +93,12 @@ public class UserStatusDispatcher implements IUserStatusDispatcher {
         return userData.getName();
     }
 
-    private void doSynchronized(final Runnable runnable) {
-        synchronized (lock) {
-            runnable.run();
-        }
-    }
-
     private void distributeUserDisconnectedMessage(final String username) {
-        final String name = onlineUserLogins.get(username);
-        distributeStatusChangeMessage(new FriendStatusChangedMessage(username, name, EnumFriendStatus.OFFLINE));
-        onlineUserLogins.remove(username);
+        final String name = onlineUserLogins.getOrDefault(username, null);
+        if (name != null) {
+            distributeStatusChangeMessage(new FriendStatusChangedMessage(username, name, EnumFriendStatus.OFFLINE));
+            onlineUserLogins.remove(username);
+        }
     }
 
     private void distributeStatusChangeMessage(final FriendStatusChangedMessage message) {
@@ -101,9 +107,16 @@ public class UserStatusDispatcher implements IUserStatusDispatcher {
     }
 
     private void sendUserStatusChangeMessageToFriends(final FriendStatusChangedMessage message, final List<IUserSearchResultDO> onlineFriends) {
-        final List<FriendStatusChangedMessage> newUserOnlineMessageList = List.of(message);
-        for (final var onlineFriend : onlineFriends) {
-            simpleMessagingTemplate.convertAndSend("/user/" + onlineFriend.getLogin() +  FRIEND_STATUS_ENDPOINT, newUserOnlineMessageList);
+        final List<String> usernames = onlineFriends.stream()
+                .map(IUserSearchResultDO::getLogin)
+                .collect(Collectors.toList());
+        sendUserStatusChangeMessagesToUsers(List.of(message), usernames);
+    }
+
+    private void sendUserStatusChangeMessagesToUsers(final List<FriendStatusChangedMessage> messages,
+                                                     final List<String> usernames) {
+        for (final String username : usernames) {
+            simpleMessagingTemplate.convertAndSendToUser(username, "/queue/friend-status", messages);
         }
     }
 

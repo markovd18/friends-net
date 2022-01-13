@@ -21,7 +21,7 @@ const HomePage: NextPage = () => {
         }
 
         const onConnect = () => {
-            client.subscribe('/messaging/user/queue/friend-status', message => console.log("message:", message), { 'Authorization': authHeader.headers.Authorization});
+            client.subscribe('/user/queue/friend-status', message => console.log("message:", message), { 'Authorization': authHeader.headers.Authorization});
         }
 
         let client = new Client({

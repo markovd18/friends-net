@@ -2,6 +2,7 @@ package cz.markovda.friendsnet.messaging.config;
 
 import cz.markovda.friendsnet.auth.config.jwt.JwtUtils;
 import cz.markovda.friendsnet.auth.service.IUserAuthService;
+import cz.markovda.friendsnet.messaging.utils.MessagingUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +10,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -23,7 +23,6 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:">David Markov</a>
@@ -57,8 +56,9 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/queue/specific-user", "/queue/friend-status");
+        registry.enableSimpleBroker("/queue");
         registry.setApplicationDestinationPrefixes("/messaging");
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -93,11 +93,8 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     }
 
     private String getAuthorizationHeader(final Message<?> message) {
-        final MessageHeaders headers = message.getHeaders();
         @SuppressWarnings("unchecked")
-        Map<String, Object> nativeHeaders = (Map<String, Object>) headers.get("nativeHeaders");
-        @SuppressWarnings("unchecked")
-        final List<String> values = (List<String>) nativeHeaders.get("Authorization");
+        final List<String> values = (List<String>) MessagingUtils.getNativeHeader(message, "Authorization");
         return values == null || values.isEmpty() ? null : values.get(0);
     }
 
