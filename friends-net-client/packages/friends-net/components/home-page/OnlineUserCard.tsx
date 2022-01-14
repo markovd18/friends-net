@@ -1,41 +1,37 @@
 import { UserIdentificationDataVO } from "@markovda/fn-api";
-import { Avatar, Badge, Card, CardActionArea, CardContent, Stack, Typography } from "@mui/material";
+import { Avatar, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import OnlineUserBadge from "./OnlineUserBadge";
 
 type Props = {
-    user: UserIdentificationDataVO,
-    onClick?: (login: string) => void,
+    userData: UserIdentificationDataVO,
+    onClick?: (userData: UserIdentificationDataVO) => void,
 }
 
-const OnlineUserCard: React.FC<Props> = ({user, onClick}) => {
+const OnlineUserCard: React.FC<Props> = ({userData, onClick}) => {
 
     const handleClick = () => {
         if (onClick) {
-            onClick(user.login);
+            onClick(userData);
         }
     }
 
     return (
-        <Card elevation={0}>
-            <CardActionArea onClick={handleClick} >
-                <CardContent>
-                    <Stack direction="row" spacing={2}>
-                        <OnlineUserBadge
-                            overlap="circular"
-                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}}
-                            variant='dot'
-                        >
-                            <Avatar>
-                                {user.name.charAt(0)}
-                            </Avatar>
-                        </OnlineUserBadge>
-                        <Typography variant="h6" color='text.secondary'>
-                            {user.name}
-                        </Typography>
-                    </Stack>
-                </CardContent>
-            </CardActionArea>
-        </Card>
+        <ListItem component="div">
+            <ListItemButton onClick={handleClick}>
+                <ListItemIcon>
+                    <OnlineUserBadge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        variant="dot"
+                    >
+                        <Avatar>
+                            {userData.name.charAt(0)}
+                        </Avatar>
+                    </OnlineUserBadge>
+                </ListItemIcon>
+                <ListItemText primary={userData.name}/>
+            </ListItemButton>
+        </ListItem>
     )
 }
 

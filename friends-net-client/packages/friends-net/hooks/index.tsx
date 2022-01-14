@@ -3,11 +3,13 @@ import useAuthRedirect from "./useAuthRedirect"
 import useAuthHeader from "./useAuthHeader";
 import useUserData from "./useUserData";
 import useUnauthRedirect from "./useUnauthRedirect";
+import useMessagingConnection from "./useMessagingConnection";
 
 export {
     useSnackbar,
     useAuthRedirect,
     useAuthHeader,
     useUserData,
-    useUnauthRedirect
+    useUnauthRedirect,
+    useMessagingConnection as useMessagingSocket
 }

@@ -1,72 +1,39 @@
 import { UserIdentificationDataVO } from "@markovda/fn-api";
-import { Avatar, Card, CardContent, List, ListItem, ListItemButton, ListItemText, Stack, Typography } from "@mui/material";
-import { Client, IMessage } from "@stomp/stompjs";
+import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
-import FriendshipsPageTab from "../components/FriendshipsPageTab";
-import OnlineUserCard from "../components/home-page/OnlineUserCard";
+import { useCallback, useEffect, useState } from "react";
+import OnlineUsersList from "../components/home-page/OnlineUsersList";
 import Navbar from "../components/nav/Navbar";
 import PageContentContainer from "../components/PageContentContainer";
-import { useAuthHeader } from "../hooks";
 import useUnauthRedirect from "../hooks/useUnauthRedirect";
 import useUserData from "../hooks/useUserData";
-import { FriendStatus } from "../utils/enums/FriendStatus";
-import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
+import useMessagingConnection from "../hooks/useMessagingConnection";
+import PopupChat from "../components/home-page/PopupChat";
 
 const HomePage: NextPage = () => {
 
+    const [chatHidden, setChatHidden] = useState<boolean>(true);
+    const [chatWith, setChatWith] = useState<UserIdentificationDataVO | undefined>();
     const [name, login] = useUserData();
-    const [onlineUsers, setOnlineUsers] = useState<UserIdentificationDataVO[]>([]);
     const redirecting = useUnauthRedirect('/login');
-    const authHeader = useAuthHeader();
+    const [onlineUsers, sendMessage, messages] = useMessagingConnection(redirecting);
 
-    const convertStatusMessageToObject = (message: IMessage): IFriendStatusChangeMessage[] => {
-        return JSON.parse(message.body);
+    const showChat = (userData: UserIdentificationDataVO) => {
+        setChatWith(userData);
+        setChatHidden(false);
     }
 
-    const processFriendStatusChangeMessage = (message: IMessage) => {
-        console.log("message:", message.body);
-
-        const statusList = convertStatusMessageToObject(message);
-        let wentOnline: UserIdentificationDataVO[] = [];
-        let wentOffline: UserIdentificationDataVO[] = [];
-        statusList.forEach(friend => friend.status === FriendStatus.ONLINE ? 
-            wentOnline.push(friend) : 
-            wentOffline.push(friend));
-
-        console.debug("went online:", wentOnline);
-        console.debug("went offline:", wentOffline);
-        
-        setOnlineUsers(beforeOnline => {
-            let newOnline = beforeOnline.filter(online => 
-                wentOffline.find(offline => offline.login === online.login) === undefined);
-            return newOnline.concat(wentOnline);
-        });
+    const hideChat = () => {
+        setChatHidden(true);
+        setChatWith(undefined);
     }
 
-    useEffect(() => {
-        if (redirecting || !authHeader) {
-            return () => {};
+    const handleMessageSubmit = (message: string) => {
+        if (chatWith) {
+            sendMessage({to: chatWith.login, content: message});
         }
-
-        const onConnect = () => {
-            client.subscribe('/user/queue/friend-status', processFriendStatusChangeMessage, { 'Authorization': authHeader.headers.Authorization});
-        }
-
-        let client = new Client({
-            brokerURL: 'ws://localhost:8080/messaging/status-change',
-            connectHeaders: { 'Authorization': authHeader.headers.Authorization},
-            reconnectDelay: 5000, 
-            onConnect: onConnect,
-            onDisconnect: () => console.log("disconnected"),
-            beforeConnect: () => { }
-        });
-
-
-        client.activate();
-        return () => client.deactivate();
-    }, [redirecting]);
+    }
     
     return redirecting ? null : (
         <>
@@ -78,7 +45,7 @@ const HomePage: NextPage = () => {
             <main>
                 <Navbar />
                 <PageContentContainer>
-                    <Card sx={{ maxWidth: 345, 
+                    <Card sx={{ maxWidth: 300, 
                         minHeight: 100, minWidth: 100, padding: 4, flex: 1, 
                         display: "flex", flexDirection: "column", 
                         justifyContent: "center", alignContent: "center",
@@ -90,7 +57,7 @@ const HomePage: NextPage = () => {
                                 </Typography>
                                 <Avatar sx={{width: 48, height: 48}}>{name?.charAt(0)}</Avatar>    
                             </Stack>
-                            <Typography variant="body2">
+                            <Typography variant="body2" overflow="clip">
                                 {login}
                             </Typography>
                         </CardContent>
@@ -107,17 +74,15 @@ const HomePage: NextPage = () => {
 
                     </Card>
 
-                    <List
-                        
-                    >
-                        {onlineUsers.map(user => (
-                            <ListItem component="div" disablePadding key={user.login}>
-                                <ListItemButton>
-                                    <ListItemText primary={user.name}/>
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
+                    <OnlineUsersList data={onlineUsers} onItemClick={showChat}/>
+
+                    <PopupChat 
+                        hidden={chatHidden}
+                        chatWith={chatWith?.name}
+                        messages={messages}
+                        onClose={hideChat}
+                        onMessageSubmit={handleMessageSubmit}
+                    />
                 </PageContentContainer>
             </main>
         </>

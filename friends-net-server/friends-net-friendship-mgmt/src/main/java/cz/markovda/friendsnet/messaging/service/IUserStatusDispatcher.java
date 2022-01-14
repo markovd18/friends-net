@@ -6,5 +6,4 @@ package cz.markovda.friendsnet.messaging.service;
  */
 public interface IUserStatusDispatcher {
 
-//    List<FriendStatusChangedMessage> distributeOnlineFriendsStatusMessage(String login);
 }

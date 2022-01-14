@@ -147,7 +147,7 @@ const FriendshipsPage : NextPage = () => {
     const blockUser = useCallback(async (login: string) => {
         try {
             await FriendshipApi.blockUser(login, authHeader);
-            await changeActiveTab(FriendshipsPageTab.FRIEND_REQUESTS);
+            await changeActiveTab(FriendshipsPageTab.FRIENDS);
         } catch(error) {
             handleRelationshipChangeError(error);
         }
