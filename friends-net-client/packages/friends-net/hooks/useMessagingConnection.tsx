@@ -1,6 +1,6 @@
 import { UserIdentificationDataVO } from "@markovda/fn-api";
 import { Client, IMessage } from "@stomp/stompjs";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FriendStatus } from "../utils/enums/FriendStatus";
 import ChatMessage from "../utils/messaging/ChatMessage";
 import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
@@ -17,14 +17,14 @@ let client = new Client({
 });
 
 
-const useMessagingConnection = (redirecting: boolean): [
-    UserIdentificationDataVO[], 
-    (message: OutboundChatMessage) => void,
-    ChatMessage[],
+const useMessagingConnection = (
+    redirecting: boolean, 
+    onInboundMessage: (message: InboundChatMessage) => void,
+    onStatusChangeMessage: (statusChanges: IFriendStatusChangeMessage[]) => void,
+): [
+    sendMessage: (message: OutboundChatMessage) => void,
 ] => {
     
-    const [onlineUsers, setOnlineUsers] = useState<UserIdentificationDataVO[]>([]);
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const authHeader = useAuthHeader();    
     
     const convertStatusMessageToObject = (message: IMessage): IFriendStatusChangeMessage[] => {
@@ -35,45 +35,32 @@ const useMessagingConnection = (redirecting: boolean): [
         return JSON.parse(message.body);
     }
 
-    const processChatMessage = (message: IMessage) => {
+    const processChatMessage = useCallback((message: IMessage) => {
         console.debug("inbound message:", message.body);
         const inboundMessage = convertChatMessageToObject(message);
-        setMessages(prevState => prevState.concat(inboundMessage));
-    }
+        onInboundMessage(inboundMessage);
+    }, [onInboundMessage]);
     
     const processFriendStatusChangeMessage = (message: IMessage) => {
-        console.log("message:", message.body);
+        console.debug("message:", message.body);
         
         const statusList = convertStatusMessageToObject(message);
-        let wentOnline: UserIdentificationDataVO[] = [];
-        let wentOffline: UserIdentificationDataVO[] = [];
-        statusList.forEach(friend => friend.status === FriendStatus.ONLINE ? 
-            wentOnline.push(friend) : 
-            wentOffline.push(friend));
-            
-        console.debug("went online:", wentOnline);
-        console.debug("went offline:", wentOffline);
-        
-        setOnlineUsers(beforeOnline => {
-            let newOnline = beforeOnline.filter(online => 
-                wentOffline.find(offline => offline.login === online.login) === undefined);
-            return newOnline.concat(wentOnline);
-        });
+        onStatusChangeMessage(statusList);
     }
 
     const sendMessage = (message: OutboundChatMessage) => {
-        setMessages(prevState => prevState.concat(message))
         client.publish({headers: authHeader?.headers, destination: '/messaging/chat', body: JSON.stringify(message)})
     }
+
+    const onConnect = useCallback(() => {
+        if (!authHeader) return;
+        client.subscribe('/user/queue/friend-status', processFriendStatusChangeMessage, { 'Authorization': authHeader.headers.Authorization});
+        client.subscribe('/user/queue/chat', processChatMessage, { 'Authorization': authHeader.headers.Authorization})
+    }, [processChatMessage]);
     
     useEffect(() => {
-        if (redirecting || !authHeader) {
+        if (redirecting || !authHeader || client.active) {
             return () => {};
-        }
-
-        const onConnect = () => {
-            client.subscribe('/user/queue/friend-status', processFriendStatusChangeMessage, { 'Authorization': authHeader.headers.Authorization});
-            client.subscribe('/user/queue/chat', processChatMessage, { 'Authorization': authHeader.headers.Authorization})
         }
 
         client.onConnect = onConnect;
@@ -83,7 +70,7 @@ const useMessagingConnection = (redirecting: boolean): [
         return () => client.deactivate();
     }, [redirecting]);
 
-    return [onlineUsers, sendMessage, messages];
+    return [sendMessage];
 }
 
 export default useMessagingConnection;

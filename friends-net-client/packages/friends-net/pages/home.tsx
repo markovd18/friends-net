@@ -10,28 +10,94 @@ import useUnauthRedirect from "../hooks/useUnauthRedirect";
 import useUserData from "../hooks/useUserData";
 import useMessagingConnection from "../hooks/useMessagingConnection";
 import PopupChat from "../components/home-page/PopupChat";
+import ChatMessage from "../utils/messaging/ChatMessage";
+import OutboundChatMessage from "../utils/messaging/OutboundChatMessage";
+import InboundChatMessage from "../utils/messaging/InboundChatMessage";
+import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
+import { FriendStatus } from "../utils/enums/FriendStatus";
+
+type Messages = {
+    [login: string]: ChatMessage[]
+}
 
 const HomePage: NextPage = () => {
-
+    
     const [chatHidden, setChatHidden] = useState<boolean>(true);
     const [chatWith, setChatWith] = useState<UserIdentificationDataVO | undefined>();
+    const [onlineUsers, setOnlineUsers] = useState<UserIdentificationDataVO[]>([]);
+    const [messages, setMessages] = useState<Messages>({});
+    const [lastInboundMessage, setLastInboundMessage] = useState<InboundChatMessage>();
     const [name, login] = useUserData();
     const redirecting = useUnauthRedirect('/login');
-    const [onlineUsers, sendMessage, messages] = useMessagingConnection(redirecting);
-
+    
     const showChat = (userData: UserIdentificationDataVO) => {
         setChatWith(userData);
         setChatHidden(false);
     }
-
+    
     const hideChat = () => {
         setChatHidden(true);
         setChatWith(undefined);
     }
+    
+    const addMessage = (login: string, message: ChatMessage) => {
+        setMessages(prevState => {
+            const newState = {...prevState};
+            if (!newState[login]) {
+                newState[login] = [];
+            }
+            newState[login].push(message);
+            return newState;
+        });
+    }
+
+    const getUserByLogin = (login: string) => {
+        return onlineUsers.find(user => user.login === login);
+    }
+    
+    const getChatMessages = () => {
+        if (!chatWith || !messages[chatWith.login]) return [];
+        return messages[chatWith.login];
+    }
+    
+    const onInboundMessage = useCallback((message: InboundChatMessage) => {
+        addMessage(message.from, message);
+        setLastInboundMessage(() => message);
+    }, []);
+
+    useEffect(() => {
+        if (chatHidden && lastInboundMessage) {
+            const from = getUserByLogin(lastInboundMessage.from);
+            if (from) {
+                showChat(from);
+            }
+        }
+    }, [lastInboundMessage]);
+
+    const onStatusChangeMessage = (statusChanges: IFriendStatusChangeMessage[]) => {
+        let wentOnline: UserIdentificationDataVO[] = [];
+        let wentOffline: UserIdentificationDataVO[] = [];
+        statusChanges.forEach(friend => friend.status === FriendStatus.ONLINE ? 
+            wentOnline.push(friend) : 
+            wentOffline.push(friend));
+            
+        console.debug("went online:", wentOnline);
+        console.debug("went offline:", wentOffline);
+        
+        setOnlineUsers(beforeOnline => {
+            let newOnline = beforeOnline.filter(online => 
+                wentOffline.find(offline => offline.login === online.login) === undefined);
+            return newOnline.concat(wentOnline);
+        });
+    }
+    
+    const [sendMessage] = useMessagingConnection(redirecting, onInboundMessage, onStatusChangeMessage);
 
     const handleMessageSubmit = (message: string) => {
         if (chatWith) {
-            sendMessage({to: chatWith.login, content: message});
+            const outboundMessage: OutboundChatMessage = {to: chatWith.login, content: message};
+            addMessage(outboundMessage.to, outboundMessage);
+            sendMessage(outboundMessage);
         }
     }
     
@@ -79,7 +145,7 @@ const HomePage: NextPage = () => {
                     <PopupChat 
                         hidden={chatHidden}
                         chatWith={chatWith?.name}
-                        messages={messages}
+                        messages={getChatMessages()}
                         onClose={hideChat}
                         onMessageSubmit={handleMessageSubmit}
                     />
