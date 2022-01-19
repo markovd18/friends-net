@@ -3,7 +3,6 @@ import { AlertColor } from '@mui/material';
 import { NextPage } from 'next'
 import Head from 'next/head';
 import { useCallback, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import LoginForm from '../components/LoginForm';
 import UnauthNavbar from '../components/nav/UnauthNavbar';
 import SimpleSnackbar from '../components/SimpleSnackbar';
@@ -17,7 +16,7 @@ const LoginPage: NextPage = () => {
     const [snackbarMessage, setSnackbarMessage] = useState<string>("");
     const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
 
-    const [,,loginUser,] = useUserData();
+    const [,loginUser] = useUserData();
     const redirecting = useAuthRedirect('/home');
 
     const handleSnackbarClose = useCallback(() => {
@@ -31,8 +30,8 @@ const LoginPage: NextPage = () => {
     }, []);
 
     const authenticate = useCallback(async (data: UserCredentialsVO) => {
-        const { data: { login, name, token } } = (await AuthApi.login(data));
-        loginUser({login: login, name: name, accessToken: token});
+        const { data: { login, name, token, roles } } = (await AuthApi.login(data));
+        loginUser({login: login, name: name, accessToken: token, roles: roles});
     }, []);
 
     const handleError = useCallback((error) => {

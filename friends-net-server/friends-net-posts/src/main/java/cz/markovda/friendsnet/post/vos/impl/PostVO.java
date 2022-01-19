@@ -1,6 +1,6 @@
 package cz.markovda.friendsnet.post.vos.impl;
 
-import cz.markovda.friendsnet.auth.vos.impl.UserVO;
+import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.post.vos.IPostVO;
 import org.hibernate.validator.constraints.Length;
 
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * @since 07.01.22
  */
 public record PostVO(
-        @NotNull UserVO author,
+        @NotNull IUserVO author,
         @NotNull @Length(min = 3, max = 255) String title,
         @NotNull String content,
         @NotNull LocalDateTime dateCreated,
@@ -20,7 +20,7 @@ public record PostVO(
 ) implements IPostVO {
 
     @Override
-    public UserVO getAuthor() {
+    public IUserVO getAuthor() {
         return author;
     }
 

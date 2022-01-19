@@ -4,6 +4,7 @@ import useAuthHeader from "./useAuthHeader";
 import useUserData from "./useUserData";
 import useUnauthRedirect from "./useUnauthRedirect";
 import useMessagingConnection from "./useMessagingConnection";
+import useInterval from "./useInterval";
 
 export {
     useSnackbar,
@@ -11,5 +12,6 @@ export {
     useAuthHeader,
     useUserData,
     useUnauthRedirect,
-    useMessagingConnection as useMessagingSocket
+    useMessagingConnection as useMessagingSocket,
+    useInterval
 }

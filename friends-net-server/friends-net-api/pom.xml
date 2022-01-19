@@ -79,7 +79,7 @@
                                 <skipFormModel>false</skipFormModel>
                             </globalProperties>
                             <typeMappings>
-                                <typeMapping>OffsetDateTime=LocalDateTime</typeMapping>
+                                <typeMapping>OffsetDateTime=java.time.LocalDateTime</typeMapping>
                             </typeMappings>
                             <importMappings>
                                 <importMapping>java.time.OffsetDateTime=java.time.LocalDateTime</importMapping>

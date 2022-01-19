@@ -24,9 +24,11 @@ let baseAxios = axios.create({baseURL, headers: { Pragma: "no-cache"}})
 const AuthApi = new Api.AuthenticationControllerApi(undefined, baseURL, baseAxios)
 const FriendshipApi = new Api.UserRelationshipControllerApi(undefined, baseURL, baseAxios);
 const UserSearchApi = new Api.UserSearchControllerApi(undefined, baseURL, baseAxios);
+const PostApi = new Api.PostControllerApi(undefined, baseURL, baseAxios);
 
 export {
     AuthApi,
     FriendshipApi,
-    UserSearchApi
+    UserSearchApi,
+    PostApi
 }

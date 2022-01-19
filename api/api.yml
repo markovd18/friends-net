@@ -201,6 +201,23 @@ paths:
           description: Post data are invalid.
         '401':
           description: Unauthorized
+    get:
+      summary: Finds frined's and users posts
+      description: Finds newest posts from user's frineds and user himself. Posts are ordered by creation date. \
+        Number of returned posts may be limited by a reqest parameter. Allows searching from certain date.
+      tags:
+        - PostController
+      operationId: findNewestPosts
+      parameters:
+        - $ref: '#/components/parameters/MaximumPostsParam'
+        - $ref: '#/components/parameters/PostsNewerThanParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/FoundPostsResponse'
+        '400':
+          description: Invalid parameters. Maximum post count has to be > 5 and maximum date has to be now.
+        '401':
+          description: Unauthenticated
 
 components:
 
@@ -234,6 +251,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/FoundUsersVO'
+
+    FoundPostsResponse:
+      description: Response on successfull post query.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FoundPostsVO'
 
   requestBodies:
     LoginRequest:
@@ -282,6 +306,26 @@ components:
         type: string
         minLength: 4
       example: boss23@mail.com
+
+    MaximumPostsParam:
+      name: maxPosts
+      in: query
+      description: Maximum number of posts returned
+      required: false
+      schema:
+        type: int
+        format: int32
+        minimum: 5
+      example: 10
+
+    PostsNewerThanParam:
+      name: newerThan
+      in: query
+      description: Date and time which should be posts newer than
+      required: false
+      schema:
+        type: string
+        format: date-time
 
   schemas:
     UserCredentialsVO:
@@ -390,20 +434,39 @@ components:
           type: string
           description: Generated JSON Web Token.
           example: 0$[wfwnfuowburmgjo2126+
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnumUserRole'
       required:
         - login
         - name
         - token
+        - roles
       example:
         login: example@email.com
         name: John Doe
         token: 0$[wfwnfuowburmgjo2126+
+        roles: ['USER', 'ADMIN']
+
+    EnumUserRole:
+      description: Enumeration of user roles
+      type: string
+      enum:
+        - 'USER'
+        - 'ADMIN'
 
     FoundUsersVO:
       description: Object carrying a list of found users.
       type: array
       items:
         $ref: '#/components/schemas/UserRelationshipVO'
+
+    FoundPostsVO:
+      description: Object carrying a list of found posts.
+      type: array
+      items:
+        $ref: '#/components/schemas/PostVO'
 
     NewPostDataVO:
       description: Data of new post to create
@@ -421,7 +484,7 @@ components:
           example: Report of sudden car crash on D1 highway in the direction to Brno from Prague. Two people are injured.
         dateCreated:
           type: string
-          format: date
+          format: date-time
           description: Date and time of the post creation.
           example: '2022-01-07:15:00:00'
         isAnnouncement:
@@ -432,6 +495,15 @@ components:
         - content
         - dateCreated
         - isAnnouncement
+
+    PostVO:
+      description: Data of an existing post including it's author.
+      allOf:
+        - $ref: '#/components/schemas/NewPostDataVO'
+        - type: object
+          properties:
+            author:
+              $ref: '#/components/schemas/UserIdentificationDataVO'
 
     BadRequestVO:
       description: Object describing a Bad Request (400) HTTP error.

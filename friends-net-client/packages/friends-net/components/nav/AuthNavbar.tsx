@@ -1,22 +1,24 @@
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
+
 import SimpleNavbar from "./SimpleNavbar";
 
 
 type Props = {
-    onLogout: () => void;
+    onLogout: () => void,
+    admin?: boolean
 }
 
-const AuthNavbar: React.FC<Props> = ({onLogout}) => {   
+const AuthNavbar: React.FC<Props> = ({onLogout, admin}) => {   
 
     const router = useRouter();
 
     return (
         <SimpleNavbar>
             <Button
-                    key='logout'
-                    sx={{ my: 2, color: 'white', display: 'block' }}
-                    onClick={onLogout}
+                key='logout'
+                sx={{ my: 2, color: 'white', display: 'block' }}
+                onClick={onLogout}
                 >
                     Logout
             </Button>
@@ -27,6 +29,15 @@ const AuthNavbar: React.FC<Props> = ({onLogout}) => {
             >
                 Friendships
             </Button>
+            {admin && 
+            <Button
+                key='admin-page'
+                sx={{ my: 2, color: 'white', display: 'block' }}
+                onClick={() => router.push('/admin')}
+            >
+                Admin page
+            </Button>}
+        
         </SimpleNavbar>
     )
 }

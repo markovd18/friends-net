@@ -6,6 +6,7 @@ import cz.markovda.friendsnet.auth.service.IUserAuthService;
 import cz.markovda.friendsnet.auth.service.validation.impl.ValidationException;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.IVOFactory;
+import cz.markovda.vo.EnumUserRole;
 import cz.markovda.vo.UserAuthenticationVO;
 import cz.markovda.vo.UserCredentialsVO;
 import cz.markovda.vo.UserRegistrationDataVO;
@@ -16,6 +17,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:">David Markov</a>
@@ -44,7 +48,17 @@ public class AuthenticationController implements AuthenticationControllerApi {
         }
 
         final String token = jwtUtils.generateToken(userVO);
-        return ResponseEntity.ok(new UserAuthenticationVO().login(credentialsVO.getLogin()).name(userVO.getName()).token(token));
+        return ResponseEntity.ok(createAuthenticationVO(userVO, token));
+    }
+
+    private UserAuthenticationVO createAuthenticationVO(final IUserVO userVO, final String token) {
+        final List<EnumUserRole> roles = userVO.getRoles()
+                .stream()
+                .map(Enum::name)
+                .map(EnumUserRole::valueOf)
+                .collect(Collectors.toList());
+
+        return new UserAuthenticationVO().login(userVO.getLogin()).name(userVO.getName()).token(token).roles(roles);
     }
 
     @Override

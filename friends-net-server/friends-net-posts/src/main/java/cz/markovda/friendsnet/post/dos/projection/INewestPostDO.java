@@ -1,16 +1,17 @@
-package cz.markovda.friendsnet.post.vos;
+package cz.markovda.friendsnet.post.dos.projection;
 
-import cz.markovda.friendsnet.auth.vos.IUserVO;
-
+import javax.persistence.Lob;
 import java.time.LocalDateTime;
 
 /**
  * @author <a href="mailto:">David Markov</a>
- * @since 07.01.22
+ * @since 19.01.22
  */
-public interface IPostVO {
+public interface INewestPostDO {
 
-    IUserVO getAuthor();
+    String getAuthorName();
+
+    String getAuthorLogin();
 
     String getTitle();
 

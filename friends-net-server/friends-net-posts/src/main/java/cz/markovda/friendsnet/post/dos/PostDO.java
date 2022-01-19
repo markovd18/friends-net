@@ -50,7 +50,6 @@ public class PostDO {
     @Column(name = TITLE, nullable = false)
     private String title;
 
-    @Lob
     @Column(name = CONTENT, nullable = false)
     private String content;
 

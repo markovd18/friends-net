@@ -1,21 +1,28 @@
 import * as React from 'react'
 import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material'
 import SimpleNavbar from './SimpleNavbar';
+import { useRouter } from 'next/router';
 
-const pages = ['Login', 'Register'];
 
 const UnauthNavbar: React.FC<{}> = () => {
-
+    const router = useRouter();
+    
     return (
         <SimpleNavbar >
-            {pages.map((page) => (
-                <Button
-                    key={page}
-                    sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                    {page}
-                </Button>
-            ))}
+            <Button
+                key='Login'
+                sx={{ my: 2, color: 'white', display: 'block' }}
+                onClick={() => router.push('/login')}
+            >
+                Login
+            </Button>
+            <Button
+                key='Register'
+                sx={{ my: 2, color: 'white', display: 'block' }}
+                onClick={() => router.push('/register')}
+            >
+                Register
+            </Button>
         </SimpleNavbar>
     )
 };

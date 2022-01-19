@@ -1,5 +1,5 @@
-import { UserIdentificationDataVO } from "@markovda/fn-api";
-import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
+import { PostApi, PostVO, UserIdentificationDataVO } from "@markovda/fn-api";
+import { Avatar, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Fab, FormControlLabel, FormGroup, Stack, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
@@ -15,6 +15,12 @@ import OutboundChatMessage from "../utils/messaging/OutboundChatMessage";
 import InboundChatMessage from "../utils/messaging/InboundChatMessage";
 import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
 import { FriendStatus } from "../utils/enums/FriendStatus";
+import { useAuthHeader, useInterval } from "../hooks";
+import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import AnnouncementIcon from "../components/AnnouncementIcon";
+import PostList from "../components/home-page/PostList";
+import { AddBox, AddCircle } from "@mui/icons-material";
+import { hasAdminRole } from "../utils/authUtils";
 
 type Messages = {
     [login: string]: ChatMessage[]
@@ -27,8 +33,40 @@ const HomePage: NextPage = () => {
     const [onlineUsers, setOnlineUsers] = useState<UserIdentificationDataVO[]>([]);
     const [messages, setMessages] = useState<Messages>({});
     const [lastInboundMessage, setLastInboundMessage] = useState<InboundChatMessage>();
-    const [name, login] = useUserData();
+    const [posts, setPosts] = useState<PostVO[]>([]);
+    const [showPostInput, setShowPostInput] = useState(false);
+
+    const [{name, login, roles}] = useUserData();
     const redirecting = useUnauthRedirect('/login');
+    const authHeader = useAuthHeader();
+
+    const fetchNewPosts = async () => {
+        const latestPost = posts.at(0);
+        let newPosts: PostVO[];
+        if (latestPost) {
+            newPosts = (await PostApi.findNewestPosts(undefined, latestPost.dateCreated, authHeader)).data;
+        } else {
+            newPosts = (await PostApi.findNewestPosts(10, undefined, authHeader)).data;
+        }
+
+        console.debug("new posts: ", newPosts);
+        setPosts(prevState => newPosts.concat(prevState))
+    }
+
+    const fetchBasePosts = async () => {
+        const posts = (await PostApi.findNewestPosts(10, undefined, authHeader)).data;
+        console.debug("posts: ", posts);
+        setPosts(() => posts);
+    }
+
+    useInterval(fetchNewPosts, 20000);
+
+    useEffect(() => {
+        if (!redirecting && authHeader) {
+            fetchBasePosts();
+        }
+
+    }, []);
     
     const showChat = (userData: UserIdentificationDataVO) => {
         setChatWith(userData);
@@ -112,7 +150,7 @@ const HomePage: NextPage = () => {
                 <Navbar />
                 <PageContentContainer>
                     <Card sx={{ maxWidth: 300, 
-                        minHeight: 100, minWidth: 100, padding: 4, flex: 1, 
+                         minWidth: 100, padding: 4, flex: 1, 
                         display: "flex", flexDirection: "column", 
                         justifyContent: "center", alignContent: "center",
                         position: "fixed"}}>
@@ -123,22 +161,49 @@ const HomePage: NextPage = () => {
                                 </Typography>
                                 <Avatar sx={{width: 48, height: 48}}>{name?.charAt(0)}</Avatar>    
                             </Stack>
-                            <Typography variant="body2" overflow="clip">
+                            <Typography variant="body2" overflow="clip" gutterBottom>
                                 {login}
                             </Typography>
+                            <Button variant='contained' size='small' color='primary' onClick={() => setShowPostInput(true)}>
+                                <AddCircle />
+                                New post
+                            </Button>
                         </CardContent>
-
                     </Card>
 
-                    <Card sx={{ 
-                        minHeight: 1000, minWidth: 200, padding: 4, flex: 1, 
-                        display: "flex", flexDirection: "column", 
-                        marginLeft: 40 }}>
-                        <CardContent>
-                        
-                        </CardContent>
+                    <Dialog open={showPostInput} onClose={() => setShowPostInput(false)}>
+                        <DialogTitle>Create new Post</DialogTitle>
+                        <DialogContent>
+                            <DialogContent>
+                                <DialogContentText gutterBottom>
+                                    To create new post, enter it's content bellow.
+                                </DialogContentText>
+                                <TextField
+                                    multiline
+                                    rows={5}
+                                    maxRows={10}
+                                    fullWidth
+                                    placeholder="What's on your mind?"
+                                />
+                            </DialogContent>
+                            <DialogActions>
+                                <FormGroup>
+                                    {hasAdminRole(roles) && <FormControlLabel control={<Switch title="Announcement"/>} label="Announcement"/>}
+                                </FormGroup>
+                                <Button variant='outlined' onClick={() => setShowPostInput(false)}>Cancel</Button>
+                                <Button variant='contained'>Create</Button>
+                            </DialogActions>
+                        </DialogContent>
+                    </Dialog>
 
-                    </Card>
+                    <PostList 
+                        data={posts}
+                        elevation={0}
+                        style={{ 
+                            minWidth: 200, padding: 4, flex: 1, 
+                            display: "flex", flexDirection: "column", 
+                            marginLeft: 40 }}
+                    />
 
                     <OnlineUsersList data={onlineUsers} onItemClick={showChat}/>
 
