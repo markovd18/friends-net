@@ -11,16 +11,10 @@ import java.time.LocalDateTime;
  * @since 07.01.22
  */
 public record NewPostVO(
-        @NotNull @Length(min = 3, max = 255) String title,
         @NotNull String content,
         @NotNull LocalDateTime dateCreated,
         boolean isAnnouncement
 ) implements INewPostVO {
-
-    @Override
-    public String getTitle() {
-        return title;
-    }
 
     @Override
     public String getContent() {

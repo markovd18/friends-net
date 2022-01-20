@@ -20,7 +20,7 @@ const FriendshipsPage : NextPage = () => {
     const [isDataLoading, setIsDataLoading] = useState(false);
 
     const redirecting = useUnauthRedirect('/');
-    const [,login,,logoutUser] = useUserData();
+    const [{login},, logoutUser] = useUserData();
     const authHeader = useAuthHeader();
     const [Snackbar, showSnackbar] = useSnackbar();
 
@@ -53,11 +53,6 @@ const FriendshipsPage : NextPage = () => {
         fetchData();
    }, [activeTab]);
 
-    // useEffect(() => {
-    //     UserSearchApi.findFriends(authHeader).then(response => {
-    //         setLastSearchResult(response.data);
-    //     }).catch(error => handleSearchError(error));
-    // }, []);
 
     const changeActiveTab = useCallback(async (newActiveTab: FriendshipsPageTab) => {
         try {

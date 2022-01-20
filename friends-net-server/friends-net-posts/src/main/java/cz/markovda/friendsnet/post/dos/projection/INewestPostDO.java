@@ -13,8 +13,6 @@ public interface INewestPostDO {
 
     String getAuthorLogin();
 
-    String getTitle();
-
     String getContent();
 
     LocalDateTime getDateCreated();

@@ -1,4 +1,4 @@
-import { PostApi, PostVO, UserIdentificationDataVO } from "@markovda/fn-api";
+import { NewPostDataVO, PostApi, PostVO, UserIdentificationDataVO } from "@markovda/fn-api";
 import { Avatar, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Fab, FormControlLabel, FormGroup, Stack, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
@@ -15,12 +15,12 @@ import OutboundChatMessage from "../utils/messaging/OutboundChatMessage";
 import InboundChatMessage from "../utils/messaging/InboundChatMessage";
 import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
 import { FriendStatus } from "../utils/enums/FriendStatus";
-import { useAuthHeader, useInterval } from "../hooks";
-import NewReleasesIcon from '@mui/icons-material/NewReleases';
-import AnnouncementIcon from "../components/AnnouncementIcon";
+import { useAuthHeader, useInterval, useSnackbar } from "../hooks";
 import PostList from "../components/home-page/PostList";
 import { AddBox, AddCircle } from "@mui/icons-material";
 import { hasAdminRole } from "../utils/authUtils";
+import NewPostModal from "../components/home-page/NewPostModal";
+import HomeBaseCard from "../components/home-page/HomeBaseCard";
 
 type Messages = {
     [login: string]: ChatMessage[]
@@ -36,9 +36,10 @@ const HomePage: NextPage = () => {
     const [posts, setPosts] = useState<PostVO[]>([]);
     const [showPostInput, setShowPostInput] = useState(false);
 
-    const [{name, login, roles}] = useUserData();
+    const [{name, login, roles},,logoutUser] = useUserData();
     const redirecting = useUnauthRedirect('/login');
     const authHeader = useAuthHeader();
+    const [Snackbar, showSnackbar] = useSnackbar();
 
     const fetchNewPosts = async () => {
         const latestPost = posts.at(0);
@@ -49,14 +50,40 @@ const HomePage: NextPage = () => {
             newPosts = (await PostApi.findNewestPosts(10, undefined, authHeader)).data;
         }
 
-        console.debug("new posts: ", newPosts);
         setPosts(prevState => newPosts.concat(prevState))
     }
 
     const fetchBasePosts = async () => {
         const posts = (await PostApi.findNewestPosts(10, undefined, authHeader)).data;
-        console.debug("posts: ", posts);
         setPosts(() => posts);
+    }
+
+    const handleError = useCallback((error) => {
+        if (!error.response) {
+            showSnackbar('Server not responding. Please try again later.', 'error');
+            return;
+        }
+
+        switch(error.response.status) {
+            case 401:
+                logoutUser();
+                break;
+            case 400:
+                showSnackbar('Invalid post data sent. Please try again.', 'warning');
+                break;
+            default:
+                showSnackbar('Unknown error while creating post. Please try again later.', 'warning');
+        }
+    }, []);
+
+    const onPostSubmit = async (data: NewPostDataVO) => {
+        setShowPostInput(false);
+        try {
+            await PostApi.createNewPost(data, authHeader);
+            await fetchNewPosts();
+        } catch (error) {
+            handleError(error);
+        }
     }
 
     useInterval(fetchNewPosts, 20000);
@@ -119,8 +146,6 @@ const HomePage: NextPage = () => {
             wentOnline.push(friend) : 
             wentOffline.push(friend));
             
-        console.debug("went online:", wentOnline);
-        console.debug("went offline:", wentOffline);
         
         setOnlineUsers(beforeOnline => {
             let newOnline = beforeOnline.filter(online => 
@@ -149,53 +174,18 @@ const HomePage: NextPage = () => {
             <main>
                 <Navbar />
                 <PageContentContainer>
-                    <Card sx={{ maxWidth: 300, 
-                         minWidth: 100, padding: 4, flex: 1, 
-                        display: "flex", flexDirection: "column", 
-                        justifyContent: "center", alignContent: "center",
-                        position: "fixed"}}>
-                        <CardContent>
-                            <Stack direction={"row"} spacing={3}>
-                                <Typography gutterBottom variant="h5" component="div">
-                                    {name}
-                                </Typography>
-                                <Avatar sx={{width: 48, height: 48}}>{name?.charAt(0)}</Avatar>    
-                            </Stack>
-                            <Typography variant="body2" overflow="clip" gutterBottom>
-                                {login}
-                            </Typography>
-                            <Button variant='contained' size='small' color='primary' onClick={() => setShowPostInput(true)}>
-                                <AddCircle />
-                                New post
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    <Dialog open={showPostInput} onClose={() => setShowPostInput(false)}>
-                        <DialogTitle>Create new Post</DialogTitle>
-                        <DialogContent>
-                            <DialogContent>
-                                <DialogContentText gutterBottom>
-                                    To create new post, enter it's content bellow.
-                                </DialogContentText>
-                                <TextField
-                                    multiline
-                                    rows={5}
-                                    maxRows={10}
-                                    fullWidth
-                                    placeholder="What's on your mind?"
-                                />
-                            </DialogContent>
-                            <DialogActions>
-                                <FormGroup>
-                                    {hasAdminRole(roles) && <FormControlLabel control={<Switch title="Announcement"/>} label="Announcement"/>}
-                                </FormGroup>
-                                <Button variant='outlined' onClick={() => setShowPostInput(false)}>Cancel</Button>
-                                <Button variant='contained'>Create</Button>
-                            </DialogActions>
-                        </DialogContent>
-                    </Dialog>
-
+                    <HomeBaseCard 
+                        name={name}
+                        login={login}
+                        onNewPostClick={() => setShowPostInput(true)}
+                        isAdmin={hasAdminRole(roles)}
+                    />
+                    <NewPostModal 
+                        open={showPostInput}
+                        isAdmin={hasAdminRole(roles)}
+                        onClose={() => setShowPostInput(false)}
+                        onSubmit={onPostSubmit}
+                    />
                     <PostList 
                         data={posts}
                         elevation={0}
@@ -204,9 +194,7 @@ const HomePage: NextPage = () => {
                             display: "flex", flexDirection: "column", 
                             marginLeft: 40 }}
                     />
-
                     <OnlineUsersList data={onlineUsers} onItemClick={showChat}/>
-
                     <PopupChat 
                         hidden={chatHidden}
                         chatWith={chatWith?.name}
@@ -214,6 +202,7 @@ const HomePage: NextPage = () => {
                         onClose={hideChat}
                         onMessageSubmit={handleMessageSubmit}
                     />
+                    {Snackbar}
                 </PageContentContainer>
             </main>
         </>

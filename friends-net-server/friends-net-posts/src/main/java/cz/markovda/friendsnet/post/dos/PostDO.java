@@ -30,7 +30,6 @@ public class PostDO {
     public static final String TABLE_NAME = "post";
     public static final String ID = "id";
     public static final String AUTHOR_ID = "author_id";
-    public static final String TITLE = "title";
     public static final String CONTENT = "content";
     public static final String DATE_CREATED = "date_created";
     public static final String ANNOUNCEMENT = "announcement";
@@ -47,9 +46,6 @@ public class PostDO {
     @ToString.Exclude
     private UserDO author;
 
-    @Column(name = TITLE, nullable = false)
-    private String title;
-
     @Column(name = CONTENT, nullable = false)
     private String content;
 
@@ -62,12 +58,11 @@ public class PostDO {
     public PostDO() {
     }
 
-    public PostDO(final UserDO author, final String title, final String content) {
-        this(author, title, content, false, LocalDateTime.now());
+    public PostDO(final UserDO author, final String content) {
+        this(author, content, false, LocalDateTime.now());
     }
-    public PostDO(final UserDO author, final String title, final String content, final boolean announcement, final LocalDateTime dateCreated) {
+    public PostDO(final UserDO author, final String content, final boolean announcement, final LocalDateTime dateCreated) {
         this.author = author;
-        this.title = title;
         this.content = content;
         this.announcement = announcement;
         this.dateCreated = dateCreated;
@@ -80,7 +75,6 @@ public class PostDO {
         PostDO postDO = (PostDO) o;
         return id != null && Objects.equals(id, postDO.id) &&
                 Objects.equals(author, postDO.author) &&
-                Objects.equals(title, postDO.title) &&
                 Objects.equals(content, postDO.content) &&
                 Objects.equals(dateCreated, postDO.dateCreated);
     }

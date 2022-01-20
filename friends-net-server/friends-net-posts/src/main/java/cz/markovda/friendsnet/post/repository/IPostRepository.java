@@ -18,13 +18,13 @@ import java.util.List;
 public interface IPostRepository extends JpaRepository<PostDO, Integer> {
 
     @Query(value = "select distinct p.date_created as dateCreated, " +
-            "p.content as content, p.title as title, " +
+            "p.content as content, " +
             "p.announcement as announcement, au.login as authorLogin, au.name as authorName from post p " +
             "left join user_relationship ur on p.author_id in (ur.id_sender, ur.id_receiver) and " +
                 "(select id from auth_user where login = :login) in (ur.id_sender, ur.id_receiver) " +
             "left join relationship_status rs on ur.id_status = rs.id " +
             "left join auth_user au on p.author_id = au.id " +
-            "where (p.announcement = true or rs.name = 'FRIENDS') and (p.date_created > :dateLimit) and (p.author_id = au.id) " +
+            "where (p.announcement = true or rs.name = 'FRIENDS' or au.login = :login) and (p.date_created > :dateLimit) and (p.author_id = au.id) " +
             "order by p.date_created desc", nativeQuery = true)
     Page<INewestPostDO> findNewestPosts(@Param("dateLimit") LocalDateTime dateLimit, @Param("login") String login, Pageable pageable);
 }

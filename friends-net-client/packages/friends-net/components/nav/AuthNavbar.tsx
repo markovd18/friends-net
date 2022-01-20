@@ -5,11 +5,10 @@ import SimpleNavbar from "./SimpleNavbar";
 
 
 type Props = {
-    onLogout: () => void,
-    admin?: boolean
+    onLogout: () => void
 }
 
-const AuthNavbar: React.FC<Props> = ({onLogout, admin}) => {   
+const AuthNavbar: React.FC<Props> = ({onLogout}) => {   
 
     const router = useRouter();
 
@@ -29,14 +28,6 @@ const AuthNavbar: React.FC<Props> = ({onLogout, admin}) => {
             >
                 Friendships
             </Button>
-            {admin && 
-            <Button
-                key='admin-page'
-                sx={{ my: 2, color: 'white', display: 'block' }}
-                onClick={() => router.push('/admin')}
-            >
-                Admin page
-            </Button>}
         
         </SimpleNavbar>
     )

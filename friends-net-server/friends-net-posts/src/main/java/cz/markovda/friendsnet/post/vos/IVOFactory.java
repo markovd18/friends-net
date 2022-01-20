@@ -8,5 +8,5 @@ import java.time.LocalDateTime;
  */
 public interface IVOFactory {
 
-    INewPostVO createNewPostVO(String title, String content, LocalDateTime dateCreated, boolean isAnnouncement);
+    INewPostVO createNewPostVO(String content, LocalDateTime dateCreated, boolean isAnnouncement);
 }

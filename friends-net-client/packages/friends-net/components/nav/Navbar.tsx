@@ -8,7 +8,7 @@ import UnauthNavbar from "./UnauthNavbar";
 const Navbar: React.FC<{}> = () => {
 
     const [cookie] = useCookies(['accessToken']);   
-    const [{roles},,logoutUser] = useUserData();
+    const [,,logoutUser] = useUserData();
 
     const handleLogout = useCallback(() => {
         logoutUser();
@@ -17,7 +17,7 @@ const Navbar: React.FC<{}> = () => {
     return (
         <>
             {cookie.accessToken 
-            ? <AuthNavbar onLogout={handleLogout} admin={hasAdminRole(roles)}/> 
+            ? <AuthNavbar onLogout={handleLogout}/> 
             : <UnauthNavbar />
             }
         </>

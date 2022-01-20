@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
  */
 public interface INewPostVO {
 
-    String getTitle();
-
     String getContent();
 
     LocalDateTime getDateCreated();

@@ -50,7 +50,7 @@ public class PostService implements IPostService {
         validateNewPost(post);
 
         final UserDO author = getAuthenticatedUser();
-        final PostDO postToSave = new PostDO(author, post.getTitle(), post.getContent(), post.isAnnouncement(), post.getDateCreated());
+        final PostDO postToSave = new PostDO(author, post.getContent(), post.isAnnouncement(), post.getDateCreated());
         postRepository.save(postToSave);
         log.debug("End of createNewPost method.");
     }
@@ -97,7 +97,7 @@ public class PostService implements IPostService {
 
     private IPostVO createPostVO(final INewestPostDO foundPost) {
         final IUserVO authorVO = new UserVO(foundPost.getAuthorLogin(), null, foundPost.getAuthorName(), null);
-        return new PostVO(authorVO, foundPost.getTitle(), foundPost.getContent(), foundPost.getDateCreated(), foundPost.isAnnouncement());
+        return new PostVO(authorVO, foundPost.getContent(), foundPost.getDateCreated(), foundPost.isAnnouncement());
     }
 
     private void validatePostQueryParameters(final Integer max, final LocalDateTime newerThan) {

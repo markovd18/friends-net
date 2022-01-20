@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
  */
 public record PostVO(
         @NotNull IUserVO author,
-        @NotNull @Length(min = 3, max = 255) String title,
         @NotNull String content,
         @NotNull LocalDateTime dateCreated,
         boolean isAnnouncement
@@ -22,11 +21,6 @@ public record PostVO(
     @Override
     public IUserVO getAuthor() {
         return author;
-    }
-
-    @Override
-    public String getTitle() {
-        return title;
     }
 
     @Override

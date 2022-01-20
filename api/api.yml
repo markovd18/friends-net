@@ -472,12 +472,6 @@ components:
       description: Data of new post to create
       type: object
       properties:
-        title:
-          type: string
-          description: Title of the post
-          minLength: 3
-          maxLength: 255
-          example: Very interesting title
         content:
           type: string
           description: Content of the post.
@@ -491,7 +485,6 @@ components:
           type: boolean
           description: Flag whether the post is an announcement or not. Only admins may create announcements.
       required:
-        - title
         - content
         - dateCreated
         - isAnnouncement

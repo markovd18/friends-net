@@ -22,7 +22,7 @@ const OnlineUsersList: React.FC<Props> = ({data, onItemClick}) => {
 
     return (
         <List
-            sx={{maxWidth: 300, position: "fixed", minWidth: 300, marginTop: 30, maxHeight: 500, overflow: 'auto'}} 
+            sx={{maxWidth: 300, position: "fixed", minWidth: 300, marginTop: 40, maxHeight: 500, overflow: 'auto'}} 
         >
             {listData}
         </List>

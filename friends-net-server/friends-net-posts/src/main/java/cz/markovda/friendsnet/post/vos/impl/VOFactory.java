@@ -14,10 +14,9 @@ import java.time.LocalDateTime;
 public class VOFactory implements IVOFactory {
 
     @Override
-    public INewPostVO createNewPostVO(final String title,
-                                      final String content,
+    public INewPostVO createNewPostVO(final String content,
                                       final LocalDateTime dateCreated,
                                       final boolean isAnnouncement) {
-        return new NewPostVO(title, content, dateCreated, isAnnouncement);
+        return new NewPostVO(content, dateCreated, isAnnouncement);
     }
 }

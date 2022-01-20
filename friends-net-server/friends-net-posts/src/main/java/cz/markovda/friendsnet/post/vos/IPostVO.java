@@ -12,8 +12,6 @@ public interface IPostVO {
 
     IUserVO getAuthor();
 
-    String getTitle();
-
     String getContent();
 
     LocalDateTime getDateCreated();

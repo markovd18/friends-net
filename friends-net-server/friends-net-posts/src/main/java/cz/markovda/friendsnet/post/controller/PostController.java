@@ -60,7 +60,6 @@ public class PostController implements PostControllerApi {
 
     private INewPostVO createNewPostVO(final NewPostDataVO newPostDataVO) {
         return voFactory.createNewPostVO(
-                newPostDataVO.getTitle(),
                 newPostDataVO.getContent(),
                 newPostDataVO.getDateCreated(),
                 newPostDataVO.getIsAnnouncement());
@@ -76,7 +75,6 @@ public class PostController implements PostControllerApi {
         final UserIdentificationDataVO author = createUserApiVO(postVO.getAuthor());
         return new PostVO()
                 .author(author)
-                .title(postVO.getTitle())
                 .content(postVO.getContent())
                 .dateCreated(postVO.getDateCreated())
                 .isAnnouncement(postVO.isAnnouncement());

@@ -13,8 +13,8 @@ const PostCard: React.FC<Props> = ({data, style}) => {
     return (
         <Card sx={style}>
             <CardHeader 
-                title={data.title}
-                subheader={`${data.author?.name} (${data.author?.login})`}
+                title={data.author?.name}
+                subheader={data.author?.login}
                 titleTypographyProps={{component: 'div', variant: 'h6'}}
                 avatar={
                     data.isAnnouncement ? <AnnouncementIcon color='blue' /> : undefined

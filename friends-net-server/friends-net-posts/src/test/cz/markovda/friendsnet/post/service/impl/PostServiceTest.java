@@ -46,7 +46,7 @@ public class PostServiceTest {
     @Test
     public void createsNewValidPost_whenAuthenticated() {
         final var login = "user";
-        final var post = new NewPostVO("Title", "Content", LocalDateTime.now(), false);
+        final var post = new NewPostVO("Content", LocalDateTime.now(), false);
 
         when(authenticationService.isUserAnonymous()).thenReturn(false);
         when(authenticationService.isUserAdmin()).thenReturn(false);

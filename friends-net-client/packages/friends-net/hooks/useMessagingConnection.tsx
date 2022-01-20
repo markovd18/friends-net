@@ -1,20 +1,12 @@
 import { UserIdentificationDataVO } from "@markovda/fn-api";
 import { Client, IMessage } from "@stomp/stompjs";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FriendStatus } from "../utils/enums/FriendStatus";
 import ChatMessage from "../utils/messaging/ChatMessage";
 import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
 import InboundChatMessage from "../utils/messaging/InboundChatMessage";
 import OutboundChatMessage from "../utils/messaging/OutboundChatMessage";
 import useAuthHeader from "./useAuthHeader";
-
-
-let client = new Client({
-    brokerURL: 'ws://localhost:8080/messaging/status-change',
-    reconnectDelay: 5000, 
-    onDisconnect: () => console.log("disconnected"),
-    beforeConnect: () => { }
-});
 
 
 const useMessagingConnection = (
@@ -25,7 +17,18 @@ const useMessagingConnection = (
     sendMessage: (message: OutboundChatMessage) => void,
 ] => {
     
-    const authHeader = useAuthHeader();    
+    const authHeader = useAuthHeader();
+
+    const client = useRef<Client>();
+
+    useEffect(() => {
+        client.current = new Client({
+            brokerURL: 'ws://localhost:8080/messaging/status-change',
+            reconnectDelay: 5000, 
+            onDisconnect: () => console.log("disconnected"),
+            beforeConnect: () => { }
+        });
+    }, []);
     
     const convertStatusMessageToObject = (message: IMessage): IFriendStatusChangeMessage[] => {
         return JSON.parse(message.body);
@@ -49,25 +52,29 @@ const useMessagingConnection = (
     }
 
     const sendMessage = (message: OutboundChatMessage) => {
-        client.publish({headers: authHeader?.headers, destination: '/messaging/chat', body: JSON.stringify(message)})
+        client.current?.publish({headers: authHeader?.headers, destination: '/messaging/chat', body: JSON.stringify(message)})
     }
 
     const onConnect = useCallback(() => {
         if (!authHeader) return;
-        client.subscribe('/user/queue/friend-status', processFriendStatusChangeMessage, { 'Authorization': authHeader.headers.Authorization});
-        client.subscribe('/user/queue/chat', processChatMessage, { 'Authorization': authHeader.headers.Authorization})
+        client.current?.subscribe('/user/queue/friend-status', processFriendStatusChangeMessage, { 'Authorization': authHeader.headers.Authorization});
+        client.current?.subscribe('/user/queue/chat', processChatMessage, { 'Authorization': authHeader.headers.Authorization})
     }, [processChatMessage]);
     
     useEffect(() => {
-        if (redirecting || !authHeader || client.active) {
+        if (!client.current) {
             return () => {};
         }
 
-        client.onConnect = onConnect;
-        client.connectHeaders = { 'Authorization': authHeader.headers.Authorization};
+        if (redirecting || !authHeader || client.current?.active) {
+            return () => {};
+        }
+
+        client.current.onConnect = onConnect;
+        client.current.connectHeaders = { 'Authorization': authHeader.headers.Authorization};
     
-        client.activate();
-        return () => client.deactivate();
+        client.current.activate();
+        return () => client.current?.deactivate();
     }, [redirecting]);
 
     return [sendMessage];
