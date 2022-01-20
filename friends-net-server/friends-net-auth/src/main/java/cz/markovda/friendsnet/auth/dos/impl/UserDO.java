@@ -1,5 +1,6 @@
 package cz.markovda.friendsnet.auth.dos.impl;
 
+import cz.markovda.friendsnet.auth.dos.EnumUserRole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -107,6 +108,10 @@ public class UserDO {
 
     public void addRole(final UserRoleDO role) {
         roles.add(role);
+    }
+
+    public boolean removeRole(final EnumUserRole role) {
+        return roles.removeIf(userRole -> userRole.getName() == role);
     }
 
     @Override

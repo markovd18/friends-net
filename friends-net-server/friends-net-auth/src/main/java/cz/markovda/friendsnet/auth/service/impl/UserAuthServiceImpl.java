@@ -6,18 +6,23 @@ import cz.markovda.friendsnet.auth.dos.impl.UserDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
 import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.repository.IUserRoleRepository;
+import cz.markovda.friendsnet.auth.service.IAuthenticationService;
 import cz.markovda.friendsnet.auth.service.IUserAuthService;
+import cz.markovda.friendsnet.auth.service.role.EnumUserRoleAction;
 import cz.markovda.friendsnet.auth.service.validation.IValidator;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.impl.UserVO;
+import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -39,6 +44,7 @@ public class UserAuthServiceImpl implements IUserAuthService {
     private final IUserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final IValidator validator;
+    private final IAuthenticationService authenticationService;
 
     private Map<EnumUserRole, Integer> userRoleToIdCache;
 
@@ -77,6 +83,7 @@ public class UserAuthServiceImpl implements IUserAuthService {
     }
 
     @Override
+    @Transactional
     public IUserVO createNewUser(@NotNull @Valid final IUserVO newUser) {
         log.debug("Start of createNewUser method (args: {}).", newUser);
         validator.validate(newUser);
@@ -89,6 +96,30 @@ public class UserAuthServiceImpl implements IUserAuthService {
 
         log.debug("End of createNewUser method.");
         return savedUser;
+    }
+
+    @Override
+    @Transactional
+    public void changeUserRole(@NotNull final String username,
+                               @NotNull final IUserVO.EnumUserRole role,
+                               @NotNull final EnumUserRoleAction action) {
+        log.debug("Start of setRoleToUser method (args: {}, {})", username, role);
+        Assert.notNull(username, "Username may not be null");
+        Assert.notNull(role, "Role may not be null");
+        Assert.notNull(action, "Action may not be null");
+
+        if (!authenticationService.isUserAdmin()) {
+            throw new AccessDeniedException("Only admin may change user's roles");
+        }
+
+        final UserDO user = userRepository.findByLoginFetchRoles(username)
+                .orElseThrow(() -> new IllegalArgumentException("User with username " + username + " not found"));
+
+        switch (action) {
+            case ADD -> user.addRole(getUserRoleDO(EnumUserRole.valueOf(role.name())));
+            case REMOVE -> user.removeRole(EnumUserRole.valueOf(role.name()));
+        }
+        log.debug("End of setRoleTOUser method.");
     }
 
     private IUserVO saveNewUser(final IUserVO newUser) {

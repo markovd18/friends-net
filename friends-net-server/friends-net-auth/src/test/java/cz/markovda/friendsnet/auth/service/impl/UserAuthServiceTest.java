@@ -7,6 +7,7 @@ import cz.markovda.friendsnet.auth.dos.impl.UserDOTestUtils;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
 import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.repository.IUserRoleRepository;
+import cz.markovda.friendsnet.auth.service.IAuthenticationService;
 import cz.markovda.friendsnet.auth.service.validation.impl.Validator;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.impl.UserVO;
@@ -47,7 +48,8 @@ public class UserAuthServiceTest {
         userRepository = mock(IUserRepository.class);
         userRoleRepository = mock(IUserRoleRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
-        userAuthService = new UserAuthServiceImpl(userRepository, userRoleRepository, passwordEncoder, mock(Validator.class));
+        userAuthService = new UserAuthServiceImpl(userRepository, userRoleRepository, passwordEncoder,
+                mock(Validator.class), mock(IAuthenticationService.class));
     }
 
     @Test

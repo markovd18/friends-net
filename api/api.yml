@@ -18,6 +18,8 @@ tags:
     description: Controller for searching of users.
   - name: PostController
     description: Controller for operations with posts and announcements
+  - name: AdminController
+    description: Controller for admin only operations
 
 # Paths are the URIs within your REST Application.
 paths:
@@ -219,6 +221,38 @@ paths:
         '401':
           description: Unauthenticated
 
+  '/api/admin/role':
+    put:
+      summary: Adds role to user
+      tags:
+        - AdminController
+      operationId: addRoleToUser
+      parameters:
+        - $ref: '#/components/parameters/UserRoleParam'
+        - $ref: '#/components/parameters/UsernameQueryParameter'
+      responses:
+        '200':
+          description: OK. Role successfully added.
+        '400':
+          description: User not found.
+        '401':
+          description: Unauthorized or Unauthenticated.
+    delete:
+      summary: Removes role from user
+      tags:
+        - AdminController
+      operationId: removeRoleFromUser
+      parameters:
+        - $ref: '#/components/parameters/UserRoleParam'
+        - $ref: '#/components/parameters/UsernameQueryParameter'
+      responses:
+        '200':
+          description: OK. Role successfully removed.
+        '400':
+          description: User not found.
+        '401':
+          description: Unauthorized or Unauthenticated.
+
 components:
 
   securitySchemes:
@@ -326,6 +360,14 @@ components:
       schema:
         type: string
         format: date-time
+
+    UserRoleParam:
+      name: role
+      in: query
+      description: Role we want to add to or remove from user
+      required: true
+      schema:
+        $ref: '#/components/schemas/EnumUserRole'
 
   schemas:
     UserCredentialsVO:
