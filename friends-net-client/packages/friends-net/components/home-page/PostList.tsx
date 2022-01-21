@@ -6,11 +6,10 @@ import PostCard from "./PostCard";
 
 type Props = {
     data: PostVO[],
-    elevation?: number,
     style?: SxProps<Theme>,
 }
 
-const PostList: React.FC<Props> = ({data, elevation, style}) => {
+const PostList: React.FC<Props> = ({data, style}) => {
 
     const posts = useMemo(() => {
         return data.map((post, index) => (
@@ -20,9 +19,7 @@ const PostList: React.FC<Props> = ({data, elevation, style}) => {
 
     return (
         <Stack sx={style}>
-            
-                {posts}
-            
+            {posts}
         </Stack>
     )
 }
