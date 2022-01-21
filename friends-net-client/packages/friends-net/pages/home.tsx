@@ -1,5 +1,4 @@
 import { AdminApi, EnumUserRole, NewPostDataVO, PostApi, PostVO, UserIdentificationDataVO, UserIdentificationDataWithRolesVO, UserSearchApi } from "@markovda/fn-api";
-import { Avatar, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Fab, FormControlLabel, FormGroup, Stack, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
@@ -41,7 +40,6 @@ const HomePage: NextPage = () => {
     const [Snackbar, showSnackbar] = useSnackbar();
 
     const handleAdminToggled = async (login: string, isAdmin: boolean) => {
-        console.log("admin toggled for:", login);
         try {
             if (isAdmin) {
                 await AdminApi.addRoleToUser(EnumUserRole.ADMIN, login, authHeader);
@@ -128,7 +126,6 @@ const HomePage: NextPage = () => {
         if (!redirecting && authHeader) {
             fetchBasePosts();
         }
-
     }, []);
     
     const showChat = (userData: UserIdentificationDataVO) => {
@@ -181,11 +178,11 @@ const HomePage: NextPage = () => {
         statusChanges.forEach(friend => friend.status === FriendStatus.ONLINE ? 
             wentOnline.push(friend) : 
             wentOffline.push(friend));
-            
         
         setOnlineUsers(beforeOnline => {
             let newOnline = beforeOnline.filter(online => 
                 wentOffline.find(offline => offline.login === online.login) === undefined);
+            wentOnline = wentOnline.filter(online => newOnline.find(user => user.login === online.login) === undefined);
             return newOnline.concat(wentOnline);
         });
     }

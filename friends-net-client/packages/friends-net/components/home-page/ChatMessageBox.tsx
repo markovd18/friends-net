@@ -3,7 +3,6 @@ import { instanceOfOutbound } from "../../utils/messaging/OutboundChatMessage";
 import ChatMessage from "../../utils/messaging/ChatMessage";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
-import { useMemo } from "react";
 
 type Props = {
     messages: ChatMessage[]

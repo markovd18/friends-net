@@ -1,5 +1,4 @@
 import useUserData from "packages/friends-net/hooks/useUserData";
-import { hasAdminRole } from "packages/friends-net/utils/authUtils";
 import { useCallback } from "react";
 import { useCookies } from "react-cookie";
 import AuthNavbar from "./AuthNavbar";

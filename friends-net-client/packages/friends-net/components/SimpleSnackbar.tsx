@@ -1,6 +1,6 @@
-import * as React from 'react'
 import MuiAlert, { AlertColor, AlertProps } from '@mui/material/Alert';
 import { Snackbar, SnackbarOrigin } from '@mui/material';
+import { forwardRef } from 'react';
 
 type Props = {
     open: boolean,
@@ -10,7 +10,7 @@ type Props = {
     position?: SnackbarOrigin | undefined
 }
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>((
+const Alert = forwardRef<HTMLDivElement, AlertProps>((
     props,
     ref,
   ) => {

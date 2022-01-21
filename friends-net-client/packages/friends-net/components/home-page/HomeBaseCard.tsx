@@ -1,6 +1,6 @@
-import { AddCircle } from "@mui/icons-material";
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import { Card, CardContent, Stack, Typography, Avatar, Button } from "@mui/material";
+import { Card, CardContent } from "@mui/material";
+import BaseCardButtons from "./BaseCardButtons";
+import BaseCardUserIdentification from "./BaseCardUserIdentification";
 
 type Props = {
     name: string,
@@ -19,26 +19,15 @@ const HomeBaseCard: React.FC<Props> = ({name, login, isAdmin, onNewPostClick, on
            justifyContent: "center", alignContent: "center",
            position: "fixed"}}>
            <CardContent>
-                <Stack direction={"row"} spacing={3}>
-                    <Typography gutterBottom variant="h5" component="div">
-                        {name}
-                    </Typography>
-                    <Avatar sx={{width: 48, height: 48}}>{name?.charAt(0)}</Avatar>    
-                </Stack>
-                <Typography variant="body2" overflow="clip" gutterBottom>
-                    {login}
-                </Typography>
-                <Stack spacing={2}>
-                    <Button variant='contained' size='small' color='primary' onClick={onNewPostClick}>
-                        <AddCircle />
-                        New post
-                    </Button>
-                    {isAdmin && 
-                    <Button variant='contained' size='small' color='secondary' onClick={onAdminRolesClick}>
-                        <AdminPanelSettingsIcon />
-                        Set admin roles
-                    </Button>}
-                </Stack>
+                <BaseCardUserIdentification 
+                    name={name}
+                    login={login}
+                />
+                <BaseCardButtons 
+                    showAdminButtons={isAdmin}
+                    onAdminRolesClick={onAdminRolesClick}
+                    onNewPostClick={onNewPostClick}
+                />
            </CardContent>
        </Card>
     )

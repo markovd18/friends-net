@@ -1,5 +1,4 @@
 import { FormControl, FormHelperText, Input, InputLabel } from '@mui/material'
-import * as React from 'react'
 
 type Props = {
     variant?: 'standard' | 'filled' | 'outlined' | undefined,
@@ -9,7 +8,9 @@ type Props = {
     label?: string | undefined,
     onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void,
     value?: string | undefined,
-    helperText?: string | undefined
+    helperText?: string | undefined,
+    error?: boolean | undefined,
+    errorText?: string | undefined,
 }
 
 const FormInput: React.FC<Props> = ({
@@ -20,11 +21,13 @@ const FormInput: React.FC<Props> = ({
     label,
     value,
     variant,
-    helperText
+    helperText,
+    error,
+    errorText
 }) => {
 
     return (
-        <FormControl variant={variant} required={required} fullWidth>
+        <FormControl variant={variant} required={required} fullWidth error={error}>
             <InputLabel htmlFor={id}>{label}</InputLabel>
             <Input 
                 id={id} 
@@ -34,6 +37,7 @@ const FormInput: React.FC<Props> = ({
                 onChange={onChange}
             />
             {helperText && <FormHelperText id={`${id}-desc`}>{helperText}</FormHelperText>}
+            {error && <FormHelperText error>{errorText}</FormHelperText>}
         </FormControl>
     )
 }

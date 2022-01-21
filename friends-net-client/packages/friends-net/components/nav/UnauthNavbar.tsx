@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Button } from '@mui/material'
 import SimpleNavbar from './SimpleNavbar';
 import { useRouter } from 'next/router';

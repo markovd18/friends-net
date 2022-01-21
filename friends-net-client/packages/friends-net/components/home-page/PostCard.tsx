@@ -1,6 +1,5 @@
 import { PostVO } from "@markovda/fn-api";
 import { Card, CardContent, CardHeader, SxProps, Theme, Typography } from "@mui/material";
-import { style } from "@mui/system";
 import AnnouncementIcon from "../AnnouncementIcon";
 
 type Props = {

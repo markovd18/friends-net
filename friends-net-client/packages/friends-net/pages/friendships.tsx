@@ -14,10 +14,10 @@ import { Box } from "@mui/system";
 const FriendshipsPage : NextPage = () => {
 
     const [activeTab, setActiveTab] = useState<FriendshipsPageTab>(FriendshipsPageTab.FRIENDS);
-    const [showingSearchResults, setShowingSearchResults] = useState(false);
+    const [showingSearchResults, setShowingSearchResults] = useState<boolean>(false);
     const [lastSearchString, setLastSearchString] = useState<string>();
     const [lastSearchResult, setLastSearchResult] = useState<UserRelationshipVO[]>([]);
-    const [isDataLoading, setIsDataLoading] = useState(false);
+    const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
 
     const redirecting = useUnauthRedirect('/');
     const [{login},, logoutUser] = useUserData();
@@ -77,6 +77,9 @@ const FriendshipsPage : NextPage = () => {
             case 401:
                 logoutUser();
                 break;
+            case 404:
+                showSnackbar('Server not responding. Please try again later.', 'error');
+                break;
             default:
                 showSnackbar('Unknown error occured. Please try again later.', 'error');
         }
@@ -95,6 +98,9 @@ const FriendshipsPage : NextPage = () => {
             case 401:
                 logoutUser();
                 break;
+            case 404:
+                showSnackbar('Server not responding. Please try again later.', 'error');
+                break;
             default:
                 showSnackbar('Unknown error occured. Please try again later.', 'error');
         }
@@ -102,15 +108,19 @@ const FriendshipsPage : NextPage = () => {
 
     const handleUserSearch = useCallback(async (searchString: string) => {
         try {
-            const foundUsers = (await UserSearchApi.findUsers(searchString, authHeader)).data;
-            setActiveTab(FriendshipsPageTab.SEARCH_RESULTS);
-            setShowingSearchResults(true);
-            setLastSearchResult(foundUsers);
-            setLastSearchString(searchString);
+            searchUsers(searchString);
         } catch (error) {
             handleSearchError(error);
         }
     }, []);
+
+    const searchUsers = async (searchString: string) => {
+        const foundUsers = (await UserSearchApi.findUsers(searchString, authHeader)).data;
+        setActiveTab(FriendshipsPageTab.SEARCH_RESULTS);
+        setShowingSearchResults(true);
+        setLastSearchResult(foundUsers);
+        setLastSearchString(searchString);
+    }
 
     const sendFriendRequest = useCallback(async (login: string) => {
         try {
@@ -133,7 +143,7 @@ const FriendshipsPage : NextPage = () => {
     const acceptFriendRequest = useCallback(async (login: string) => {
         try {
             await FriendshipApi.acceptFriendRequest(login, authHeader);
-            await changeActiveTab(FriendshipsPageTab.FRIEND_REQUESTS);
+            await changeActiveTab(FriendshipsPageTab.FRIENDS);
         } catch (error) {
             handleRelationshipChangeError(error);
         }

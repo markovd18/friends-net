@@ -1,8 +1,5 @@
-import { UserIdentificationDataVO } from "@markovda/fn-api";
 import { Client, IMessage } from "@stomp/stompjs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FriendStatus } from "../utils/enums/FriendStatus";
-import ChatMessage from "../utils/messaging/ChatMessage";
+import { useCallback, useEffect, useRef } from "react";
 import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
 import InboundChatMessage from "../utils/messaging/InboundChatMessage";
 import OutboundChatMessage from "../utils/messaging/OutboundChatMessage";

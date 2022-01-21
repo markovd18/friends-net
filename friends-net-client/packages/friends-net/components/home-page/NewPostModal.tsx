@@ -1,22 +1,13 @@
 import { NewPostDataVO } from "@markovda/fn-api";
 import { 
-    Button, 
-    ButtonGroup, 
     Dialog, 
     DialogActions, 
-    DialogContent, 
-    DialogContentText, 
+    DialogContent,  
     DialogTitle, 
-    FormControl, 
-    FormControlLabel, 
-    FormGroup, 
-    FormHelperText, 
-    Stack, 
-    Switch, 
-    TextField 
 } from "@mui/material";
-import { Box } from "@mui/system";
 import React, { useState } from "react";
+import NewPostModalActions from "./NewPostModalActions";
+import NewPostModalContent from "./NewPostModalContent";
 
 
 type Props = {
@@ -55,51 +46,25 @@ const NewPostModal: React.FC<Props> = ({open, isAdmin, onClose, onSubmit}) => {
         onSubmit({content: content, isAnnouncement: isAnnouncement, dateCreated: getISOStringDateNow()});
     }
 
-    const renderAnnouncementSwitch = (): JSX.Element => {
-        return (
-            <Switch 
-                title="Announcement" 
-                checked={isAnnouncement} 
-                onChange={() => setIsAnnouncement(prevState => !prevState)} 
-            />
-        );
-    }
-
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>Create new Post</DialogTitle>
             <DialogContent>
                 <DialogContent>
-                    <DialogContentText gutterBottom>
-                        To create new post, enter it's content bellow.
-                    </DialogContentText>
-                    
-                        <TextField
-                            multiline
-                            minRows={5}
-                            maxRows={10}
-                            fullWidth
-                            placeholder="What's on your mind?"
-                            value={content}
-                            onChange={onContentChange}
-                            error={!!error}
-                        />
-                        {error && <FormHelperText id="error-desc" error>{error}</FormHelperText>}
-                    
+                    <NewPostModalContent 
+                        content={content}
+                        error={error}
+                        onContentChange={onContentChange}
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <form onSubmit={handleSubmit}>
-                        <Stack direction='row'>
-                            <FormGroup>
-                                {isAdmin && 
-                                <FormControlLabel control={renderAnnouncementSwitch()} label="Announcement"/>}
-                            </FormGroup>
-                            <ButtonGroup >
-                                <Button variant='outlined' onClick={onClose}>Cancel</Button>
-                                <Button variant='contained' type='submit'>Create</Button>
-                            </ButtonGroup>
-                        </Stack>
-                    </form>
+                    <NewPostModalActions 
+                        isAdmin={isAdmin}
+                        isAnnouncement={isAnnouncement}
+                        onAnnouncementToggle={() => setIsAnnouncement(prevState => !prevState)}
+                        onClose={onClose}
+                        onSubmit={handleSubmit}
+                    />
                 </DialogActions>
             </DialogContent>
         </Dialog>

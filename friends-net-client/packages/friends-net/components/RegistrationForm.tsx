@@ -1,30 +1,34 @@
 import { UserRegistrationDataVO } from '@markovda/fn-api'
 import { Button, Link, Stack } from '@mui/material'
 import * as React from 'react'
+import { useCallback, useState } from 'react';
 import FormInput from './FormInput'
 
 type FormData = UserRegistrationDataVO;
+
 type Props = {
     onSubmit: (data: FormData) => Promise<boolean>,
 }
 
 const RegistrationForm: React.FC<Props> = ({onSubmit}) => {
 
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("")
-    const [name, setName] = React.useState("");
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("")
+    const [name, setName] = useState<string>("");
+    const [nameTooShort, setNameTooShort] = useState<boolean>(false);
+    const [nameTooLong, setNameTooLong] = useState<boolean>(false);
 
-    const updateEmail = React.useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updateEmail = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
         event.preventDefault();
         setEmail(event.target.value);
     }, [email]);
 
-    const updatePassword = React.useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updatePassword = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
         event.preventDefault();
         setPassword(event.target.value);
     }, [password]);
 
-    const updateName = React.useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updateName = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
         event.preventDefault();
         setName(event.target.value);
     }, [name]);
@@ -33,10 +37,22 @@ const RegistrationForm: React.FC<Props> = ({onSubmit}) => {
         setEmail("");
         setPassword("");
         setName("");
+        setNameTooShort(false);
+        setNameTooLong(false);
     }, []);
 
     const handleSubmit = React.useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (name.length < 3) {
+            setNameTooShort(true);
+            return;
+        }
+
+        if (name.length > 50) {
+            setNameTooLong(true);
+            return;
+        }
+
         const success: boolean = await onSubmit({login: email, password: password, name: name});
         if (success)  {
             clearForm();
@@ -72,7 +88,11 @@ const RegistrationForm: React.FC<Props> = ({onSubmit}) => {
                     value={name}
                     onChange={updateName}
                     required
-                /> 
+                    error={nameTooShort || nameTooLong}
+                    errorText={nameTooShort ? 
+                        'Name has to be at least 3 chatacters long' : 
+                        'Name has to be max. 50 chatacters long'}
+                />
                 <Button variant="contained" type="submit">
                     Sign Up
                 </Button>    

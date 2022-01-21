@@ -1,33 +1,18 @@
 import { AuthApi, UserCredentialsVO } from '@markovda/fn-api';
-import { AlertColor } from '@mui/material';
 import { NextPage } from 'next'
 import Head from 'next/head';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import LoginForm from '../components/LoginForm';
-import UnauthNavbar from '../components/nav/UnauthNavbar';
-import SimpleSnackbar from '../components/SimpleSnackbar';
-import { useAuthRedirect } from '../hooks';
+import Navbar from '../components/nav/Navbar';
+import { useAuthRedirect, useSnackbar } from '../hooks';
 import useUserData from '../hooks/useUserData';
 import styles from '../styles/Home.module.css'
 
 const LoginPage: NextPage = () => {
 
-    const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-    const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
-
     const [,loginUser] = useUserData();
     const redirecting = useAuthRedirect('/home');
-
-    const handleSnackbarClose = useCallback(() => {
-        setSnackbarOpen(false);
-    }, []);
-
-    const showSnackbar = useCallback((message: string, severity: AlertColor) => {
-        setSnackbarMessage(message);
-        setSnackbarSeverity(severity);
-        setSnackbarOpen(true);
-    }, []);
+    const [snackbar, showSnackbar] = useSnackbar();
 
     const authenticate = useCallback(async (data: UserCredentialsVO) => {
         const { data: { login, name, token, roles } } = (await AuthApi.login(data));
@@ -68,14 +53,9 @@ const LoginPage: NextPage = () => {
                 <meta name="description" content="Friends Net login page"/>
             </Head>
             <main className={styles.main}>
-                <UnauthNavbar />
+                <Navbar />
                 <LoginForm onSubmit={handleSumbit} />
-                <SimpleSnackbar 
-                    open={snackbarOpen} 
-                    message={snackbarMessage} 
-                    severity={snackbarSeverity} 
-                    handleClose={handleSnackbarClose}
-                />
+                {snackbar}
             </main>
         </>
     )

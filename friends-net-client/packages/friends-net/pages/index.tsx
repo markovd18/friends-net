@@ -3,8 +3,10 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useCookies } from 'react-cookie'
 import UnauthNavbar from '../components/nav/UnauthNavbar'
-import { Link } from '@mui/material'
 import { useRouter } from 'next/router'
+import LandingPageFooter from '../components/landing-page/LandingPageFooter'
+import LandingPageHeader from '../components/landing-page/LandingPageHeader'
+import LandingPageContent from '../components/landing-page/LandingPageContent'
 
 const Home: NextPage = () => {
 
@@ -25,38 +27,12 @@ const Home: NextPage = () => {
 
       <UnauthNavbar />
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to Friends Net!
-        </h1>
-       
-        <p className={styles.description}>
-          Get started by signing in.
-        </p>
+        <LandingPageHeader />
 
-        <div className={styles.grid}>
-          <Link className={styles.card} href='/login'>
-            <h2>Sign In &rarr;</h2>
-            <p>Already have an account? Sign in and contact your friends!.</p>
-          </Link>
-
-          <Link className={styles.card} href='/register'>
-            <h2>Sign Up &rarr;</h2>
-            <p>Don't have an account yet? Don't worry you can register right now!</p>
-          </Link>
-        </div>
+        <LandingPageContent />
       </main>
 
-      <footer className={styles.footer}>
-        <Link
-          href="https://github.com/markovd18"
-          target="_blank"
-          rel="noopener noreferrer"
-          underline='hover'
-          color={'GrayText'}
-        >
-          Created by David Markov for KIV/PIA course.
-          </Link>
-      </footer>
+      <LandingPageFooter />
     </div>
   )
 }

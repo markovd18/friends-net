@@ -1,5 +1,5 @@
 import { UserIdentificationDataVO } from "@markovda/fn-api";
-import { Card, CardMedia, Avatar, Box, CardContent, Stack, CardActions, Button, Typography } from "@mui/material";
+import { Card, CardMedia, Avatar, Box, CardContent, Stack, CardActions, Typography } from "@mui/material";
 import { PropsWithChildren } from "react";
 
 type Props = Required<PropsWithChildren<{}>> & {
