@@ -1,7 +1,7 @@
 package cz.markovda.friendsnet.auth.service.impl;
 
 import cz.markovda.friendsnet.auth.dos.EnumUserRole;
-import cz.markovda.friendsnet.auth.dos.IUserRoleDO;
+import cz.markovda.friendsnet.auth.dos.projection.IUserRoleDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserDOTestUtils;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;

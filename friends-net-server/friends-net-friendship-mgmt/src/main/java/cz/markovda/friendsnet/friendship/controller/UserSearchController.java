@@ -1,9 +1,14 @@
 package cz.markovda.friendsnet.friendship.controller;
 
 import cz.markovda.api.UserSearchControllerApi;
+import cz.markovda.friendsnet.auth.dos.projection.IUserWithRolesSearchResultDO;
+import cz.markovda.friendsnet.auth.vos.IUserVO;
+import cz.markovda.friendsnet.auth.vos.IUserWithRolesSearchResultVO;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;
 import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
 import cz.markovda.vo.EnumRelationshipStatus;
+import cz.markovda.vo.EnumUserRole;
+import cz.markovda.vo.UserIdentificationDataWithRolesVO;
 import cz.markovda.vo.UserRelationshipVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +52,14 @@ public class UserSearchController implements UserSearchControllerApi {
     }
 
     @Override
+    public ResponseEntity<List<UserIdentificationDataWithRolesVO>> findFriendsWithRoles() {
+        final List<IUserWithRolesSearchResultVO> foundUsers = userSearchService.findAuthenticatedUsersFriendsWithRoles();
+        return ResponseEntity.ok(foundUsers.stream()
+                .map(this::createUserIdentificationDataVO)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
     public ResponseEntity<List<UserRelationshipVO>> findUsers(final String nameLike) {
         final List<IUserSearchResultVO> foundUsers = userSearchService.findUsersWithNamesContainingString(nameLike);
         return ResponseEntity.ok(foundUsers.stream()
@@ -60,5 +73,16 @@ public class UserSearchController implements UserSearchControllerApi {
                 .name(userSearchResultVO.getName())
                 .relationshipStatus(userSearchResultVO.getRelationshipStatus() == null
                         ? null : EnumRelationshipStatus.valueOf(userSearchResultVO.getRelationshipStatus().name()));
+    }
+
+    private UserIdentificationDataWithRolesVO createUserIdentificationDataVO(final IUserWithRolesSearchResultVO userSearchResultVO) {
+        final List<EnumUserRole> roles = userSearchResultVO.getRoles().stream()
+                .map(IUserVO.EnumUserRole::name)
+                .map(EnumUserRole::valueOf)
+                .collect(Collectors.toList());
+        return new UserIdentificationDataWithRolesVO()
+                .login(userSearchResultVO.getLogin())
+                .name(userSearchResultVO.getName())
+                .roles(roles);
     }
 }

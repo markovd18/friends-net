@@ -1,7 +1,7 @@
 package cz.markovda.friendsnet.auth.dos.impl;
 
 import cz.markovda.friendsnet.auth.dos.EnumUserRole;
-import cz.markovda.friendsnet.auth.dos.IUserRoleDO;
+import cz.markovda.friendsnet.auth.dos.projection.IUserRoleDO;
 import lombok.Getter;
 import org.hibernate.Hibernate;
 

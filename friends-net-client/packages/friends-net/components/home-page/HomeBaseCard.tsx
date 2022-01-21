@@ -7,9 +7,10 @@ type Props = {
     login: string,
     isAdmin?: boolean,
     onNewPostClick: () => void,
+    onAdminRolesClick?: () => void,
 }
 
-const HomeBaseCard: React.FC<Props> = ({name, login, isAdmin, onNewPostClick}) => {
+const HomeBaseCard: React.FC<Props> = ({name, login, isAdmin, onNewPostClick, onAdminRolesClick}) => {
 
     return (
         <Card sx={{ maxWidth: 300, 
@@ -33,7 +34,7 @@ const HomeBaseCard: React.FC<Props> = ({name, login, isAdmin, onNewPostClick}) =
                         New post
                     </Button>
                     {isAdmin && 
-                    <Button variant='contained' size='small' color='secondary'>
+                    <Button variant='contained' size='small' color='secondary' onClick={onAdminRolesClick}>
                         <AdminPanelSettingsIcon />
                         Set admin roles
                     </Button>}

@@ -1,7 +1,7 @@
 package cz.markovda.friendsnet.auth.service.impl;
 
 import cz.markovda.friendsnet.auth.dos.EnumUserRole;
-import cz.markovda.friendsnet.auth.dos.IUserRoleDO;
+import cz.markovda.friendsnet.auth.dos.projection.IUserRoleDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
 import cz.markovda.friendsnet.auth.repository.IUserRepository;
@@ -114,6 +114,10 @@ public class UserAuthServiceImpl implements IUserAuthService {
 
         final UserDO user = userRepository.findByLoginFetchRoles(username)
                 .orElseThrow(() -> new IllegalArgumentException("User with username " + username + " not found"));
+
+        if (authenticationService.getLoginName().equals(user.getLogin())) {
+            throw new IllegalArgumentException("User may not change his own role");
+        }
 
         switch (action) {
             case ADD -> user.addRole(getUserRoleDO(EnumUserRole.valueOf(role.name())));

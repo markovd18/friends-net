@@ -1,8 +1,15 @@
 package cz.markovda.friendsnet.friendship.service.impl;
 
+import cz.markovda.friendsnet.auth.dos.impl.UserDO;
+import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
+import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
+import cz.markovda.friendsnet.auth.vos.IUserVO;
+import cz.markovda.friendsnet.auth.vos.IUserWithRolesSearchResultVO;
+import cz.markovda.friendsnet.auth.vos.impl.UserWithRolesSearchResultVO;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import cz.markovda.friendsnet.friendship.dos.projection.IUserSearchResultDO;
+import cz.markovda.friendsnet.auth.dos.projection.IUserWithRolesSearchResultDO;
 import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;
 import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
@@ -12,7 +19,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +34,7 @@ import java.util.stream.Collectors;
 public class UserSearchService implements IUserSearchService {
 
     private final IUserRelationshipRepository userRelationshipRepository;
+    private final IUserRepository userRepository;
     private final IAuthenticationService authenticationService;
 
     @Override
@@ -88,7 +98,7 @@ public class UserSearchService implements IUserSearchService {
     }
 
     @Override
-    public List<IUserSearchResultVO> findPendingRequestsForUser(String username) {
+    public List<IUserSearchResultVO> findPendingRequestsForUser(@NotNull final String username) {
         log.debug("Start of findPendingRequestsForUser (args: {}).", username);
         Assert.notNull(username, "Username may not be null");
         final List<IUserSearchResultDO> searchResults = userRelationshipRepository.findUsersWithRelationshipToUser(
@@ -98,15 +108,53 @@ public class UserSearchService implements IUserSearchService {
         return result;
     }
 
+    @Override
+    public List<IUserWithRolesSearchResultVO> findAuthenticatedUsersFriendsWithRoles() {
+        log.debug("Start of findAuthenticatedUsersFriendsWithRoles method.");
+        final String username = authenticationService.getLoginName();
+        final List<IUserWithRolesSearchResultVO> result = findUsersFriendsWithRoles(username);
+        log.debug("End of findAuthenticatedUsersFriendsWithRoles method. Found {} results.", result.size());
+        return result;
+    }
+
+    @Override
+    public List<IUserWithRolesSearchResultVO> findUsersFriendsWithRoles(@NotNull final String username) {
+        log.debug("Start of findUsersFriendsWithRoles method (args: {}).", username);
+        Assert.notNull(username, "Username may not be null");
+        final List<String> friendUsernames = userRelationshipRepository.findUsersFriends(username)
+                .stream()
+                .map(IUserSearchResultDO::getLogin)
+                .collect(Collectors.toList());
+        final List<UserDO> foundUsers = userRepository.findByLoginInFetchRoles(friendUsernames);
+        final List<IUserWithRolesSearchResultVO> result = createSearchWithRolesResults(foundUsers);
+        log.debug("End of findUsersFriendsWithRoles method. Found {} results.", result.size());
+        return result;
+    }
+
     private List<IUserSearchResultVO> createSearchResults(final List<IUserSearchResultDO> searchResults) {
         return searchResults.stream()
                 .map(this::createSearchResultVO)
                 .collect(Collectors.toList());
     }
 
+    private List<IUserWithRolesSearchResultVO> createSearchWithRolesResults(final List<UserDO> searchResults) {
+        return searchResults.stream()
+                .map(this::createSearchWithRolesResultVO)
+                .collect(Collectors.toList());
+    }
+
     private IUserSearchResultVO createSearchResultVO(final IUserSearchResultDO searchResultDO) {
         final IUserSearchResultVO.EnumRelationshipStatus status = createRelationshipStatusVO(searchResultDO.getRelationshipStatus());
         return new UserSearchResultVO(searchResultDO.getName(), searchResultDO.getLogin(), status);
+    }
+
+    private IUserWithRolesSearchResultVO createSearchWithRolesResultVO(final UserDO searchResult) {
+        final Set<IUserVO.EnumUserRole> roles = searchResult.getRoles().stream()
+                .map(UserRoleDO::getName)
+                .map(Enum::name)
+                .map(IUserVO.EnumUserRole::valueOf)
+                .collect(Collectors.toSet());
+        return new UserWithRolesSearchResultVO(searchResult.getLogin(), searchResult.getName(), roles);
     }
 
     private IUserSearchResultVO.EnumRelationshipStatus createRelationshipStatusVO(final EnumRelationshipStatus status) {

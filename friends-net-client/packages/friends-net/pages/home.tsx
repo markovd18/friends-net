@@ -1,4 +1,4 @@
-import { NewPostDataVO, PostApi, PostVO, UserIdentificationDataVO } from "@markovda/fn-api";
+import { AdminApi, EnumUserRole, NewPostDataVO, PostApi, PostVO, UserIdentificationDataVO, UserIdentificationDataWithRolesVO, UserSearchApi } from "@markovda/fn-api";
 import { Avatar, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Fab, FormControlLabel, FormGroup, Stack, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
@@ -15,9 +15,8 @@ import OutboundChatMessage from "../utils/messaging/OutboundChatMessage";
 import InboundChatMessage from "../utils/messaging/InboundChatMessage";
 import { IFriendStatusChangeMessage } from "../utils/messaging/FriendStatusChangeMessage";
 import { FriendStatus } from "../utils/enums/FriendStatus";
-import { useAuthHeader, useInterval, useSnackbar } from "../hooks";
+import { useAuthHeader, useInterval, useSnackbar, useUserRolesDialog } from "../hooks";
 import PostList from "../components/home-page/PostList";
-import { AddBox, AddCircle } from "@mui/icons-material";
 import { hasAdminRole } from "../utils/authUtils";
 import NewPostModal from "../components/home-page/NewPostModal";
 import HomeBaseCard from "../components/home-page/HomeBaseCard";
@@ -41,6 +40,39 @@ const HomePage: NextPage = () => {
     const authHeader = useAuthHeader();
     const [Snackbar, showSnackbar] = useSnackbar();
 
+    const handleAdminToggled = async (login: string, isAdmin: boolean) => {
+        console.log("admin toggled for:", login);
+        try {
+            if (isAdmin) {
+                await AdminApi.addRoleToUser(EnumUserRole.ADMIN, login, authHeader);
+            } else {
+                await AdminApi.removeRoleFromUser(EnumUserRole.ADMIN, login, authHeader);
+            }
+        } catch(error) {
+            handleError(error);
+        }
+    }
+
+    const [adminDialog, showAdminDialog] = useUserRolesDialog(handleAdminToggled);
+
+    const fetchFriendsWithRoles = async () => {
+        const friends = (await UserSearchApi.findFriendsWithRoles(authHeader)).data;
+        return friends.map(friend => ({
+            login: friend.login, 
+            name: friend.name, 
+            isAdmin: friend.roles ? friend.roles.some(role => role === EnumUserRole.ADMIN) : false
+        }));
+    }
+
+    const handleShowAdminDialog = async () => {
+        try {
+            const data = await fetchFriendsWithRoles();
+            showAdminDialog(data);
+        } catch (error) {
+            handleError(error);
+        }
+    }
+
     const fetchNewPosts = async () => {
         const latestPost = posts.at(0);
         let newPosts: PostVO[];
@@ -54,8 +86,12 @@ const HomePage: NextPage = () => {
     }
 
     const fetchBasePosts = async () => {
-        const posts = (await PostApi.findNewestPosts(10, undefined, authHeader)).data;
-        setPosts(() => posts);
+        try {
+            const posts = (await PostApi.findNewestPosts(10, undefined, authHeader)).data;
+            setPosts(() => posts);
+        } catch (error) {
+            handleError(error);
+        }
     }
 
     const handleError = useCallback((error) => {
@@ -69,7 +105,7 @@ const HomePage: NextPage = () => {
                 logoutUser();
                 break;
             case 400:
-                showSnackbar('Invalid post data sent. Please try again.', 'warning');
+                showSnackbar('Invalid request sent. Please try again.', 'warning');
                 break;
             default:
                 showSnackbar('Unknown error while creating post. Please try again later.', 'warning');
@@ -179,6 +215,7 @@ const HomePage: NextPage = () => {
                         login={login}
                         onNewPostClick={() => setShowPostInput(true)}
                         isAdmin={hasAdminRole(roles)}
+                        onAdminRolesClick={handleShowAdminDialog}
                     />
                     <NewPostModal 
                         open={showPostInput}
@@ -186,6 +223,8 @@ const HomePage: NextPage = () => {
                         onClose={() => setShowPostInput(false)}
                         onSubmit={onPostSubmit}
                     />
+
+                    {adminDialog}
                     <PostList 
                         data={posts}
                         elevation={0}

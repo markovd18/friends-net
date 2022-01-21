@@ -4,9 +4,9 @@ import SimpleSnackbar from "../components/SimpleSnackbar";
 
 const useSnackbar = (): [JSX.Element, (message: string, severity: AlertColor) => void] => {
 
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+    const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>();
 
     const handleSnackbarClose = useCallback(() => {
         setSnackbarOpen(false);
@@ -21,7 +21,7 @@ const useSnackbar = (): [JSX.Element, (message: string, severity: AlertColor) =>
     const Snackbar = <SimpleSnackbar 
                         open={snackbarOpen} 
                         message={snackbarMessage} 
-                        severity={snackbarSeverity as AlertColor} 
+                        severity={snackbarSeverity} 
                         handleClose={handleSnackbarClose}
                     />
 

@@ -1,5 +1,6 @@
 package cz.markovda.friendsnet.friendship.service;
 
+import cz.markovda.friendsnet.auth.vos.IUserWithRolesSearchResultVO;
 import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;
 
 import javax.validation.constraints.NotNull;
@@ -24,4 +25,8 @@ public interface IUserSearchService {
     List<IUserSearchResultVO> findPendingRequestsForAuthenticatedUser();
 
     List<IUserSearchResultVO> findPendingRequestsForUser(@NotNull String username);
+
+    List<IUserWithRolesSearchResultVO> findAuthenticatedUsersFriendsWithRoles();
+
+    List<IUserWithRolesSearchResultVO> findUsersFriendsWithRoles(@NotNull String username);
 }

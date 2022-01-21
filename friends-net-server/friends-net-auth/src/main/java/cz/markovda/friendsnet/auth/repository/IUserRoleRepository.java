@@ -1,7 +1,7 @@
 package cz.markovda.friendsnet.auth.repository;
 
 import cz.markovda.friendsnet.auth.dos.EnumUserRole;
-import cz.markovda.friendsnet.auth.dos.IUserRoleDO;
+import cz.markovda.friendsnet.auth.dos.projection.IUserRoleDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

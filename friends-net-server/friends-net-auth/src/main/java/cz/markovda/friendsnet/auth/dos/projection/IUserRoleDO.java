@@ -1,4 +1,6 @@
-package cz.markovda.friendsnet.auth.dos;
+package cz.markovda.friendsnet.auth.dos.projection;
+
+import cz.markovda.friendsnet.auth.dos.EnumUserRole;
 
 /**
  * @author <a href="mailto:">David Markov</a>

@@ -5,6 +5,7 @@ import useUserData from "./useUserData";
 import useUnauthRedirect from "./useUnauthRedirect";
 import useMessagingConnection from "./useMessagingConnection";
 import useInterval from "./useInterval";
+import useUserRolesDialog from "./useUserRolesDialog";
 
 export {
     useSnackbar,
@@ -13,5 +14,6 @@ export {
     useUserData,
     useUnauthRedirect,
     useMessagingConnection as useMessagingSocket,
-    useInterval
+    useInterval,
+    useUserRolesDialog
 }

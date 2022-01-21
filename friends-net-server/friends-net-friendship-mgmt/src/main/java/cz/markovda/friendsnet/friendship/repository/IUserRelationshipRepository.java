@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,7 +48,6 @@ public interface IUserRelationshipRepository extends JpaRepository<UserRelations
             "AND (ur.receiver.login = :firstLogin OR ur.receiver.login = :secondLogin)")
     boolean existsByUsernames(String firstLogin, String secondLogin);
 
-    @Transactional(readOnly = true)
     @Query(value = "SELECT au.name as name, au.login as login, rs.name as relationshipStatus FROM auth_user au " +
             "LEFT JOIN user_relationship ur ON au.id IN (ur.id_sender, ur.id_receiver) " +
             "AND (SELECT id from auth_user WHERE login = :authUsername) IN (ur.id_sender, ur.id_receiver) " +
@@ -58,7 +56,6 @@ public interface IUserRelationshipRepository extends JpaRepository<UserRelations
     List<IUserSearchResultDO> findPotentialFriendsWithNameLike(@Param("authUsername") String authUsername,
                                                                @Param("soughtName") String soughtNameLike);
 
-    @Transactional(readOnly = true)
     @Query(value = "SELECT au.login as login, au.name as name, 'FRIENDS' as relationshipStatus " +
             "FROM auth_user au " +
             "INNER JOIN user_relationship ur ON au.id IN (ur.id_sender, ur.id_receiver) " +
@@ -68,7 +65,6 @@ public interface IUserRelationshipRepository extends JpaRepository<UserRelations
             "WHERE rs.name = 'FRIENDS'", nativeQuery = true)
     List<IUserSearchResultDO> findUsersFriends(@Param("username") String username);
 
-    @Transactional(readOnly = true)
     @Query(value = "SELECT au.login as login, au.name as name FROM auth_user au " +
             "INNER JOIN user_relationship ur on au.id IN (ur.id_sender, ur.id_receiver) " +
                 "AND (SELECT id from auth_user WHERE login = :userLogin) IN (ur.id_sender, ur.id_receiver) " +
@@ -77,7 +73,6 @@ public interface IUserRelationshipRepository extends JpaRepository<UserRelations
             "WHERE rs.name = 'FRIENDS' AND au.login IN :usernames", nativeQuery = true)
     List<IUserSearchResultDO> findUsersFriendsByUsernameIn(@Param("userLogin") String userLogin, @Param("usernames") Set<String> usernames);
 
-    @Transactional(readOnly = true)
     @Query("SELECT au.login as login, au.name as name, ur.status.name as relationshipStatus " +
             "FROM auth_user au INNER JOIN user_relationship ur ON au.id = ur.id.idSender " +
             "WHERE ur.receiver.login = :username AND ur.status.name = :statusName")

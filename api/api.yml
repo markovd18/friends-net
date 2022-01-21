@@ -188,6 +188,19 @@ paths:
         '401':
           description: Unauthenticated
 
+  '/api/users/friends-roles':
+    get:
+      summary: Finds user's friends with roles.
+      description: Finds all users that are friends with authenticated user including their roles.
+      tags:
+        - UserSearchController
+      operationId: findFriendsWithRoles
+      responses:
+        '200':
+          $ref: '#/components/responses/UserWithRolesSearchResponse'
+        '401':
+          description: Unauthenticated
+
   '/api/post':
     post:
       summary: Creates new post
@@ -285,6 +298,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/FoundUsersVO'
+
+    UserWithRolesSearchResponse:
+      description: Response on successfull user with roles search query.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FoundUsersWithRolesVO'
 
     FoundPostsResponse:
       description: Response on successfull post query.
@@ -457,6 +477,21 @@ components:
         - name
         - login
 
+    UserIdentificationDataWithRolesVO:
+      description: Object with user's identification data and roles.
+      allOf:
+        - $ref: '#/components/schemas/UserIdentificationDataVO'
+        - type: object
+          properties:
+            roles:
+              type: array
+              items:
+                $ref: '#/components/schemas/EnumUserRole'
+      required:
+        - name
+        - login
+        - roles
+
     UserAuthenticationVO:
       description: Object carrying logged in user's detail information and generated JSON Web Token for authentication.
       type: object
@@ -503,6 +538,12 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/UserRelationshipVO'
+      
+    FoundUsersWithRolesVO:
+      description: Object carrying a list of found users including their roles.
+      type: array
+      items:
+        $ref: '#/components/schemas/UserIdentificationDataWithRolesVO'
 
     FoundPostsVO:
       description: Object carrying a list of found posts.

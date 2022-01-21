@@ -1,5 +1,6 @@
 package cz.markovda.friendsnet.friendship.service.impl;
 
+import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import cz.markovda.friendsnet.friendship.dos.projection.IUserSearchResultDO;
@@ -33,7 +34,7 @@ public class UserSearchServiceTest {
         authenticationService = mock(IAuthenticationService.class);
         userRelationshipRepository = mock(IUserRelationshipRepository.class);
 
-        userSearchService = new UserSearchService(userRelationshipRepository, authenticationService);
+        userSearchService = new UserSearchService(userRelationshipRepository, mock(IUserRepository.class), authenticationService);
     }
 
     @Test
