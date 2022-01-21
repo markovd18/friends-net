@@ -223,7 +223,6 @@ const HomePage: NextPage = () => {
                         </Stack>
                         <PostList 
                             data={posts}
-                            elevation={0}
                             style={{ 
                                 minWidth: {xs: '90%', sm: 250}, flex: 1, 
                                 display: "flex", flexDirection: "column", 
