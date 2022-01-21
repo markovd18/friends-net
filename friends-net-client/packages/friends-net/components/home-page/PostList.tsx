@@ -1,5 +1,5 @@
 import { PostVO } from "@markovda/fn-api"
-import { Card, CardContent, SxProps, Theme } from "@mui/material";
+import { Card, CardContent, Stack, SxProps, Theme } from "@mui/material";
 import { useMemo } from "react"
 import PostCard from "./PostCard";
 
@@ -19,11 +19,11 @@ const PostList: React.FC<Props> = ({data, elevation, style}) => {
     }, [data]);
 
     return (
-        <Card elevation={elevation} sx={style}>
-            <CardContent>
+        <Stack sx={style}>
+            
                 {posts}
-            </CardContent>
-        </Card>
+            
+        </Stack>
     )
 }
 

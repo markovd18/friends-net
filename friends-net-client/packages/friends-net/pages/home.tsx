@@ -1,4 +1,4 @@
-import { AdminApi, EnumUserRole, NewPostDataVO, PostApi, PostVO, UserIdentificationDataVO, UserIdentificationDataWithRolesVO, UserSearchApi } from "@markovda/fn-api";
+import { AdminApi, EnumUserRole, NewPostDataVO, PostApi, PostVO, UserIdentificationDataVO, UserSearchApi } from "@markovda/fn-api";
 import { NextPage } from "next";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
@@ -19,6 +19,7 @@ import PostList from "../components/home-page/PostList";
 import { hasAdminRole } from "../utils/authUtils";
 import NewPostModal from "../components/home-page/NewPostModal";
 import HomeBaseCard from "../components/home-page/HomeBaseCard";
+import { Stack } from "@mui/material";
 
 type Messages = {
     [login: string]: ChatMessage[]
@@ -207,30 +208,36 @@ const HomePage: NextPage = () => {
             <main>
                 <Navbar />
                 <PageContentContainer>
-                    <HomeBaseCard 
-                        name={name}
-                        login={login}
-                        onNewPostClick={() => setShowPostInput(true)}
-                        isAdmin={hasAdminRole(roles)}
-                        onAdminRolesClick={handleShowAdminDialog}
-                    />
+                    <Stack direction={{xs: "column", sm: "row"}} alignItems={{xs: "center", sm: "normal"}}>
+
+                        <Stack direction={"column"} position={{xs: "static", sm: "fixed"}}>
+                            <HomeBaseCard 
+                                name={name}
+                                login={login}
+                                onNewPostClick={() => setShowPostInput(true)}
+                                isAdmin={hasAdminRole(roles)}
+                                onAdminRolesClick={handleShowAdminDialog}
+                            />
+
+                            <OnlineUsersList data={onlineUsers} onItemClick={showChat}/>
+                        </Stack>
+                        <PostList 
+                            data={posts}
+                            elevation={0}
+                            style={{ 
+                                minWidth: {xs: '90%', sm: 250}, flex: 1, 
+                                display: "flex", flexDirection: "column", 
+                                marginLeft: {xs: 0, sm: 40} }}
+                        />
+                    </Stack>
+
                     <NewPostModal 
                         open={showPostInput}
                         isAdmin={hasAdminRole(roles)}
                         onClose={() => setShowPostInput(false)}
                         onSubmit={onPostSubmit}
                     />
-
                     {adminDialog}
-                    <PostList 
-                        data={posts}
-                        elevation={0}
-                        style={{ 
-                            minWidth: 200, padding: 4, flex: 1, 
-                            display: "flex", flexDirection: "column", 
-                            marginLeft: 40 }}
-                    />
-                    <OnlineUsersList data={onlineUsers} onItemClick={showChat}/>
                     <PopupChat 
                         hidden={chatHidden}
                         chatWith={chatWith?.name}

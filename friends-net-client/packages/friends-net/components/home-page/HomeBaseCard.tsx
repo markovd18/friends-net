@@ -17,7 +17,7 @@ const HomeBaseCard: React.FC<Props> = ({name, login, isAdmin, onNewPostClick, on
             minWidth: 100, padding: 4, flex: 1, 
            display: "flex", flexDirection: "column", 
            justifyContent: "center", alignContent: "center",
-           position: "fixed"}}>
+           }}>
            <CardContent>
                 <BaseCardUserIdentification 
                     name={name}
