@@ -1,6 +1,12 @@
-# Install dependencies only when needed
+# Dockerfile is composed in a way that requires the context passed to Docker
+# daemon to have root in this project's root directory (meaning parent directory
+# to this one)
+#
+# To build the project, please use the docker-compose.yml file in project root
+# or execute 'docker build -f friends-net-server/Dockerfile . ' in project root.
 
-# skripty pro sestavení závislostí v samostatném kontejneru
+
+#   Dependencies container, installing all necessary dependencies and generating API
 
 FROM node:alpine AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -13,9 +19,7 @@ COPY ./api ../api
 RUN yarn install --frozen-lockfile
 
 
-# skripty k sestavení projektu v samostatném kontejneru
-
-# # Rebuild the source code only when needed
+#   Builder container creating production build
 FROM node:alpine AS builder
 WORKDIR /app/client
 COPY ./friends-net-client/ .
@@ -24,8 +28,6 @@ COPY --from=deps /app/client/packages/friends-net/node_modules ./packages/friend
 COPY --from=deps /app/client/packages/friends-net-api ./packages/friends-net-api
 RUN yarn build && yarn install --production --ignore-scripts --prefer-offline
 
-
-# skripty k nakopírování binárek a spuštění aplikace
 
 # Production image, copy all the files and run next
 FROM node:alpine AS runner
@@ -39,20 +41,12 @@ RUN adduser -S nextjs -u 1001
 # You only need to copy next.config.js if you are NOT using the default configuration
 # COPY --from=builder /app/next.config.js ./
 
-# použít, pokud se instalují závislosti a build z kontejnerů - z lokálu stačí varianta níže
 COPY --from=builder /app/client/packages/friends-net/public ./packages/friends-net/public
 COPY --from=builder --chown=nextjs:nodejs /app/client/packages/friends-net/.next ./packages/friends-net/.next
 COPY --from=builder /app/client/node_modules ./node_modules
 COPY --from=builder /app/client/packages/friends-net/node_modules ./packages/friends-net/node_modules
 COPY --from=builder /app/client/packages/friends-net/package.json ./packages/friends-net/package.json
 COPY --from=builder /app/client/package.json ./package.json
-
-# COPY packages/friends-net/public ./packages/friends-net/public
-# COPY --chown=nextjs:nodejs packages/friends-net/.next ./packages/friends-net/.next
-# COPY node_modules ./node_modules
-# COPY packages/friends-net/node_modules ./packages/friends-net/node_modules
-# COPY package.json ./package.json
-# COPY packages/friends-net/package.json ./packages/friends-net/package.json
 
 USER nextjs
 

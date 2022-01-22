@@ -1,6 +1,5 @@
 package cz.markovda.friendsnet.messaging.controller;
 
-import cz.markovda.friendsnet.messaging.service.IUserStatusDispatcher;
 import cz.markovda.friendsnet.messaging.vos.InboundChatMessage;
 import cz.markovda.friendsnet.messaging.vos.OutboundChatMessage;
 import io.jsonwebtoken.lang.Assert;

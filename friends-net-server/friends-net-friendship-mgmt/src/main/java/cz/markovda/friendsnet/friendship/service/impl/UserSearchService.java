@@ -9,7 +9,6 @@ import cz.markovda.friendsnet.auth.vos.IUserWithRolesSearchResultVO;
 import cz.markovda.friendsnet.auth.vos.impl.UserWithRolesSearchResultVO;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import cz.markovda.friendsnet.friendship.dos.projection.IUserSearchResultDO;
-import cz.markovda.friendsnet.auth.dos.projection.IUserWithRolesSearchResultDO;
 import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;
 import cz.markovda.friendsnet.friendship.vos.IUserSearchResultVO;

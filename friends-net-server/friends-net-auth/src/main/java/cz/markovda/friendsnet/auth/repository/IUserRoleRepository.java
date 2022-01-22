@@ -1,11 +1,10 @@
 package cz.markovda.friendsnet.auth.repository;
 
 import cz.markovda.friendsnet.auth.dos.EnumUserRole;
-import cz.markovda.friendsnet.auth.dos.projection.IUserRoleDO;
 import cz.markovda.friendsnet.auth.dos.impl.UserRoleDO;
+import cz.markovda.friendsnet.auth.dos.projection.IUserRoleDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Set;
@@ -16,10 +15,8 @@ import java.util.Set;
  */
 public interface IUserRoleRepository extends JpaRepository<UserRoleDO, Integer> {
 
-    @Transactional(readOnly = true)
     @Query("SELECT ar FROM auth_role ar")
     Set<IUserRoleDO> findAllReadOnly();
 
-    @Transactional(readOnly = true)
     Set<UserRoleDO> findAllByNameIn(final Collection<EnumUserRole> names);
 }

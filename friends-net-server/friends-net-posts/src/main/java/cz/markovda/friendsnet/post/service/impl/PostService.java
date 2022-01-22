@@ -4,7 +4,6 @@ import cz.markovda.friendsnet.auth.dos.impl.UserDO;
 import cz.markovda.friendsnet.auth.repository.IUserRepository;
 import cz.markovda.friendsnet.auth.service.IAuthenticationService;
 import cz.markovda.friendsnet.auth.service.validation.IValidator;
-import cz.markovda.friendsnet.auth.service.validation.impl.ValidationException;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.impl.UserVO;
 import cz.markovda.friendsnet.post.dos.PostDO;

@@ -3,7 +3,6 @@ package cz.markovda.friendsnet.friendship.config;
 import cz.markovda.friendsnet.friendship.dos.EnumRelationshipStatus;
 import cz.markovda.friendsnet.friendship.dos.RelationshipStatusDO;
 import cz.markovda.friendsnet.friendship.repository.IRelationshipStatusRepository;
-import cz.markovda.friendsnet.friendship.repository.IUserRelationshipRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 public class FriendshipMgmtDbConfiguration implements InitializingBean {
 
     private final IRelationshipStatusRepository relationshipStatusRepository;
-    private final IUserRelationshipRepository userRelationshipJpaRepository;
 
     @Transactional
     @Override

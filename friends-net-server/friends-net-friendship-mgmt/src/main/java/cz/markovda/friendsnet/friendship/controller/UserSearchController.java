@@ -1,7 +1,6 @@
 package cz.markovda.friendsnet.friendship.controller;
 
 import cz.markovda.api.UserSearchControllerApi;
-import cz.markovda.friendsnet.auth.dos.projection.IUserWithRolesSearchResultDO;
 import cz.markovda.friendsnet.auth.vos.IUserVO;
 import cz.markovda.friendsnet.auth.vos.IUserWithRolesSearchResultVO;
 import cz.markovda.friendsnet.friendship.service.IUserSearchService;

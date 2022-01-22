@@ -4,7 +4,6 @@ import cz.markovda.friendsnet.friendship.dos.RelationshipStatusDO;
 import cz.markovda.friendsnet.friendship.dos.projection.IRelationshipStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -16,7 +15,6 @@ import java.util.Set;
 public interface IRelationshipStatusRepository extends JpaRepository<RelationshipStatusDO, Integer> {
 
 
-    @Transactional(readOnly = true)
     @Query("SELECT rs FROM relationship_status rs")
     Set<IRelationshipStatus> findAllReadOnly();
 }

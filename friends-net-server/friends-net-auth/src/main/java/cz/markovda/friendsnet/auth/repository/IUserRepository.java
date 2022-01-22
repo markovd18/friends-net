@@ -1,7 +1,6 @@
 package cz.markovda.friendsnet.auth.repository;
 
 import cz.markovda.friendsnet.auth.dos.impl.UserDO;
-import cz.markovda.friendsnet.auth.dos.projection.IUserWithRolesSearchResultDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,8 +22,6 @@ public interface IUserRepository extends JpaRepository<UserDO, Integer> {
     Optional<UserDO> findByLogin(String login);
 
     boolean existsByLogin(String login);
-
-    Optional<Integer> findIdByLogin(String login);
 
     @Query("SELECT au.id FROM auth_user au WHERE au.login in :logins")
     Set<Integer> findIdsByLoginIn(Collection<String> logins);
