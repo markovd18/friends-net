@@ -11,6 +11,11 @@ Application is divided into [client](/friends-net-client/README.md) and [server]
 3. Execute `docker-compose build` - this builds the project from sources
 4. Execute `docker-compose up` - this bootstraps all required docker containers and runs the application stack
 
+On first startup, application contains no data. Database will be created but only necessary data will be inserted, which is:
+- default user roles
+- default user relationship statuses
+- default admin user - it's credentials are loggend into the console
+
 ## Core Features
 
 - user login and registration
