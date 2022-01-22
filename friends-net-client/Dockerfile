@@ -21,6 +21,7 @@ WORKDIR /app/client
 COPY ./friends-net-client/ .
 COPY --from=deps /app/client/node_modules ./node_modules
 COPY --from=deps /app/client/packages/friends-net/node_modules ./packages/friends-net/node_modules
+COPY --from=deps /app/client/packages/friends-net-api ./packages/friends-net-api
 RUN yarn build && yarn install --production --ignore-scripts --prefer-offline
 
 
