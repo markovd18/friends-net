@@ -1,21 +1,8 @@
 logging:
   level:
-    cz: DEBUG
-    org:
-      apache: WARN
-      springframework:
-        web: DEBUG
-        messaging: TRACE
-      hibernate:
-        SQL: DEBUG
-      type:
-        descriptor:
-          sql:
-            BasicBinder: TRACE
-    #          context:
-    #            support:
-    #              SpringBeanAutowiringSupport: ERROR
     com: INFO
+    cz: INFO
+    org: INFO
 
 spring:
   datasource:
