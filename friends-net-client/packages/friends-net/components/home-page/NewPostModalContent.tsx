@@ -10,7 +10,7 @@ const NewPostModalContent: React.FC<Props> = ({error, content, onContentChange})
     return (
         <>
             <DialogContentText gutterBottom>
-                To create new post, enter it's content bellow.
+                To create new post, enter it&apos;s content bellow.
             </DialogContentText>
             <TextField
                 multiline

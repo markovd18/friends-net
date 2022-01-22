@@ -60,7 +60,7 @@ public class UserRoleDO implements IUserRoleDO {
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 }

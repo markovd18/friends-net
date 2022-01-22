@@ -19,7 +19,7 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/friends-net-db
+    url: jdbc:postgresql://friends-net-db:5432/friends-net-db
     username: root
     password: superstrongpassword
 

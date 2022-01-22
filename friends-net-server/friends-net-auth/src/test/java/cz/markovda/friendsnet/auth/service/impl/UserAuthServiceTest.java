@@ -90,27 +90,6 @@ public class UserAuthServiceTest {
     }
 
     @Test
-    public void registersNewValidUser() {
-        final IUserVO userVO = new UserVO("login", "password", "Sir John", Set.of(IUserVO.EnumUserRole.USER));
-        final String encodedPassword = "super-encoded-password";
-        final var roles = new HashSet<UserRoleDO>(1);
-        roles.add(UserDOTestUtils.prepareRoleDO(EnumUserRole.USER));
-
-        final UserDO userToSave = UserDOTestUtils.prepareUserDO(1, userVO.getLogin(), encodedPassword, roles);
-
-        when(userRepository.existsByLogin(userVO.getLogin())).thenReturn(false);
-//        doReturn(userToSave).when(userRepository.save()).thenReturn(userToSave);
-//        TODO create DO factory to decompose userDO constructor from service
-        when(passwordEncoder.encode(userVO.getPassword())).thenReturn(encodedPassword);
-
-        final IUserVO createdUser = userAuthService.createNewUser(userVO);
-        assertAll(() -> assertNotNull(createdUser, "Created user may not be NULL!"),
-                () -> assertEquals(userVO.getLogin(), createdUser.getLogin(), "Login of created user has to be equal to the argument!"),
-                () -> assertNull(createdUser.getPassword(), "Password of created user should not be returned!"),
-                () -> assertIterableEquals(userVO.getRoles(), createdUser.getRoles(), "Created user has to have role USER!"));
-    }
-
-    @Test
     public void throwsWhenRegisteredUserExists() {
         final IUserVO userVO = new UserVO("great", "stuff", "Nameless", Set.of(IUserVO.EnumUserRole.ADMIN));
 

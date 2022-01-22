@@ -56,7 +56,7 @@ public class UserSearchServiceTest {
         final IUserSearchResultVO searchResultVO = prepareSearchResultVO(foundUser);
 
         when(authenticationService.getLoginName()).thenReturn(authUser);
-        when(userRelationshipRepository.findPotentialFriendsWithNameLike(authUser, searchString))
+        when(userRelationshipRepository.findPotentialFriendsWithNameLike(authUser, "%" + searchString + "%"))
                 .thenReturn(List.of(foundUser));
 
         final List<IUserSearchResultVO> foundUsers = userSearchService.findUsersWithNamesContainingString(searchString);

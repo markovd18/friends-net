@@ -16,7 +16,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>((
   ) => {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
-  
+Alert.displayName = 'Alert';
 
 const SimpleSnackbar: React.FC<Props> = ({open, handleClose, message, severity, position}) => {
 

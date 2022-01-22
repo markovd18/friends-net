@@ -1,4 +1,12 @@
-import { AdminApi, EnumUserRole, NewPostDataVO, PostApi, PostVO, UserIdentificationDataVO, UserSearchApi } from "@markovda/fn-api";
+import { 
+    AdminApi, 
+    EnumUserRole, 
+    NewPostDataVO, 
+    PostApi, 
+    PostVO, 
+    UserIdentificationDataVO, 
+    UserSearchApi 
+} from "@markovda/fn-api";
 import { NextPage } from "next";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
@@ -101,6 +109,7 @@ const HomePage: NextPage = () => {
 
         switch(error.response.status) {
             case 401:
+            case 403:
                 logoutUser();
                 break;
             case 400:
@@ -121,7 +130,13 @@ const HomePage: NextPage = () => {
         }
     }
 
-    useInterval(fetchNewPosts, 20000);
+    useInterval(async () => {
+        try {
+            await fetchNewPosts();
+        } catch (error) {
+            handleError(error);
+        }
+    }, 20000);
 
     useEffect(() => {
         if (!redirecting && authHeader) {

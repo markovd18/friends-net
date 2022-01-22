@@ -8,7 +8,7 @@ import cz.markovda.friendsnet.auth.dos.EnumUserRole;
  */
 public interface IUserRoleDO {
 
-    int getId();
+    Integer getId();
 
     EnumUserRole getName();
 }

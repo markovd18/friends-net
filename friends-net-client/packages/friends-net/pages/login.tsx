@@ -28,6 +28,7 @@ const LoginPage: NextPage = () => {
         switch (error.response.status){
             case 400:
             case 401:
+            case 403:
                 showSnackbar('E-mail or password are incorrect', 'warning');
                 break;
             case 404:

@@ -53,7 +53,7 @@ const LoginForm: React.FC<Props> = ({onSubmit}) => {
                     Sign In
                 </Button>    
                 <Link href='/register' underline='hover'>
-                    Don't have an account yet? Create one now.
+                    Don&apos;t have an account yet? Create one now.
                 </Link>
             </Stack>
         </form>

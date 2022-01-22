@@ -42,7 +42,7 @@ const FriendshipsPageContent: React.FC<Props> = ({
     const renderSearchResultHeader = () => {
         return (
             <Typography variant="h4">
-                Search results for "{lastSearchString}":
+                Search results for &quot;{lastSearchString}&quot;:
             </Typography>
         )
     }

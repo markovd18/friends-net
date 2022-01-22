@@ -75,6 +75,7 @@ const FriendshipsPage : NextPage = () => {
 
         switch (error.response.status) {
             case 401:
+            case 403:
                 logoutUser();
                 break;
             case 404:
@@ -96,6 +97,7 @@ const FriendshipsPage : NextPage = () => {
                 showSnackbar('Target user not found', 'warning');
                 break;
             case 401:
+            case 403:
                 logoutUser();
                 break;
             case 404:
@@ -195,7 +197,7 @@ const FriendshipsPage : NextPage = () => {
                                     {showingSearchResults && 
                                         <>
                                             <Typography variant="h4">
-                                                Search results for "{lastSearchString}":
+                                                Search results for &quot;{lastSearchString}&quot;:
                                             </Typography>
                                         </>}
                                     

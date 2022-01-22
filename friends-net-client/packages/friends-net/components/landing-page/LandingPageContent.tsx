@@ -11,7 +11,7 @@ const LandingPageContent: React.FC<{}> = () => {
 
           <Link className={styles.card} href='/register'>
             <h2>Sign Up &rarr;</h2>
-            <p>Don't have an account yet? Don't worry you can register right now!</p>
+            <p>Don&apos;t have an account yet? Don&apos;t worry you can register right now!</p>
           </Link>
         </div>
     )
