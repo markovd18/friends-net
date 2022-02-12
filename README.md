@@ -25,6 +25,10 @@ On first startup, application contains no data. Database will be created but onl
 - adding friends and blocking specific users
 - user role settings for admin users
 
+## Bonus features
+
+- Open API, React Front-End client, git version control
+
 ## Technology stack
 
 ### Back-end
